@@ -40,7 +40,7 @@ button.addEventListener('click',()=>{
     setTimeout(()=>{blast.hidden=true;card.classList.remove('is-exploded');taps=[];button.textContent='運命を回す'},2600);return;
   }
   if(spinning)return;
-  spinning=true;button.textContent='なおキング、裁定中…';message.textContent='なおキングが今日の運勢を読んでいる……たぶん適当だ。';
+  spinning=true;button.textContent='なおキング採点中・連打厳禁…';message.textContent='なおキングが今日の運勢を読んでいる……たぶん適当だ。';
   reel.innerHTML=fortunes.concat(fortunes,fortunes).map(tile).join('');slot.classList.add('is-spinning');
   const next=Math.floor(Math.random()*fortunes.length);
   spinTimer=setTimeout(()=>{const f=fortunes[next];slot.classList.remove('is-spinning');reel.innerHTML=tile(f);nameEl.textContent=f.name;message.textContent=f.lines[Math.floor(Math.random()*f.lines.length)];button.textContent='運命を回す';spinning=false},1700);
