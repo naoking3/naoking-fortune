@@ -24,6 +24,7 @@ const navLinks=[...document.querySelectorAll('[data-tab]')];
 const nav=document.querySelector('#site-nav');
 const menuButton=document.querySelector('#menu-button');
 function openTab(name){
+  if(name!=="game")gameStop();
   if(name!=="fortune"&&locked)canReset=true;
   if(name==="fortune"&&locked&&canReset){
     locked=false;canReset=false;blast.hidden=true;card.classList.remove('is-exploded');taps=[];
@@ -61,3 +62,36 @@ button.addEventListener('click',()=>{
   const next=Math.floor(Math.random()*fortunes.length);
   spinTimer=setTimeout(()=>{const f=fortunes[next];slot.classList.remove('is-spinning');reel.innerHTML=tile(f);nameEl.textContent=f.name;message.textContent=f.lines[Math.floor(Math.random()*f.lines.length)];button.textContent='運命を回す';spinning=false},1700);
 });
+
+const canvas=document.querySelector('#swim-game');
+const ctx=canvas.getContext('2d');
+const gameStart=document.querySelector('#game-start');
+const gameScore=document.querySelector('#game-score');
+const gameStatus=document.querySelector('#game-status');
+const gameResult=document.querySelector('#game-result');
+const sharkSprite=new Image();
+sharkSprite.src='naoking-1.png';
+let gameRunning=false,gameFrame,gameX=330,gameScoreValue=0,gameItems=[],gameEndsAt=0,lastSpawn=0,moveDirection=0;
+function gameDraw(){
+  const w=canvas.width,h=canvas.height;
+  const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#42a9c6');sky.addColorStop(1,'#06374e');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='#d5f8ff55';for(let i=0;i<15;i++){ctx.beginPath();ctx.arc((i*71+30)%w,35+(i*47)%250,3+(i%4),0,Math.PI*2);ctx.fill()}
+  gameItems.forEach(item=>{if(item.kind==='fish'){ctx.fillStyle='#ffdd89';ctx.beginPath();ctx.ellipse(item.x,item.y,14,8,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.moveTo(item.x+12,item.y);ctx.lineTo(item.x+25,item.y-10);ctx.lineTo(item.x+25,item.y+10);ctx.fill()}else if(item.kind==='rock'){ctx.fillStyle='#314b5b';ctx.beginPath();ctx.arc(item.x,item.y,22,Math.PI,0);ctx.lineTo(item.x+22,item.y+28);ctx.lineTo(item.x-22,item.y+28);ctx.fill()}else{ctx.strokeStyle='#d8f7ff';ctx.lineWidth=4;ctx.strokeRect(item.x-19,item.y-19,38,38);ctx.beginPath();ctx.moveTo(item.x-19,item.y-19);ctx.lineTo(item.x+19,item.y+19);ctx.moveTo(item.x+19,item.y-19);ctx.lineTo(item.x-19,item.y+19);ctx.stroke()}});
+  if(sharkSprite.complete)ctx.drawImage(sharkSprite,gameX,255,92,70);else{ctx.fillStyle='#9bd6e5';ctx.fillRect(gameX,270,90,35)}
+}
+function endGame(reason){gameRunning=false;cancelAnimationFrame(gameFrame);gameStart.disabled=false;gameStart.textContent='もう一度回遊する';gameStatus.textContent='なおキング、帰港。';const rank=gameScoreValue>=9?'海の支配者':gameScoreValue>=5?'背びれ絶好調':'小魚以下';gameResult.textContent=`今回の回遊評価：${rank}。エサ${gameScoreValue}匹。${reason}`}
+function gameLoop(now){
+  if(!gameRunning)return;
+  if(!lastSpawn||now-lastSpawn>620){const roll=Math.random();gameItems.push({x:30+Math.random()*660,y:-30,kind:roll<.58?'fish':roll<.82?'rock':'net',speed:2.2+Math.random()*2.4});lastSpawn=now}
+  gameX=Math.max(0,Math.min(canvas.width-92,gameX+moveDirection*7));
+  gameItems.forEach(item=>item.y+=item.speed);gameItems=gameItems.filter(item=>item.y<400);
+  for(let i=gameItems.length-1;i>=0;i--){const item=gameItems[i];if(item.y>245&&item.y<330&&Math.abs((item.x)-(gameX+46))<45){if(item.kind==='fish'){gameScoreValue++;gameItems.splice(i,1);gameScore.textContent=gameScoreValue}else{gameDraw();endGame('障害物に当たった。王様なのに。');return}}}
+  gameDraw();gameStatus.textContent=`なおキング回遊中。残り${Math.max(0,Math.ceil((gameEndsAt-now)/1000))}秒。`;
+  if(now>=gameEndsAt){endGame('生還した。まあ、当然だな。');return}gameFrame=requestAnimationFrame(gameLoop)
+}
+function startGame(){gameRunning=true;gameX=330;gameScoreValue=0;gameItems=[];lastSpawn=0;moveDirection=0;gameScore.textContent='0';gameStart.disabled=true;gameStart.textContent='回遊中…';gameResult.textContent='魚は取れ。岩と網は避けろ。常識だ。';gameEndsAt=performance.now()+15000;gameFrame=requestAnimationFrame(gameLoop)}
+function gameStop(){if(gameRunning){gameRunning=false;cancelAnimationFrame(gameFrame);gameStart.disabled=false;gameStart.textContent='回遊を始める';gameStatus.textContent='なおキング、寄り道中。'}}
+gameStart.addEventListener('click',startGame);
+document.querySelectorAll('[data-move]').forEach(control=>{const dir=control.dataset.move==='left'?-1:1;control.addEventListener('pointerdown',()=>moveDirection=dir);['pointerup','pointerleave','pointercancel'].forEach(type=>control.addEventListener(type,()=>moveDirection=0))});
+window.addEventListener('keydown',event=>{if(event.key==='ArrowLeft')moveDirection=-1;if(event.key==='ArrowRight')moveDirection=1});window.addEventListener('keyup',event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight')moveDirection=0});
+gameDraw();
