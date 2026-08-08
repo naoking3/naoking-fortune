@@ -7,6 +7,6 @@
 }
 
 @media (max-width: 760px) {
-  .page h1 em { font-size: clamp(38px, 11vw, 48px); }
+  .page h1 em { font-size: clamp(32px, 10vw, 44px); }
   .brand b { font-size: 28px; }
 }
