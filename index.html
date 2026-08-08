@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>なおキングの今日の運勢</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <div class="bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <section class="fortune-card" id="card">
+      <p class="eyebrow">SHARK FORTUNE TERMINAL ・きょうの判定</p>
+      <h1>なおキングの<br><em>今日の運勢</em></h1>
+      <p class="intro">サメの顔したなおキングが、<br>あなたの運命を雑に裁定する。</p>
+      <div class="slot-window" id="slot" aria-label="今日の運勢">
+        <div class="pointer" aria-hidden="true">▼</div>
+        <div class="slot-reel" id="reel"><div class="shark-tile"><img class="shark-face" id="shark" src="naoking-1.png" alt="なおキング"></div></div>
+      </div>
+      <div class="result" aria-live="polite">
+        <span>本日のサメ式判定</span>
+        <strong id="fortune-name">海の支配者</strong>
+        <p id="message">ボタンを押せ。なおキングが、あなたの都合を見ずに今日の運勢を決める。</p>
+      </div>
+      <button type="button" id="spin">運命を回す</button>
+      <p class="footnote">※ なおキングは責任を取りません。サメなので。</p>
+      <div class="blast" id="blast" hidden><b>💥</b><span>おい、連打するな！</span></div>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
