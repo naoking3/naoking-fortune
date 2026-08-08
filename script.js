@@ -92,6 +92,6 @@ function gameLoop(now){
 function startGame(){gameRunning=true;gameX=330;gameScoreValue=0;gameItems=[];lastSpawn=0;moveDirection=0;gameScore.textContent='0';gameStart.disabled=true;gameStart.textContent='回遊中…';gameResult.textContent='魚は取れ。岩と網は避けろ。常識だ。';gameEndsAt=performance.now()+15000;gameFrame=requestAnimationFrame(gameLoop)}
 function gameStop(){if(gameRunning){gameRunning=false;cancelAnimationFrame(gameFrame);gameStart.disabled=false;gameStart.textContent='回遊を始める';gameStatus.textContent='なおキング、寄り道中。'}}
 gameStart.addEventListener('click',startGame);
-document.querySelectorAll('[data-move]').forEach(control=>{const dir=control.dataset.move==='left'?-1:1;control.addEventListener('pointerdown',()=>moveDirection=dir);['pointerup','pointerleave','pointercancel'].forEach(type=>control.addEventListener(type,()=>moveDirection=0))});
+document.querySelectorAll('[data-move]').forEach(control=>{const dir=control.dataset.move==='left'?-1:1;control.addEventListener('pointerdown',event=>{event.preventDefault();moveDirection=dir});['pointerup','pointerleave','pointercancel'].forEach(type=>control.addEventListener(type,event=>{event.preventDefault();moveDirection=0}));['contextmenu','selectstart','dblclick'].forEach(type=>control.addEventListener(type,event=>event.preventDefault()))});
 window.addEventListener('keydown',event=>{if(event.key==='ArrowLeft')moveDirection=-1;if(event.key==='ArrowRight')moveDirection=1});window.addEventListener('keyup',event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight')moveDirection=0});
 gameDraw();
