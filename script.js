@@ -24,6 +24,11 @@ const navLinks=[...document.querySelectorAll('[data-tab]')];
 const nav=document.querySelector('#site-nav');
 const menuButton=document.querySelector('#menu-button');
 function openTab(name){
+  if(name!=="fortune"&&locked)canReset=true;
+  if(name==="fortune"&&locked&&canReset){
+    locked=false;canReset=false;blast.hidden=true;card.classList.remove('is-exploded');taps=[];
+    reel.innerHTML=tile(fortunes[0]);nameEl.textContent='海の支配者';message.textContent='ボタンを押せ。なおキングが、あなたの都合を見ずに今日の運勢を決める。';button.textContent='運命を回す';
+  }
   pages.forEach(page=>page.classList.toggle('is-active',page.id===name));
   navLinks.forEach(link=>link.classList.toggle('is-active',link.dataset.tab===name&&link.classList.contains('nav-link')));
   nav.classList.remove('is-open');
@@ -39,16 +44,16 @@ const nameEl=document.querySelector('#fortune-name');
 const message=document.querySelector('#message');
 const button=document.querySelector('#spin');
 const blast=document.querySelector('#blast');
-let spinning=false,taps=[],spinTimer;
+let spinning=false,taps=[],spinTimer,locked=false,canReset=false;
 function tile(f){return `<div class="shark-tile"><img class="shark-face" src="naoking-${f.face}.png" alt="なおキング"></div>`}
 button.addEventListener('click',()=>{
-  if(blast.hidden===false)return;
+  if(blast.hidden===false||locked)return;
   const now=Date.now();
   taps=taps.filter(time=>now-time<2400);taps.push(now);
   if(taps.length>=3){
-    clearTimeout(spinTimer);spinning=false;slot.classList.remove('is-spinning');blast.hidden=false;card.classList.add('is-exploded');
+    clearTimeout(spinTimer);spinning=false;locked=true;canReset=false;slot.classList.remove('is-spinning');blast.hidden=false;card.classList.add('is-exploded');
     nameEl.textContent='なおキング激怒';message.textContent='連打されたので、今日の運勢はもう壊れた。';button.textContent='なおキング、停止中…';
-    setTimeout(()=>{blast.hidden=true;card.classList.remove('is-exploded');taps=[];button.textContent='運命を回す'},2600);return;
+    setTimeout(()=>{blast.hidden=true;card.classList.remove('is-exploded');taps=[];button.textContent='なおキング、怒って停止中…'},2600);return;
   }
   if(spinning)return;
   spinning=true;button.textContent='なおキング採点中・連打厳禁…';message.textContent='なおキングが今日の運勢を読んでいる……たぶん適当だ。';
