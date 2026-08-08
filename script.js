@@ -45,7 +45,7 @@ button.addEventListener('click',()=>{
   if(blast.hidden===false)return;
   const now=Date.now();
   taps=taps.filter(time=>now-time<2400);taps.push(now);
-  if(taps.length>=5){
+  if(taps.length>=3){
     clearTimeout(spinTimer);spinning=false;slot.classList.remove('is-spinning');blast.hidden=false;card.classList.add('is-exploded');
     nameEl.textContent='なおキング激怒';message.textContent='連打されたので、今日の運勢はもう壊れた。';button.textContent='なおキング、停止中…';
     setTimeout(()=>{blast.hidden=true;card.classList.remove('is-exploded');taps=[];button.textContent='運命を回す'},2600);return;
