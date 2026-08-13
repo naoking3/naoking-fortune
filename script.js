@@ -60,6 +60,7 @@ const nameEl=document.querySelector('#fortune-name');
 const message=document.querySelector('#message');
 const button=document.querySelector('#spin');
 const blast=document.querySelector('#blast');
+const rouletteStatus=document.querySelector('#roulette-status');
 let spinning=false,taps=[],spinTimer,locked=false,canReset=false;
 function tile(f){return `<div class="shark-tile"><img class="shark-face" src="naoking-${f.face}.png" alt="なおキング"></div>`}
 button.addEventListener('click',()=>{
@@ -72,10 +73,10 @@ button.addEventListener('click',()=>{
     setTimeout(()=>{blast.hidden=true;card.classList.remove('is-exploded');taps=[];button.textContent='なおキング、怒って停止中…'},2600);return;
   }
   if(spinning)return;
-  spinning=true;button.textContent='なおキング採点中・連打厳禁…';message.textContent='なおキングが今日の運勢を読んでいる……たぶん適当だ。';
+  spinning=true;const jackpot=Math.random()<.035;card.classList.toggle('is-jackpot',jackpot);slot.classList.toggle('is-jackpot',jackpot);rouletteStatus.textContent=jackpot?'RARE SIGNAL DETECTED // JACKPOT MODE':'JUDGMENT SYSTEM / SPINNING';button.textContent='なおキング採点中・連打厳禁…';message.textContent=jackpot?'……なんだこの光。なおキングが珍しく本気を出している。':'なおキングが今日の運勢を読んでいる……たぶん適当だ。';
   reel.innerHTML=fortunes.concat(fortunes,fortunes).map(tile).join('');slot.classList.add('is-spinning');
   const next=Math.floor(Math.random()*fortunes.length);
-  spinTimer=setTimeout(()=>{const f=fortunes[next];slot.classList.remove('is-spinning');reel.innerHTML=tile(f);nameEl.textContent=f.name;message.textContent=f.lines[Math.floor(Math.random()*f.lines.length)];button.textContent='運命を回す';spinning=false},1700);
+  spinTimer=setTimeout(()=>{const f=fortunes[next];slot.classList.remove('is-spinning');reel.innerHTML=tile(f);nameEl.textContent=jackpot?'虹色の支配者':f.name;message.textContent=jackpot?'激レア演出。今日は珍しく、お前を海の民として認めてやる。調子に乗るのは明日からにしろ。':f.lines[Math.floor(Math.random()*f.lines.length)];rouletteStatus.textContent=jackpot?'JACKPOT CONFIRMED // RAINBOW KING':'JUDGMENT COMPLETE // TRY AGAIN';button.textContent='運命を回す';spinning=false},1700);
 });
 
 const canvas=document.querySelector('#swim-game');
