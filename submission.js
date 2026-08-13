@@ -7,7 +7,9 @@
   const previewName = document.querySelector('#photo-preview-name');
   const status = document.querySelector('#submit-status');
   const button = form.querySelector('button[type="submit"]');
+  const creditInput = document.querySelector('#photo-credit');
   const endpoint = 'https://xagrwinvrsjhtyxtnyrh.supabase.co/storage/v1/object/naoking-photos';
+  const metadataEndpoint = 'https://xagrwinvrsjhtyxtnyrh.supabase.co/rest/v1/photo_submissions';
   const publicKey = 'sb_publishable_JDX8Rc_mXOOd_F2WHnmzKw_VMKq2Wta';
   const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
   const maxBytes = 10 * 1024 * 1024;
@@ -63,6 +65,20 @@
         body: file
       });
       if (!response.ok) throw new Error('upload failed');
+      const metadataResponse = await fetch(metadataEndpoint, {
+        method: 'POST',
+        headers: {
+          apikey: publicKey,
+          Authorization: `Bearer ${publicKey}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal'
+        },
+        body: JSON.stringify({
+          object_path: safeName,
+          nickname: creditInput.value.trim() || null
+        })
+      });
+      if (!metadataResponse.ok) throw new Error('metadata failed');
       localStorage.setItem('naokingLastUpload', String(Date.now()));
       form.reset();
       clearPreview();
