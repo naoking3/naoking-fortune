@@ -35,7 +35,9 @@ const navLinks=[...document.querySelectorAll('[data-tab]')];
 const nav=document.querySelector('#site-nav');
 const menuButton=document.querySelector('#menu-button');
 function openTab(name){
-  document.querySelector('main').classList.toggle('is-home',name==='home');
+  const main=document.querySelector('main');
+  main.classList.toggle('is-home',name==='home');
+  main.dataset.page=name;
   if(name!=="game")gameStop();
   if(name!=="fortune"&&locked)canReset=true;
   if(name==="fortune"&&locked&&canReset){
@@ -45,7 +47,8 @@ function openTab(name){
   pages.forEach(page=>page.classList.toggle('is-active',page.id===name));
   navLinks.forEach(link=>link.classList.toggle('is-active',link.dataset.tab===name&&link.classList.contains('nav-link')));
   nav.classList.remove('is-open');
-  window.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo(0,0);
+  document.querySelector(`#${name}`).scrollIntoView({block:'start'});
 }
 navLinks.forEach(link=>link.addEventListener('click',event=>{event.preventDefault();openTab(link.dataset.tab)}));
 menuButton.addEventListener('click',()=>nav.classList.toggle('is-open'));
