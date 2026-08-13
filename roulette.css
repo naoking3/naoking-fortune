@@ -15,4 +15,16 @@
 .fortune-card.is-failed{filter:grayscale(1) brightness(.42);transition:filter .22s ease}
 .fortune-card.is-revival{animation:revival-flash .18s linear 8;filter:none}
 .roulette-fx.revival{color:#fff;background:radial-gradient(circle,#fff9 0 8%,#ff2ac755 28%,#00deff44 56%,transparent 72%);text-shadow:0 0 10px #fff,0 0 30px #ff3ad4,0 0 52px #00eaff;font-size:clamp(21px,4vw,38px)}
+.roulette-fx.crown{color:#fff4ac;text-shadow:0 0 10px #fff,0 0 28px #ffb000,0 0 52px #ff7400;font-size:clamp(18px,3.8vw,34px)}
 @keyframes revival-flash{50%{filter:brightness(2.6) saturate(1.8);transform:translateY(-2px)}}
+
+/* Bad-luck variations. The dried shark literally steals a promising result. */
+.dry-shark-intruder{position:absolute;z-index:32;right:-52%;bottom:13%;width:min(54%,245px);pointer-events:none;filter:drop-shadow(0 8px 10px #000b);transform:translateX(0) rotate(10deg);opacity:0}
+.dry-shark-intruder.is-running{animation:dry-shark-steal 1.8s cubic-bezier(.2,.75,.2,1) both}
+.fortune-card.is-dry-steal{animation:dry-steal-shake .14s linear 6}
+.fortune-card.is-void-miss{filter:saturate(.45) grayscale(.3)}
+.roulette-fx.void{color:#b8c6ce;background:#0009;text-shadow:0 0 12px #9faeb8;font-size:clamp(18px,3.5vw,31px)}
+@keyframes dry-shark-steal{0%{opacity:0;transform:translateX(18%) rotate(12deg)}16%{opacity:1}56%{opacity:1;transform:translateX(-108%) rotate(-10deg)}100%{opacity:0;transform:translateX(-158%) rotate(-16deg)}}
+@keyframes dry-steal-shake{50%{transform:translateX(5px)}}
+
+.crown-rain{position:absolute;z-index:31;inset:0;overflow:hidden;pointer-events:none;opacity:0}.crown-rain i{position:absolute;top:-24%;color:#fff2a2;font:900 38px/1 serif;text-shadow:0 0 10px #ffb000,0 0 25px #ff8a00;opacity:0}.crown-rain i:nth-child(1){left:8%;animation-delay:0s}.crown-rain i:nth-child(2){left:24%;animation-delay:.18s}.crown-rain i:nth-child(3){left:43%;animation-delay:.06s}.crown-rain i:nth-child(4){left:61%;animation-delay:.24s}.crown-rain i:nth-child(5){left:77%;animation-delay:.12s}.crown-rain i:nth-child(6){left:91%;animation-delay:.3s}.crown-rain.is-raining{opacity:1}.crown-rain.is-raining i{animation:crown-fall 1.25s cubic-bezier(.24,.7,.3,1) both}.fortune-card.is-crown-drop{box-shadow:0 0 12px #fff,0 0 42px #ffb82e,inset 0 0 0 4px #ffe898!important}@keyframes crown-fall{0%{opacity:0;transform:translateY(-10px) rotate(-35deg) scale(.65)}15%{opacity:1}83%{opacity:1}100%{opacity:0;transform:translateY(420px) rotate(260deg) scale(1.25)}}

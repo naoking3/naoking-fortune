@@ -75,10 +75,34 @@
   const fx = document.createElement('div');
   fx.className = 'roulette-fx';
   card.append(fx);
+  const dryIntruder = document.createElement('img');
+  dryIntruder.className = 'dry-shark-intruder';
+  dryIntruder.src = 'naoking-7.png';
+  dryIntruder.alt = '';
+  dryIntruder.setAttribute('aria-hidden', 'true');
+  card.append(dryIntruder);
+  const crownRain = document.createElement('div');
+  crownRain.className = 'crown-rain';
+  crownRain.setAttribute('aria-hidden', 'true');
+  crownRain.innerHTML = '<i>♛</i><i>♛</i><i>♛</i><i>♛</i><i>♛</i><i>♛</i>';
+  card.append(crownRain);
   const showFx = (kind, text, duration = 1500) => {
     fx.className = `roulette-fx is-visible ${kind}`;
     fx.textContent = text;
     window.setTimeout(() => { fx.className = 'roulette-fx'; }, duration);
+  };
+  const showDryIntruder = () => {
+    dryIntruder.classList.remove('is-running');
+    // Restart the CSS animation every time the dried shark steals a result.
+    void dryIntruder.offsetWidth;
+    dryIntruder.classList.add('is-running');
+    window.setTimeout(() => dryIntruder.classList.remove('is-running'), 1800);
+  };
+  const showCrownRain = () => {
+    crownRain.classList.remove('is-raining');
+    void crownRain.offsetWidth;
+    crownRain.classList.add('is-raining');
+    window.setTimeout(() => crownRain.classList.remove('is-raining'), 1700);
   };
   let spinning = false;
   let locked = false;
@@ -113,17 +137,20 @@
     const deep = !jackpot && roll < 0.075;
     const gold = !jackpot && !deep && roll < 0.19;
     const revival = !jackpot && !deep && !gold && roll < 0.215;
-    const fake = !jackpot && !deep && !gold && !revival && roll < 0.46;
-    const duration = revival ? 2850 : jackpot ? 2350 : 1700;
+    const crownDrop = !jackpot && !deep && !gold && !revival && roll < 0.235;
+    const drySteal = !jackpot && !deep && !gold && !revival && !crownDrop && roll < 0.285;
+    const voidMiss = !jackpot && !deep && !gold && !revival && !crownDrop && !drySteal && roll < 0.35;
+    const fake = !jackpot && !deep && !gold && !revival && !crownDrop && !drySteal && !voidMiss && roll < 0.55;
+    const duration = revival ? 2850 : crownDrop ? 2450 : drySteal ? 2050 : jackpot ? 2350 : 1700;
     card.classList.toggle('is-jackpot', jackpot);
     card.classList.toggle('is-deep', deep);
     card.classList.toggle('is-gold', gold);
     card.classList.toggle('is-revival', false);
     slot.classList.toggle('is-jackpot', jackpot);
     slot.classList.toggle('is-long-spin', revival);
-    status.textContent = revival ? 'UNUSUAL DELAY // HOLD YOUR BREATH' : jackpot ? 'RARE SIGNAL DETECTED // JACKPOT MODE' : deep ? 'ABYSS SIGNAL // DEEP SEA MODE' : gold ? 'ROYAL WHIM // GOLD FLASH' : 'JUDGMENT SYSTEM / SPINNING';
+    status.textContent = revival ? 'UNUSUAL DELAY // HOLD YOUR BREATH' : crownDrop ? 'ROYAL OBJECT DETECTED // LOOK UP' : drySteal ? 'LUCKY SIGNAL // ALMOST THERE...' : voidMiss ? 'SIGNAL ERROR // TRY NOT TO CRY' : jackpot ? 'RARE SIGNAL DETECTED // JACKPOT MODE' : deep ? 'ABYSS SIGNAL // DEEP SEA MODE' : gold ? 'ROYAL WHIM // GOLD FLASH' : 'JUDGMENT SYSTEM / SPINNING';
     button.textContent = 'なおキング採点中・連打厳禁…';
-    message.textContent = revival ? '……判定が妙に長い。なおキングが何か企んでいる。' : 'なおキングが今日の運勢を読んでいる……たぶん適当だ。';
+    message.textContent = revival ? '……判定が妙に長い。なおキングが何か企んでいる。' : crownDrop ? '上から何か落ちてくる。避けるな、これはたぶん吉兆だ。' : drySteal ? '大当たりの気配。なおキングが少しだけ笑っている。' : voidMiss ? '通信が不安定。運勢まで不安定。' : 'なおキングが今日の運勢を読んでいる……たぶん適当だ。';
     if (fake) window.setTimeout(() => showFx('fake', '！？'), 510);
     if (gold) showFx('gold', 'ROYAL FLASH');
     if (deep) showFx('deep', 'DEEP SEA MODE', 1850);
@@ -152,6 +179,74 @@
           showFx('revival', 'REVIVAL!!', 2200);
           window.setTimeout(() => { card.classList.remove('is-revival', 'is-jackpot'); slot.classList.remove('is-jackpot'); }, 1500);
         }, 820);
+        return;
+      }
+      if (crownDrop) {
+        card.classList.add('is-crown-drop', 'is-jackpot');
+        slot.classList.add('is-jackpot');
+        showCrownRain();
+        showFx('crown', 'CROWN DROP!', 1900);
+        reel.innerHTML = jackpotTile();
+        nameEl.textContent = '王冠落下大当たり';
+        message.textContent = pick([
+          '王冠が空から落ちてきた。避けなかったお前の勝ちだ。',
+          '落下した王冠が判定を直撃。これは文句なしの大当たり。',
+          'なおキングの王冠が増えた。一本はお前の運だ。',
+          '上を見ろ。王冠と幸運が同時に落ちてきた。',
+          '王冠落下演出。お前、今日だけは選ばれた側だ。'
+        ]);
+        status.textContent = 'CROWN DROP JACKPOT // ROYAL IMPACT';
+        button.textContent = '運命を回す';
+        spinning = false; streak = 0;
+        window.setTimeout(() => { card.classList.remove('is-crown-drop', 'is-jackpot'); slot.classList.remove('is-jackpot'); }, 1800);
+        return;
+      }
+      if (drySteal) {
+        reel.innerHTML = normalTile({ image: 'naoking-1.png' });
+        nameEl.textContent = '海の支配者！？';
+        message.textContent = 'おお、これは当たりの予感……';
+        status.textContent = 'LUCKY SIGNAL CONFIRMED // ...';
+        showFx('gold', '大当たり！？', 1500);
+        revivalTimer = window.setTimeout(() => {
+          showDryIntruder();
+          card.classList.add('is-dry-steal');
+          reel.innerHTML = normalTile({ image: 'naoking-7.png' });
+          nameEl.textContent = '干からびた横取り';
+          message.textContent = pick([
+            '干からびたなおキングが画面外から来て、当たりを持っていった。悲しいな。',
+            '当たりはあった。だが干からびたサメが先に食べた。',
+            '大当たり寸前で干からび乱入。運は乾いた。',
+            '王冠の代わりに干からびが来た。受け入れろ。',
+            '当たりを信じたお前が悪い。干からびたなおキングより。'
+          ]);
+          status.textContent = 'DRY SHARK STOLE YOUR LUCK';
+          button.textContent = '運命を回す';
+          spinning = false;
+          window.setTimeout(() => card.classList.remove('is-dry-steal'), 1200);
+        }, 850);
+        return;
+      }
+      if (voidMiss) {
+        card.classList.add('is-void-miss');
+        reel.innerHTML = normalTile({ image: 'naoking-1.png' });
+        nameEl.textContent = '……！？';
+        message.textContent = '画面が暗くなった。まさか、これは……';
+        status.textContent = 'DEEP BLACKOUT // SOMETHING IS COMING';
+        showFx('void', '深海暗転', 1450);
+        revivalTimer = window.setTimeout(() => {
+          reel.innerHTML = normalTile({ image: 'naoking-6.png' });
+          nameEl.textContent = '海流エラー';
+          message.textContent = pick([
+            '暗転しただけだった。判定は海流に流された。',
+            '期待させておいて通信断。なおキングは昼寝に入った。',
+            '深海の正体はハズレ。お前のドキドキを返せ。',
+            '大当たりっぽい暗転からの結果なし。海は冷たい。'
+          ]);
+          status.textContent = 'NO RESULT // THE SEA REFUSED';
+          button.textContent = '運命を回す';
+          spinning = false;
+          window.setTimeout(() => card.classList.remove('is-void-miss'), 1150);
+        }, 980);
         return;
       }
       reel.innerHTML = jackpot ? jackpotTile() : normalTile(selected);
