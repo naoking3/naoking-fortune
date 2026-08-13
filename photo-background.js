@@ -6,15 +6,14 @@ photoLayers.forEach(layer=>photoBackground?.append(layer));
 function rotateBackground(){
   let next;do{next=Math.floor(Math.random()*backgroundPhotos.length)}while(next===currentPhoto&&backgroundPhotos.length>1);currentPhoto=next;
   const incoming=photoLayers.find(layer=>!layer.classList.contains('is-visible'))||photoLayers[0];
-  incoming.style.backgroundImage=`url('${backgroundPhotos[next]}')`;
-  incoming.style.backgroundPosition=`${30+Math.floor(Math.random()*41)}% ${25+Math.floor(Math.random()*41)}%`;
-  incoming.classList.add('is-visible');
+  incoming.style.backgroundImage=`url('${backgroundPhotos[next]}')`;incoming.classList.add('is-visible');
   photoLayers.filter(layer=>layer!==incoming).forEach(layer=>layer.classList.remove('is-visible'));
-  const mobilePhoto=document.querySelector('#mobile-photo');
-  if(mobilePhoto){
-    mobilePhoto.classList.add('is-changing');
-    window.setTimeout(()=>{mobilePhoto.src=backgroundPhotos[next]},700);
-    mobilePhoto.onload=()=>{window.setTimeout(()=>mobilePhoto.classList.remove('is-changing'),80)};
+  const snapshotPhotos=[...document.querySelectorAll('.snapshot-photo')];
+  if(snapshotPhotos.length){
+    const nextPhoto=snapshotPhotos.find(photo=>!photo.classList.contains('is-visible'))||snapshotPhotos[0];
+    nextPhoto.src=backgroundPhotos[next];
+    nextPhoto.onload=()=>nextPhoto.classList.add('is-visible');
+    snapshotPhotos.filter(photo=>photo!==nextPhoto).forEach(photo=>photo.classList.remove('is-visible'));
   }
 }
 rotateBackground();window.setInterval(rotateBackground,8500);
