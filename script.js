@@ -62,6 +62,16 @@ const button=document.querySelector('#spin');
 const blast=document.querySelector('#blast');
 const rouletteStatus=document.querySelector('#roulette-status');
 let spinning=false,taps=[],spinTimer,locked=false,canReset=false;
+let spinStreak=0;
+const fxLayer=document.createElement('div');
+fxLayer.className='roulette-fx';
+card.append(fxLayer);
+function showRouletteFx(kind,text){
+  fxLayer.className=`roulette-fx is-visible ${kind}`;
+  fxLayer.textContent=text;
+  setTimeout(()=>{fxLayer.className='roulette-fx'},kind==='deep' ? 1200 : 760);
+}
+function jackpotTile(){return `<div class="shark-tile jackpot-tile"><img class="shark-face" src="naoking-jackpot.png" alt="王冠なおキング"></div>`}
 function tile(f){return `<div class="shark-tile"><img class="shark-face" src="naoking-${f.face}.png" alt="なおキング"></div>`}
 button.addEventListener('click',()=>{
   if(blast.hidden===false||locked)return;
@@ -73,10 +83,14 @@ button.addEventListener('click',()=>{
     setTimeout(()=>{blast.hidden=true;card.classList.remove('is-exploded');taps=[];button.textContent='なおキング、怒って停止中…'},2600);return;
   }
   if(spinning)return;
-  spinning=true;const jackpot=Math.random()<.035;card.classList.toggle('is-jackpot',jackpot);slot.classList.toggle('is-jackpot',jackpot);rouletteStatus.textContent=jackpot?'RARE SIGNAL DETECTED // JACKPOT MODE':'JUDGMENT SYSTEM / SPINNING';button.textContent='なおキング採点中・連打厳禁…';message.textContent=jackpot?'……なんだこの光。なおキングが珍しく本気を出している。':'なおキングが今日の運勢を読んでいる……たぶん適当だ。';
+  spinning=true;spinStreak++;const pity=spinStreak>=8;const roll=Math.random();const jackpot=pity||roll<.035;const deep=!jackpot&&roll<.075;const gold=!jackpot&&!deep&&roll<.19;const fake=!jackpot&&!deep&&!gold&&roll<.42;card.classList.toggle('is-jackpot',jackpot);slot.classList.toggle('is-jackpot',jackpot);card.classList.toggle('is-deep',deep);card.classList.toggle('is-gold',gold);rouletteStatus.textContent=jackpot?'RARE SIGNAL DETECTED // JACKPOT MODE':deep?'ABYSS SIGNAL // DEEP SEA MODE':gold?'ROYAL WHIM // GOLD FLASH':'JUDGMENT SYSTEM / SPINNING';button.textContent='なおキング採点中・連打厳禁…';message.textContent=jackpot?'……なんだこの光。なおキングが珍しく本気を出している。':deep?'深海から何かが近づいている。逃げても無駄。':gold?'王の気まぐれが発動した。期待だけはしておけ。':'なおキングが今日の運勢を読んでいる……たぶん適当だ。';
+  if(fake)setTimeout(()=>showRouletteFx('fake','！？'),520);
+  if(gold)showRouletteFx('gold','ROYAL FLASH');
+  if(deep)showRouletteFx('deep','DEEP SEA MODE');
+  if(pity)showRouletteFx('jackpot','STREAK BONUS');
   reel.innerHTML=fortunes.concat(fortunes,fortunes).map(tile).join('');slot.classList.add('is-spinning');
   const next=Math.floor(Math.random()*fortunes.length);
-  spinTimer=setTimeout(()=>{const f=fortunes[next];slot.classList.remove('is-spinning');reel.innerHTML=tile(f);nameEl.textContent=jackpot?'虹色の支配者':f.name;message.textContent=jackpot?'激レア演出。今日は珍しく、お前を海の民として認めてやる。調子に乗るのは明日からにしろ。':f.lines[Math.floor(Math.random()*f.lines.length)];rouletteStatus.textContent=jackpot?'JACKPOT CONFIRMED // RAINBOW KING':'JUDGMENT COMPLETE // TRY AGAIN';button.textContent='運命を回す';spinning=false},1700);
+  spinTimer=setTimeout(()=>{const f=fortunes[next];slot.classList.remove('is-spinning');reel.innerHTML=jackpot?jackpotTile():tile(f);nameEl.textContent=jackpot?'虹色の支配者':deep?'深海の支配者':gold?'金の気まぐれ':f.name;message.textContent=jackpot?'激レア演出。今日は珍しく、お前を海の民として認めてやる。調子に乗るのは明日からにしろ。':deep?'深海モード終了。生きて帰れただけで上出来だ。':gold?'王の気まぐれで少しだけ運が乗った。大事にしろ。':f.lines[Math.floor(Math.random()*f.lines.length)];rouletteStatus.textContent=jackpot?'JACKPOT CONFIRMED // RAINBOW KING':deep?'ABYSS JUDGMENT COMPLETE':gold?'ROYAL FLASH COMPLETE':'JUDGMENT COMPLETE // TRY AGAIN';button.textContent='運命を回す';spinning=false;if(jackpot)spinStreak=0;card.classList.remove('is-deep','is-gold')},1700);
 });
 
 const canvas=document.querySelector('#swim-game');
