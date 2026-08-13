@@ -84,7 +84,7 @@
         <div class="submit-notice"><b>送る前に確認</b><p>自分で撮影した写真、または利用を許可できる写真だけを送ってください。採用された写真は、なおキングダムの動画・SNS等で使用される場合があります。</p></div>
         <div class="submit-frame" id="submit-frame">
           <form class="photo-submit-form" id="photo-submit-form">
-            <label class="file-drop" for="photo-file"><span>📸</span><strong>写真を選ぶ</strong><small>JPEG / PNG / WebP ・ 10MBまで</small><input id="photo-file" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required></label>
+            <label class="file-drop" for="photo-file"><span>📸</span><strong>写真を選ぶ</strong><small>JPEG / PNG / WebP ・ 10MBまで</small><img class="photo-preview" id="photo-preview" alt="選択した写真のプレビュー" hidden><span class="photo-preview-name" id="photo-preview-name" hidden></span><input id="photo-file" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required></label>
             <label>撮影者名・ニックネーム（任意）<input id="photo-credit" name="credit" type="text" maxlength="50" placeholder="例：なおキングの民"></label>
             <label class="usage-check"><input id="photo-consent" type="checkbox" required><span>自分で撮影した、または使用許可のある写真であり、なおキングダムの動画・SNSで使われる場合があることに同意します。</span></label>
             <button class="submit-photo-button" type="submit">なおキングに写真を献上する</button>

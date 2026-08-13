@@ -3,6 +3,8 @@
   if (!form) return;
 
   const fileInput = document.querySelector('#photo-file');
+  const preview = document.querySelector('#photo-preview');
+  const previewName = document.querySelector('#photo-preview-name');
   const status = document.querySelector('#submit-status');
   const button = form.querySelector('button[type="submit"]');
   const endpoint = 'https://xagrwinvrsjhtyxtnyrh.supabase.co/storage/v1/object/naoking-photos';
@@ -16,9 +18,29 @@
     status.className = `submit-status ${tone}`.trim();
   }
 
+  let previewUrl = '';
+  function clearPreview() {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    previewUrl = '';
+    preview.removeAttribute('src');
+    preview.hidden = true;
+    previewName.textContent = '';
+    previewName.hidden = true;
+  }
+
   fileInput.addEventListener('change', () => {
     const file = fileInput.files[0];
-    setStatus(file ? `選択中：${file.name}` : '選んだ写真は、王様が気まぐれに確認します。');
+    clearPreview();
+    if (file) {
+      previewUrl = URL.createObjectURL(file);
+      preview.src = previewUrl;
+      preview.hidden = false;
+      previewName.textContent = `選択中：${file.name}`;
+      previewName.hidden = false;
+      setStatus(`選択中：${file.name}`);
+    } else {
+      setStatus('選んだ写真は、王様が気まぐれに確認します。');
+    }
   });
 
   form.addEventListener('submit', async (event) => {
@@ -43,6 +65,7 @@
       if (!response.ok) throw new Error('upload failed');
       localStorage.setItem('naokingLastUpload', String(Date.now()));
       form.reset();
+      clearPreview();
       setStatus('献上完了。なおキングが気まぐれに確認します。', 'is-success');
     } catch {
       setStatus('送信に失敗しました。少し待ってもう一度試してください。', 'is-error');
