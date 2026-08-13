@@ -35,6 +35,7 @@ const navLinks=[...document.querySelectorAll('[data-tab]')];
 const nav=document.querySelector('#site-nav');
 const menuButton=document.querySelector('#menu-button');
 function openTab(name){
+  document.querySelector('main').classList.toggle('is-home',name==='home');
   if(name!=="game")gameStop();
   if(name!=="fortune"&&locked)canReset=true;
   if(name==="fortune"&&locked&&canReset){
