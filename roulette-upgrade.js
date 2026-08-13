@@ -30,7 +30,7 @@
     '失敗しても沈むな。浮いてこい。', '結果より勢いで勝てる日。理屈は後付け。',
     'まあまあの運勢。贅沢を言うな。'
   ];
-  const makeLines = (prefix) => templates.map((line, index) => `${prefix} ${line}（判定 ${String(index + 1).padStart(2, '0')}）`);
+  const makeLines = prefix => templates.map(line => `${prefix} ${line}`);
   const fortunes = [
     { name: '海の支配者', image: 'naoking-1.png', lines: makeLines('海が少しだけお前を認めた。') },
     { name: '背びれ絶好調', image: 'naoking-2.png', lines: makeLines('背びれの角度が良い。') },
@@ -75,7 +75,7 @@
   const fx = document.createElement('div');
   fx.className = 'roulette-fx';
   card.append(fx);
-  const showFx = (kind, text, duration = 820) => {
+  const showFx = (kind, text, duration = 1500) => {
     fx.className = `roulette-fx is-visible ${kind}`;
     fx.textContent = text;
     window.setTimeout(() => { fx.className = 'roulette-fx'; }, duration);
@@ -126,8 +126,8 @@
     message.textContent = revival ? '……判定が妙に長い。なおキングが何か企んでいる。' : 'なおキングが今日の運勢を読んでいる……たぶん適当だ。';
     if (fake) window.setTimeout(() => showFx('fake', '！？'), 510);
     if (gold) showFx('gold', 'ROYAL FLASH');
-    if (deep) showFx('deep', 'DEEP SEA MODE', 1250);
-    if (pity) showFx('jackpot', 'STREAK BONUS', 1200);
+    if (deep) showFx('deep', 'DEEP SEA MODE', 1850);
+    if (pity) showFx('jackpot', 'STREAK BONUS', 1850);
     reel.innerHTML = fortunes.concat(fortunes, fortunes).map(normalTile).join('');
     slot.classList.add('is-spinning');
     const selected = pick(fortunes);
@@ -149,7 +149,7 @@
           status.textContent = 'REVIVAL JACKPOT CONFIRMED';
           button.textContent = '運命を回す';
           spinning = false; streak = 0;
-          showFx('revival', 'REVIVAL!!', 1350);
+          showFx('revival', 'REVIVAL!!', 2200);
           window.setTimeout(() => { card.classList.remove('is-revival', 'is-jackpot'); slot.classList.remove('is-jackpot'); }, 1500);
         }, 820);
         return;
