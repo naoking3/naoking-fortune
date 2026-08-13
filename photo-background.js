@@ -8,5 +8,7 @@ function rotateBackground(){
   const incoming=photoLayers.find(layer=>!layer.classList.contains('is-visible'))||photoLayers[0];
   incoming.style.backgroundImage=`url('${backgroundPhotos[next]}')`;incoming.classList.add('is-visible');
   photoLayers.filter(layer=>layer!==incoming).forEach(layer=>layer.classList.remove('is-visible'));
+  const mobilePhoto=document.querySelector('#mobile-photo');
+  if(mobilePhoto)mobilePhoto.src=backgroundPhotos[next];
 }
 rotateBackground();window.setInterval(rotateBackground,8500);
