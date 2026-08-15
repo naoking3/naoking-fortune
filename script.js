@@ -73,7 +73,9 @@ function showRouletteFx(kind,text){
 }
 function jackpotTile(){return `<div class="shark-tile jackpot-tile"><img class="shark-face" src="naoking-jackpot.png" alt="王冠なおキング"></div>`}
 function tile(f){return `<div class="shark-tile"><img class="shark-face" src="naoking-${f.face}.png" alt="なおキング"></div>`}
-button.addEventListener('click',()=>{
+// Legacy roulette implementation retained temporarily for reference. The active
+// implementation is roulette-controller.js, which owns the only spin listener.
+if (false) button.addEventListener('click',()=>{
   if(blast.hidden===false||locked)return;
   const now=Date.now();
   taps=taps.filter(time=>now-time<2400);taps.push(now);
