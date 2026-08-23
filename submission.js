@@ -101,11 +101,13 @@
         })
       });
       if (!metadataResponse.ok) {
-        await fetch(`${endpoint}/${safeName}`, {
+        const cleanupResponse = await fetch(`${endpoint}/${safeName}`, {
           method: 'DELETE',
           headers: { apikey: publicKey, Authorization: `Bearer ${publicKey}` }
         });
-        uploaded = false;
+        // Keep the more precise warning when cleanup fails and an orphaned
+        // Storage object may still exist.
+        uploaded = !cleanupResponse.ok;
         throw new Error('metadata failed');
       }
       localStorage.setItem('naokingLastUpload', String(Date.now()));

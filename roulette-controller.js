@@ -272,10 +272,63 @@
     resetVisualState();
     button.textContent = '運命を回す';
     status.textContent = 'JUDGMENT SYSTEM / READY';
+    title.textContent = '海の支配者';
+    message.textContent = 'ボタンを押せ。なおキングが、あなたの都合を見ずに今日の運勢を決める。';
+    reel.innerHTML = tile(normalResults[0].image);
   });
 
-  window.NaokingRouletteDebug = Object.freeze({
-    probabilities: Object.freeze({ normal: 0.76, specialWin: 0.14, specialLoss: 0.10, streakBonusAfter: 7 }),
-    getState: () => Object.freeze({ busy, locked, normalHistory: [...normalHistory], displayed: displayHistory.map(item => item.key) })
-  });
+  function runDiagnostics(iterations = 10000) {
+    const sampleSize = Math.max(1, Math.min(250000, Math.floor(Number(iterations) || 10000)));
+    const historySnapshot = [...normalHistory];
+    const spinsSnapshot = spinsSinceWin;
+    const bagSnapshot = new Map([...messageBags].map(([key, bag]) => [key, [...bag]]));
+    const lastMessageSnapshot = new Map(lastMessageByResult);
+    const counts = { normal: 0, win: 0, loss: 0 };
+    const byResult = {};
+    const lastMessage = new Map();
+    let lastNormalKey = null;
+    let repeatedNormal = 0;
+    let immediateMessageRepeat = 0;
+
+    try {
+      for (let index = 0; index < sampleSize; index += 1) {
+        const result = resolveFinalResult();
+        counts[result.kind] += 1;
+        byResult[result.key] = (byResult[result.key] || 0) + 1;
+        if (result.kind === 'normal') {
+          if (result.key === lastNormalKey) repeatedNormal += 1;
+          lastNormalKey = result.key;
+        }
+        if (lastMessage.get(result.key) === result.message) immediateMessageRepeat += 1;
+        lastMessage.set(result.key, result.message);
+      }
+    } finally {
+      normalHistory.splice(0, normalHistory.length, ...historySnapshot);
+      spinsSinceWin = spinsSnapshot;
+      messageBags.clear();
+      bagSnapshot.forEach((bag, key) => messageBags.set(key, [...bag]));
+      lastMessageByResult.clear();
+      lastMessageSnapshot.forEach((value, key) => lastMessageByResult.set(key, value));
+    }
+
+    return Object.freeze({
+      iterations: sampleSize,
+      counts: Object.freeze(counts),
+      rates: Object.freeze(Object.fromEntries(Object.entries(counts).map(([key, value]) => [key, value / sampleSize]))),
+      byResult: Object.freeze(byResult),
+      repeatedNormal,
+      immediateMessageRepeat
+    });
+  }
+
+  // Keep heavy diagnostics available on local/test hosts without exposing a
+  // synchronous 250k-loop helper on the public GitHub Pages build.
+  if (!window.location || ['localhost', '127.0.0.1'].includes(window.location.hostname)) {
+    window.NaokingRouletteDebug = Object.freeze({
+      baseProbabilities: Object.freeze({ normal: 0.76, specialWin: 0.14, specialLoss: 0.10 }),
+      pityRule: 'The eighth consecutive non-winning draw becomes rainbow.',
+      getState: () => Object.freeze({ busy, locked, normalHistory: [...normalHistory], displayed: displayHistory.map(item => item.key) }),
+      runDiagnostics
+    });
+  }
 })();

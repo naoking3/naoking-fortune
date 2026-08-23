@@ -605,7 +605,7 @@
       context.textAlign = 'start';
     }
 
-    if (game.mode === 'idle') {
+    if (game.mode === 'idle' && (!curtain || curtain.hidden)) {
       context.fillStyle = '#031722d9';
       context.fillRect(0, 0, WORLD.width, WORLD.height);
       context.textAlign = 'center';

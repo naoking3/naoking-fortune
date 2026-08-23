@@ -5,12 +5,19 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#020b13">
   <meta name="description" content="VRChatのサメ、なおキングが統べる架空の深海王国。映像、神託、回遊ゲーム、王国記録を公開中。">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="なおキングダム — Abyssal Court">
+  <meta property="og:description" content="変なサメが統べる、静かでちょっとおかしい深海王国。">
+  <meta property="og:image" content="https://naoking3.github.io/naoking-fortune/assets/backgrounds/vrchat-01.webp">
+  <meta property="og:url" content="https://naoking3.github.io/naoking-fortune/">
+  <meta name="twitter:card" content="summary_large_image">
   <title>なおキングダム — Abyssal Court</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="assets/characters/naoking-hero.webp" as="image" type="image/webp">
   <link rel="preload" href="assets/backgrounds/vrchat-01.webp" as="image" type="image/webp">
-  <link rel="stylesheet" href="deep-sea.css">
-  <link rel="stylesheet" href="roulette.css">
-  <link rel="stylesheet" href="deep-sea-game.css">
+  <link rel="stylesheet" href="deep-sea.css?v=20260824b">
+  <link rel="stylesheet" href="roulette.css?v=20260824b">
+  <link rel="stylesheet" href="deep-sea-game.css?v=20260824b">
 </head>
 <body data-page="home">
   <a class="skip-link" href="#main-content">本文へ潜る</a>
@@ -155,11 +162,11 @@
     <section class="page" id="game" data-depth="3280" aria-labelledby="game-title" hidden>
       <div class="page-hero game-page-hero section-frame"><div><p class="kicker"><span>03</span> ROYAL HUNTING GROUND</p><h1 id="game-title">なおキングの<br><em>回遊。</em></h1></div><p>魚を食べ、コンボを繋ぎ、王冠でフィーバー。網と岩は王様にも平等に危険です。</p></div>
       <div class="game-shell deep-sea-game section-frame">
-        <div class="game-topline"><span>EXPEDITION // SECTOR 7</span><strong id="game-state">出航待機中</strong></div>
+        <div class="game-topline"><span>EXPEDITION // SECTOR 7</span><strong id="game-state" aria-live="polite">出航待機中</strong><b id="game-rank">未判定</b></div>
         <div class="game-hud"><div><small>TIME</small><b id="game-time">30.0</b></div><div><small>SCORE</small><b id="game-score">00000</b></div><div><small>COMBO</small><b id="game-combo">× 1</b></div><div><small>BEST</small><b id="game-high-score">00000</b></div></div>
         <div class="game-stage"><canvas id="game-canvas" width="960" height="540" aria-label="なおキングを操作して魚を集める回遊ゲーム"></canvas><div class="game-curtain" id="game-curtain"><p>ABYSSAL HUNT</p><strong>王様、自力で魚を取る。</strong><small>矢印キー / A・D / 画面ボタンで移動</small></div></div>
         <div class="game-actions"><button class="action action-primary" id="start-game" type="button">回遊を始める <span>→</span></button><div class="game-controls"><button id="left-control" type="button" aria-label="左へ泳ぐ">← <span>LEFT</span></button><button id="right-control" type="button" aria-label="右へ泳ぐ"><span>RIGHT</span> →</button></div></div>
-        <p class="game-help">普通の魚 +100 / 金の魚 +350 / 王冠はフィーバー。障害物に当たるとコンボが消えます。</p>
+        <p class="game-help">小魚 +12 / マグロ +28 / 真珠 +42 / 王冠 +100・フィーバー。コンボとフィーバーで得点倍率が上がります。</p>
       </div>
     </section>
 
@@ -189,6 +196,6 @@
   <footer class="site-footer"><span>NAOKING KINGDOM / EST. SOMEWHERE</span><p>© なおキングダム　海の支配者がたぶん管理中</p><button type="button" id="crest-secret" aria-label="王冠の紋章">♛</button></footer>
   <div class="secret-decree" id="secret-decree" role="status" aria-live="polite" hidden>秘密通達：今日はもう十分えらい。海へ帰れ。</div>
 
-  <script src="site.js" defer></script><script src="photo-background.js" defer></script><script src="submission.js" defer></script><script src="roulette-controller.js" defer></script><script src="deep-sea-game.js" defer></script>
+  <script src="site.js?v=20260824b" defer></script><script src="photo-background.js?v=20260824b" defer></script><script src="submission.js?v=20260824b" defer></script><script src="roulette-controller.js?v=20260824b" defer></script><script src="deep-sea-game.js?v=20260824b" defer></script>
 </body>
 </html>
