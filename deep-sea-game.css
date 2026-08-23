@@ -1,0 +1,205 @@
+/* Deep Sea Migration — isolated game module */
+.deep-sea-game {
+  --game-ink: #e9fbff;
+  --game-muted: #8fb9c5;
+  --game-gold: #ffd66b;
+  --game-edge: rgba(145, 226, 244, .24);
+  position: relative;
+  width: min(100%, 1040px);
+  margin-inline: auto;
+  color: var(--game-ink);
+  isolation: isolate;
+}
+
+.deep-sea-game__shell {
+  position: relative;
+  padding: clamp(12px, 2vw, 22px);
+  overflow: hidden;
+  border: 1px solid var(--game-edge);
+  border-radius: clamp(20px, 3vw, 34px);
+  background:
+    radial-gradient(circle at 85% 10%, rgba(50, 181, 208, .14), transparent 32%),
+    linear-gradient(145deg, rgba(5, 36, 49, .96), rgba(2, 18, 27, .98));
+  box-shadow: 0 28px 80px rgba(0, 8, 14, .48), inset 0 1px rgba(255, 255, 255, .05);
+}
+
+.deep-sea-game__shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .32;
+  background-image: radial-gradient(circle, rgba(171, 240, 255, .3) 0 1px, transparent 1.5px);
+  background-size: 31px 31px;
+  mask-image: linear-gradient(to bottom, #000, transparent 72%);
+}
+
+.deep-sea-game__hud {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.deep-sea-game__metric {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(148, 226, 243, .15);
+  border-radius: 14px;
+  background: rgba(1, 16, 24, .64);
+}
+
+.deep-sea-game__metric small {
+  display: block;
+  overflow: hidden;
+  margin-bottom: 3px;
+  color: var(--game-muted);
+  font: 700 10px/1.1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: .12em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.deep-sea-game__metric strong {
+  display: block;
+  overflow: hidden;
+  color: var(--game-ink);
+  font: 800 clamp(16px, 2.4vw, 24px)/1.05 system-ui, sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deep-sea-game__metric--combo strong,
+.deep-sea-game__metric--score strong {
+  color: var(--game-gold);
+}
+
+#game-canvas {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 240px;
+  overflow: hidden;
+  border: 1px solid rgba(171, 239, 255, .34);
+  border-radius: clamp(16px, 2.5vw, 25px);
+  background: #052f42;
+  box-shadow: inset 0 0 50px rgba(0, 10, 17, .4);
+  touch-action: none;
+}
+
+#game-canvas:is(canvas) {
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+#game-canvas:not(canvas) > canvas,
+.deep-sea-game__surface {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  outline: none;
+  touch-action: none;
+}
+
+#game-canvas canvas:focus-visible,
+#game-canvas:is(canvas):focus-visible {
+  outline: 3px solid var(--game-gold);
+  outline-offset: -5px;
+}
+
+.deep-sea-game__state {
+  min-height: 3.2em;
+  margin: 14px 4px 10px;
+  color: #cbeaf1;
+  font: 650 14px/1.6 system-ui, sans-serif;
+  text-align: center;
+}
+
+.deep-sea-game__actions {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.4fr) 1fr 1fr;
+  gap: 9px;
+}
+
+#start-game,
+#left-control,
+#right-control {
+  min-height: 52px;
+  border: 1px solid rgba(154, 231, 246, .25);
+  border-radius: 15px;
+  color: var(--game-ink);
+  background: rgba(11, 65, 83, .74);
+  font: 800 14px/1 system-ui, sans-serif;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: none;
+  transition: border-color .2s ease, background .2s ease, transform .15s ease;
+}
+
+#start-game {
+  border-color: rgba(255, 214, 107, .5);
+  color: #09202a;
+  background: linear-gradient(135deg, #ffe69c, #ffc552);
+  box-shadow: 0 8px 26px rgba(255, 190, 63, .18);
+}
+
+#start-game:disabled {
+  opacity: .6;
+  cursor: progress;
+}
+
+#start-game:not(:disabled):hover,
+#left-control:hover,
+#right-control:hover {
+  border-color: rgba(190, 245, 255, .65);
+  transform: translateY(-1px);
+}
+
+#start-game:focus-visible,
+#left-control:focus-visible,
+#right-control:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+#left-control:active,
+#right-control:active {
+  background: rgba(67, 165, 190, .82);
+  transform: translateY(1px) scale(.985);
+}
+
+.deep-sea-game.is-fever .deep-sea-game__shell {
+  border-color: rgba(255, 216, 101, .7);
+  box-shadow: 0 28px 90px rgba(255, 181, 43, .16), inset 0 1px rgba(255, 255, 255, .12);
+  animation: naoking-fever-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes naoking-fever-pulse {
+  to { filter: saturate(1.18) brightness(1.05); }
+}
+
+@media (max-width: 680px) {
+  .deep-sea-game__shell { padding: 9px; border-radius: 20px; }
+  .deep-sea-game__hud { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .deep-sea-game__metric { padding: 8px 10px; }
+  .deep-sea-game__actions { grid-template-columns: 1fr 1fr; }
+  #start-game { grid-column: 1 / -1; }
+  #game-canvas { min-height: 180px; border-radius: 15px; }
+  .deep-sea-game__state { margin-top: 10px; font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deep-sea-game *,
+  .deep-sea-game *::before,
+  .deep-sea-game *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

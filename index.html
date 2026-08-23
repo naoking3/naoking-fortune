@@ -2,112 +2,193 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>なおキングダム</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="fix.css">
-  <link rel="stylesheet" href="video.css">
-  <link rel="stylesheet" href="game.css">
-  <link rel="stylesheet" href="redesign.css">
-  <link rel="stylesheet" href="opening.css">
-  <link rel="stylesheet" href="photo-background.css">
-    <link rel="stylesheet" href="submission.css">
-    <link rel="stylesheet" href="roulette.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#020b13">
+  <meta name="description" content="VRChatのサメ、なおキングが統べる架空の深海王国。映像、神託、回遊ゲーム、王国記録を公開中。">
+  <title>なおキングダム — Abyssal Court</title>
+  <link rel="preload" href="assets/characters/naoking-hero.webp" as="image" type="image/webp">
+  <link rel="preload" href="assets/backgrounds/vrchat-01.webp" as="image" type="image/webp">
+  <link rel="stylesheet" href="deep-sea.css">
+  <link rel="stylesheet" href="roulette.css">
+  <link rel="stylesheet" href="deep-sea-game.css">
 </head>
-<body>
-  <div class="photo-background" aria-hidden="true" id="photo-background"></div>
-  <div class="opening" id="opening" aria-label="なおキングダム オープニング">
-    <div class="opening-rays" aria-hidden="true"></div>
-    <div class="opening-rings" aria-hidden="true"><i></i><i></i><i></i></div>
-    <div class="opening-copy"><p>VRCHAT SHARK GROUP</p><h1><span>なお</span>キングダム</h1><strong>WELCOME TO THE DEEP</strong><small>ENTERING THE KINGDOM</small></div>
-    <div class="opening-bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<body data-page="home">
+  <a class="skip-link" href="#main-content">本文へ潜る</a>
+  <div class="photo-background" id="photo-background" aria-hidden="true"></div>
+  <div class="ocean-atmosphere" aria-hidden="true">
+    <i class="caustic caustic-a"></i><i class="caustic caustic-b"></i>
+    <i class="drift drift-a"></i><i class="drift drift-b"></i><i class="drift drift-c"></i>
   </div>
-  <main class="is-home" data-page="home">
-    <div class="bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-    <section class="kingdom-shell">
-      <header class="site-header">
-        <a class="brand" href="#home" data-tab="home"><small>VRCHAT SHARK GROUP</small><b>なおキングダム</b></a>
-        <button class="menu-button" id="menu-button" type="button" aria-label="メニューを開く">☰</button>
-        <nav id="site-nav" aria-label="サイトメニュー">
-          <button class="nav-link is-active" type="button" data-tab="home">トップ</button>
-          <button class="nav-link" type="button" data-tab="videos">新作動画</button>
-          <button class="nav-link" type="button" data-tab="fortune">今日の運勢</button>
-          <button class="nav-link" type="button" data-tab="game">回遊ゲーム</button>
-          <button class="nav-link" type="button" data-tab="submit">写真素材投稿</button>
-          <button class="nav-link" type="button" data-tab="join">入会方法</button>
-        </nav>
-      </header>
 
-      <section class="page is-active" id="home">
+  <div class="opening" id="opening" aria-label="なおキングダムへ潜航中">
+    <div class="opening-horizon" aria-hidden="true"></div>
+    <div class="opening-lockup">
+      <p>NAOKING KINGDOM / GATE 00</p>
+      <span class="opening-crest" aria-hidden="true">♛</span>
+      <h1><em>なお</em>キングダム</h1>
+      <div class="opening-depth"><i></i><span>DESCENDING TO THE ABYSS</span></div>
+    </div>
+    <button type="button" id="skip-opening">SKIP DIVE</button>
+  </div>
+
+  <header class="site-header" id="site-header">
+    <a class="brand" href="#home" data-tab="home" aria-label="なおキングダム トップへ">
+      <span class="brand-crest" aria-hidden="true">N</span>
+      <span><small>THE ABYSSAL COURT</small><b>なおキングダム</b></span>
+    </a>
+    <div class="header-depth" aria-hidden="true"><small>CURRENT DEPTH</small><b id="header-depth-value">0000 M</b></div>
+    <button class="menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span></span><span></span><small>MENU</small>
+    </button>
+    <nav id="site-nav" aria-label="王国内の移動">
+      <button class="nav-link is-active" type="button" data-tab="home"><span>00</span>王国門</button>
+      <button class="nav-link" type="button" data-tab="videos"><span>01</span>映像記録</button>
+      <button class="nav-link" type="button" data-tab="fortune"><span>02</span>深海神託</button>
+      <button class="nav-link" type="button" data-tab="game"><span>03</span>回遊海域</button>
+      <button class="nav-link" type="button" data-tab="submit"><span>04</span>献上窓口</button>
+      <button class="nav-link" type="button" data-tab="join"><span>05</span>入国儀式</button>
+    </nav>
+  </header>
+
+  <aside class="depth-rail" aria-hidden="true">
+    <span>SURFACE</span><i><b id="depth-progress"></b></i><span>ABYSS</span>
+  </aside>
+
+  <main id="main-content">
+    <section class="page is-active" id="home" data-depth="1280" aria-labelledby="home-title">
+      <div class="hero section-frame">
         <div class="hero-copy">
-          <p class="eyebrow">WELCOME TO THE KINGDOM. SURVIVE IF YOU CAN.</p>
-          <h1>ここは<br><em>なおキングダム。</em></h1>
-          <p class="lead">VRChatに現れたサメ、なおキングが、動画と運勢と意味のない威厳をお届けする公式っぽい場所。</p>
-          <div class="hero-actions"><button class="primary-action" type="button" data-tab="videos">新作を見に行く</button><button class="ghost-action" type="button" data-tab="fortune">今日の運勢を見る</button><button class="ghost-action" type="button" data-tab="game">回遊ゲームを遊ぶ</button></div>
+          <p class="kicker"><span>00</span> THE KINGDOM GATE / 深度 1,280M</p>
+          <h1 id="home-title"><span>ENTER THE</span><strong>ABYSSAL<br>COURT.</strong></h1>
+          <p class="hero-japanese">ここは、<em>なおキングダム。</em></p>
+          <p class="lead">VRChatの海から現れたサメ、なおキングが統べる非公式の深海王国。映像と神託と、意味のない威厳を静かに配信中。</p>
+          <div class="hero-actions">
+            <button class="action action-primary" type="button" data-tab="fortune">神託を受ける <span>↘</span></button>
+            <button class="action action-quiet" type="button" data-tab="videos">王国記録を見る <span>→</span></button>
+          </div>
+          <dl class="hero-coordinates">
+            <div><dt>SECTOR</dt><dd>NAO-03</dd></div>
+            <div><dt>STATUS</dt><dd><i></i> KING AWAKE</dd></div>
+            <div><dt>VISITORS</dt><dd>ヒレを収納</dd></div>
+          </dl>
         </div>
-        <div class="hero-shark"><img src="naoking-hero.png" alt="なおキング"><span>海の支配者（自称）</span></div>
-        <aside class="mobile-photo-card" aria-label="なおキングダムの写真"><img class="snapshot-photo is-visible" src="backgrounds/vrchat-01.jpg" alt="なおキングダムのVRChat写真"><img class="snapshot-photo" src="backgrounds/vrchat-01.jpg" alt="" aria-hidden="true"><div><small>NAOKING SNAPSHOT</small><b>本日の王国風景</b></div></aside>
-        <div class="notice"><b>なおキングからの通達</b><p>見学は歓迎する。だが、ヒレはしまっておけ。</p></div>
+        <figure class="hero-king">
+          <div class="royal-orbit" aria-hidden="true"><span>THE SELF-PROCLAIMED SOVEREIGN · NAOKING · </span></div>
+          <img src="assets/characters/naoking-hero.webp" alt="海の支配者を自称するサメ、なおキング" width="1120" height="1030">
+          <figcaption><small>RULER NO. 001</small><strong>海の支配者</strong><span>（自称）</span></figcaption>
+        </figure>
+        <button class="dive-cue" type="button" data-scroll-to="kingdom-overview"><span>DIVE</span><i>↓</i></button>
+      </div>
+
+      <section class="kingdom-overview section-frame" id="kingdom-overview" aria-labelledby="overview-title">
+        <header class="section-heading">
+          <p class="kicker"><span>GATE</span> KINGDOM TELEMETRY</p>
+          <h2 id="overview-title">本日の王国は、<br><em>だいたい平常。</em></h2>
+        </header>
+        <div class="royal-grid">
+          <article class="snapshot-card">
+            <div class="snapshot-media">
+              <img class="snapshot-photo is-visible" src="assets/backgrounds/vrchat-01.webp" alt="なおキングダムのVRChat風景" width="1600" height="900">
+              <img class="snapshot-photo" src="assets/backgrounds/vrchat-02.webp" alt="" width="1600" height="900" aria-hidden="true">
+            </div>
+            <div class="snapshot-caption"><span>LIVE ARCHIVE / 08.24</span><strong>本日の王国風景</strong><small>8.5秒ごとに海流が変わります</small></div>
+          </article>
+          <div class="royal-status">
+            <article><span>ROYAL WEATHER</span><strong id="kingdom-condition">水圧、やや偉そう</strong><p>国王の機嫌とは関係ありません。</p></article>
+            <article><span>DECREE #034</span><strong>見学は歓迎する。</strong><p>ただし、ヒレはしまっておけ。</p></article>
+            <article><span>ROYAL PROFILE</span><strong>なおキング</strong><p>王 / 案内役 / 責任は取らない</p></article>
+          </div>
+        </div>
       </section>
 
-      <section class="page" id="videos">
-        <p class="eyebrow">LATEST MOVIES / なおキングの映像記録</p>
-        <h2>新作動画</h2>
-        <p class="page-intro">最新の動画を最優先で置く予定。いまはまだ、王国が編集室を探している。</p>
-        <article class="video-feature"><div class="video-screen"><iframe src="https://www.youtube.com/embed/ur3w4qmnQW8" title="なおキングダムの新作動画" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><div><p class="label">LATEST VIDEO</p><h3>なおキングダム、最新の映像記録。</h3><p>見終わったなら、なおキングに感想を送ってもいい。読まれる保証はない。</p><a class="video-link" href="https://www.youtube.com/watch?v=ur3w4qmnQW8" target="_blank" rel="noreferrer">YouTubeで開く</a></div></article>
-        <div class="video-grid"><article>過去動画置き場<br><small>ただし、まだ空。</small></article><article>サメの活動記録<br><small>記録係も行方不明。</small></article><article>謎の短編<br><small>存在するかも不明。</small></article></div>
+      <section class="portal-section section-frame" aria-labelledby="portal-title">
+        <header class="section-heading heading-inline">
+          <div><p class="kicker"><span>MAP</span> EXPLORE THE COURT</p><h2 id="portal-title">王国を巡る。</h2></div>
+          <p>静かな記録庫から、騒がしい神託装置まで。好きな深度へどうぞ。</p>
+        </header>
+        <div class="portal-grid">
+          <button class="portal portal-featured" type="button" data-tab="fortune"><span>02 / ORACLE</span><b>今日の運勢</b><p>王が、あなたの都合を無視して裁定。</p><i>神託を開始 →</i></button>
+          <button class="portal" type="button" data-tab="game"><span>03 / HUNTING GROUND</span><b>なおキングの回遊</b><p>魚を集め、網を避け、王冠を奪え。</p><i>出航する →</i></button>
+          <button class="portal" type="button" data-tab="videos"><span>01 / ARCHIVE</span><b>映像記録庫</b><p>王国で起きた出来事を映像で保管。</p><i>記録を見る →</i></button>
+          <button class="portal" type="button" data-tab="submit"><span>04 / OFFERING</span><b>写真素材を献上</b><p>動画に使える王国の記録を送る。</p><i>献上窓口へ →</i></button>
+          <button class="portal portal-document" type="button" data-tab="join"><span>05 / DECREE</span><b>入会方法</b><p>公式文書は存在する。方法は存在しない。</p><i>文書を読む →</i></button>
+        </div>
       </section>
 
-      <section class="page" id="fortune">
-        <div class="fortune-heading"><p class="eyebrow">NAOKING'S DAILY JUDGMENT</p><h2>なおキングの今日の運勢</h2><p>偉そうなサメが、あなたの都合を見ずに裁定する。</p></div>
+      <section class="royal-index section-frame" aria-labelledby="index-title">
+        <div class="index-mark" aria-hidden="true">NK</div>
+        <div><p class="kicker"><span>INDEX</span> SUBJECT 001</p><h2 id="index-title">王は、<br>ちょっと変なサメ。</h2></div>
+        <dl>
+          <div><dt>NAME</dt><dd>なおキング</dd></div><div><dt>SPECIES</dt><dd>たぶんサメ</dd></div><div><dt>DOMAIN</dt><dd>VRChat / 深海</dd></div><div><dt>AUTHORITY</dt><dd>自称</dd></div>
+        </dl>
+        <p>見た目は王国の公式サイト。中身は、サメが運勢を決めたり、入会方法を忘れたりする場所です。</p>
+      </section>
+    </section>
+
+    <section class="page" id="videos" data-depth="2360" aria-labelledby="videos-title" hidden>
+      <div class="page-hero section-frame"><p class="kicker"><span>01</span> ROYAL MOTION ARCHIVE</p><h1 id="videos-title">王国<br><em>映像記録。</em></h1><p>なおキングダムで起きた出来事を、記録係が逃げ出す前に保存しています。</p></div>
+      <div class="archive-layout section-frame">
+        <article class="featured-film">
+          <div class="film-frame"><iframe src="https://www.youtube.com/embed/ur3w4qmnQW8" title="なおキングダム 最新映像記録" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe><span>FEATURED / RECORD 001</span></div>
+          <div class="film-copy"><p class="kicker">LATEST DISPATCH</p><h2>なおキングダム、<br>最新の映像記録。</h2><p>海のどこかで撮影された、王国の公式っぽい記録。最後まで見ても、入会方法は分かりません。</p><a class="action action-primary" href="https://www.youtube.com/watch?v=ur3w4qmnQW8" target="_blank" rel="noreferrer">YOUTUBEで視聴 <span>↗</span></a></div>
+        </article>
+        <div class="archive-ledger"><article><span>RECORD 002 / CLASSIFIED</span><b>次の記録を編集中</b><p>映像は存在する。完成日は深海に沈んでいる。</p></article><article><span>RECORD 003 / MISSING</span><b>記録係、行方不明</b><p>戻り次第、過去映像の整理を始める予定。</p></article></div>
+      </div>
+    </section>
+
+    <section class="page" id="fortune" data-depth="4810" aria-labelledby="fortune-title" hidden>
+      <div class="page-hero oracle-hero section-frame"><div><p class="kicker"><span>02</span> THE SOVEREIGN ORACLE</p><h1 id="fortune-title">深海<br><em>神託装置。</em></h1></div><p>結果は一度だけ確定し、王国の演出装置を経てあなたへ届きます。連打は王への反逆です。</p></div>
+      <div class="oracle-layout section-frame">
         <div class="fortune-card" id="card">
-          <div class="roulette-marquee" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="slot-window" id="slot" aria-label="今日の運勢"><div class="pointer" aria-hidden="true">▼</div><div class="roulette-flare" aria-hidden="true"></div><div class="slot-reel" id="reel"><div class="shark-tile"><img class="shark-face" id="shark" src="naoking-1.png" alt="なおキング"></div></div></div><p class="roulette-status" id="roulette-status">JUDGMENT SYSTEM / READY</p>
+          <div class="machine-plate"><span>NAOKING ORACLE // UNIT 03</span><i>ONLINE</i></div>
+          <div class="roulette-marquee" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="slot-window" id="slot" aria-label="今日の運勢"><div class="pointer" aria-hidden="true">▼</div><div class="roulette-flare" aria-hidden="true"></div><div class="slot-reel" id="reel"><div class="shark-tile"><img class="shark-face" id="shark" src="assets/characters/naoking-1.webp" alt="なおキング"></div></div></div>
+          <p class="roulette-status" id="roulette-status">JUDGMENT SYSTEM / READY</p>
           <div class="result" aria-live="polite"><span>本日のサメ式判定</span><strong id="fortune-name">海の支配者</strong><p id="message">ボタンを押せ。なおキングが、あなたの都合を見ずに今日の運勢を決める。</p></div>
-          <button type="button" id="spin">運命を回す</button><p class="footnote">※ なおキングは責任を取りません。サメなので。</p><div class="blast" id="blast" hidden><b>💥</b><span>おい、連打するな！</span></div>
+          <button type="button" id="spin"><span>運命を回す</span><small>HOLD YOUR BREATH</small></button>
+          <p class="footnote">※ なおキングは結果に責任を取りません。王なので。</p><div class="blast" id="blast" hidden><b>反逆検知</b><span>おい、連打するな。</span></div>
         </div>
-      </section>
+        <aside class="oracle-notes"><header><span>JUDGMENT PROTOCOL</span><b>神託を受ける前に</b></header><ol><li><span>01</span><p>深呼吸をする。効果は特にない。</p></li><li><span>02</span><p>一度だけボタンを押し、王を急かさない。</p></li><li><span>03</span><p>結果を受け入れる。異議申立先はない。</p></li></ol><div class="oracle-history"><span>RECENT JUDGMENTS</span><ul id="fortune-history"><li>まだ神託はありません</li></ul></div><p class="oracle-odds"><i></i>特殊信号は通常判定とは独立して観測されます。</p></aside>
+      </div>
+    </section>
 
-      <section class="page" id="game">
-        <div class="game-heading"><p class="eyebrow">NAOKING'S MIGRATION / 浅瀬には気をつけろ</p><h2>なおキングの回遊</h2><p>魚を食べて点を稼げ。岩と漁網に当たると、王の機嫌が悪くなる。</p></div>
-        <div class="game-card">
-          <div class="game-hud"><span id="game-status">なおキング、出航前。</span><strong>エサ <b id="game-score">0</b></strong></div>
-          <canvas id="swim-game" width="720" height="360" aria-label="なおキングの回遊ゲーム"></canvas>
-          <div class="game-result" id="game-result">15秒間、生き残れ。王様なのに自力で。</div>
-          <button class="game-start" id="game-start" type="button">回遊を始める</button>
-          <div class="game-controls"><button type="button" data-move="left">← 左へ泳ぐ</button><button type="button" data-move="right">右へ泳ぐ →</button></div>
-        </div>
-      </section>
+    <section class="page" id="game" data-depth="3280" aria-labelledby="game-title" hidden>
+      <div class="page-hero game-page-hero section-frame"><div><p class="kicker"><span>03</span> ROYAL HUNTING GROUND</p><h1 id="game-title">なおキングの<br><em>回遊。</em></h1></div><p>魚を食べ、コンボを繋ぎ、王冠でフィーバー。網と岩は王様にも平等に危険です。</p></div>
+      <div class="game-shell deep-sea-game section-frame">
+        <div class="game-topline"><span>EXPEDITION // SECTOR 7</span><strong id="game-state">出航待機中</strong></div>
+        <div class="game-hud"><div><small>TIME</small><b id="game-time">30.0</b></div><div><small>SCORE</small><b id="game-score">00000</b></div><div><small>COMBO</small><b id="game-combo">× 1</b></div><div><small>BEST</small><b id="game-high-score">00000</b></div></div>
+        <div class="game-stage"><canvas id="game-canvas" width="960" height="540" aria-label="なおキングを操作して魚を集める回遊ゲーム"></canvas><div class="game-curtain" id="game-curtain"><p>ABYSSAL HUNT</p><strong>王様、自力で魚を取る。</strong><small>矢印キー / A・D / 画面ボタンで移動</small></div></div>
+        <div class="game-actions"><button class="action action-primary" id="start-game" type="button">回遊を始める <span>→</span></button><div class="game-controls"><button id="left-control" type="button" aria-label="左へ泳ぐ">← <span>LEFT</span></button><button id="right-control" type="button" aria-label="右へ泳ぐ"><span>RIGHT</span> →</button></div></div>
+        <p class="game-help">普通の魚 +100 / 金の魚 +350 / 王冠はフィーバー。障害物に当たるとコンボが消えます。</p>
+      </div>
+    </section>
 
-      <section class="page" id="submit">
-        <p class="eyebrow">NAOKING MATERIAL DROP / 海のどこかから届く素材</p>
-        <h2>写真素材を<br><em>送る</em></h2>
-        <p class="page-intro">なおキングダムの動画に使ってよさそうな写真を送れ。採用される保証はない。だが、王様はたぶん見る。</p>
-        <div class="submit-notice"><b>送る前に確認</b><p>自分で撮影した写真、または利用を許可できる写真だけを送ってください。採用された写真は、なおキングダムの動画・SNS等で使用される場合があります。</p></div>
-        <div class="submit-frame" id="submit-frame">
-          <form class="photo-submit-form" id="photo-submit-form">
-            <label class="file-drop" for="photo-file"><span>📸</span><strong>写真を選ぶ</strong><small>JPEG / PNG / WebP ・ 10MBまで</small><img class="photo-preview" id="photo-preview" alt="選択した写真のプレビュー" hidden><span class="photo-preview-name" id="photo-preview-name" hidden></span><input id="photo-file" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required></label>
-            <label>撮影者名・ニックネーム（任意）<input id="photo-credit" name="credit" type="text" maxlength="50" placeholder="例：なおキングの民"></label>
-            <label class="usage-check"><input id="photo-consent" type="checkbox" required><span>自分で撮影した、または使用許可のある写真であり、なおキングダムの動画・SNSで使われる場合があることに同意します。</span></label>
-            <button class="submit-photo-button" type="submit">なおキングに写真を献上する</button>
-            <p class="submit-status" id="submit-status" aria-live="polite">選んだ写真は、王様が気まぐれに確認します。</p>
-          </form>
-        </div>
-      </section>
+    <section class="page" id="submit" data-depth="6120" aria-labelledby="submit-title" hidden>
+      <div class="page-hero offering-hero section-frame"><div><p class="kicker"><span>04</span> ROYAL MATERIAL OFFERING</p><h1 id="submit-title">写真素材<br><em>献上窓口。</em></h1></div><p>あなたが撮影した王国の記録を、動画素材としてなおキングへ献上できます。</p></div>
+      <div class="offering-layout section-frame">
+        <aside class="offering-guidance"><span>OFFERING PROTOCOL</span><h2>送る前に、<br>三つだけ確認。</h2><ul><li>自分で撮影した、または使用許可がある</li><li>動画・SNSで使用される可能性に同意する</li><li>JPEG / PNG / WebP、10MB以内</li></ul><p>採用の保証はありません。王の気まぐれです。</p></aside>
+        <div class="submit-frame" id="submit-frame"><form class="photo-submit-form" id="photo-submit-form">
+          <label class="file-drop" for="photo-file"><span class="file-index">01 / IMAGE</span><strong>写真を選ぶ</strong><small>DROP OR TAP TO SELECT</small><img class="photo-preview" id="photo-preview" alt="選択した写真のプレビュー" hidden><span class="photo-preview-name" id="photo-preview-name" hidden></span><input id="photo-file" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required></label>
+          <label class="field-label"><span>02 / CREDIT</span>撮影者名・ニックネーム（任意）<input id="photo-credit" name="credit" type="text" maxlength="50" placeholder="例：なおキングの民" autocomplete="nickname"></label>
+          <label class="usage-check"><input id="photo-consent" type="checkbox" required><span>自分で撮影した、または使用許可のある写真であり、なおキングダムの動画・SNSで使われる場合があることに同意します。</span></label>
+          <button class="submit-photo-button" type="submit">写真を献上する <span>↗</span></button><p class="submit-status" id="submit-status" aria-live="polite">選んだ写真は、王様が気まぐれに確認します。</p>
+        </form></div>
+      </div>
+    </section>
 
-      <section class="page" id="join">
-        <p class="eyebrow">OFFICIAL-LOOKING GUIDANCE / 実用性は保証しない</p>
-        <h2>なおキングダムグループへの<br><em>入会方法</em></h2>
-        <p class="page-intro">入会には所定の手続きが必要です。所定の手続きは、所定の場所で所定の者に確認してください。</p>
-        <div class="procedure"><article><b>第一条</b><h3>所定の門を探す</h3><p>門の所在地は非公開です。門があるかどうかも非公開です。</p></article><article><b>第二条</b><h3>所定の者に会う</h3><p>所定の者は現在不在です。帰還予定も所定です。</p></article><article><b>最終条</b><h3>入会する</h3><p>以上を満たした方は、たぶん入会できています。おめでとう。</p></article></div>
-        <p class="final-word">結論：<strong>入会方法は不明です。</strong><br>なおキングも、よく分かっていません。</p>
-      </section>
-      <footer>© なおキングダム　/　海の支配者がたぶん管理中</footer>
+    <section class="page" id="join" data-depth="8050" aria-labelledby="join-title" hidden>
+      <div class="page-hero decree-hero section-frame"><div><p class="kicker"><span>05</span> ROYAL DECREE / DOCUMENT 404</p><h1 id="join-title">なおキングダム<br><em>入会方法。</em></h1></div><p>王国の公式記録によれば、入会には所定の手続きが必要です。所定の意味は非公開です。</p></div>
+      <article class="decree section-frame">
+        <header><div class="decree-seal">王</div><div><span>ABYSSAL COURT — OFFICIAL DOCUMENT</span><h2>王国入会に関する布告</h2></div><b>CLASSIFIED</b></header>
+        <ol class="decree-steps"><li><span>第一条</span><div><h3>所定の門を探す</h3><p>門の所在地は非公開です。門が存在するかどうかも、現在確認中です。</p></div><i>STATUS / MISSING</i></li><li><span>第二条</span><div><h3>所定の者に会う</h3><p>所定の者は不在です。帰還予定は「所定の時刻」と記録されています。</p></div><i>STATUS / AWAY</i></li><li><span>最終条</span><div><h3>入会したことにする</h3><p>ここまで読んだ者は、たぶん入会できています。王への報告は不要です。</p></div><i>STATUS / MAYBE</i></li></ol>
+        <footer><p>結論</p><strong>入会方法は、<em>完全に謎。</em></strong><small>なおキングも、よく分かっていません。</small></footer>
+      </article>
     </section>
   </main>
-  <script src="script.js"></script>
-  <script src="opening.js"></script>
-  <script src="photo-background.js"></script>
-  <script src="submission.js"></script>
-  <script src="roulette-controller.js"></script>
+
+  <footer class="site-footer"><span>NAOKING KINGDOM / EST. SOMEWHERE</span><p>© なおキングダム　海の支配者がたぶん管理中</p><button type="button" id="crest-secret" aria-label="王冠の紋章">♛</button></footer>
+  <div class="secret-decree" id="secret-decree" role="status" aria-live="polite" hidden>秘密通達：今日はもう十分えらい。海へ帰れ。</div>
+
+  <script src="site.js" defer></script><script src="photo-background.js" defer></script><script src="submission.js" defer></script><script src="roulette-controller.js" defer></script><script src="deep-sea-game.js" defer></script>
 </body>
 </html>

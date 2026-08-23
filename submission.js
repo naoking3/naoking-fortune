@@ -8,6 +8,7 @@
   const status = document.querySelector('#submit-status');
   const button = form.querySelector('button[type="submit"]');
   const creditInput = document.querySelector('#photo-credit');
+  const fileDrop = form.querySelector('.file-drop');
   const endpoint = 'https://xagrwinvrsjhtyxtnyrh.supabase.co/storage/v1/object/naoking-photos';
   const metadataEndpoint = 'https://xagrwinvrsjhtyxtnyrh.supabase.co/rest/v1/photo_submissions';
   const publicKey = 'sb_publishable_JDX8Rc_mXOOd_F2WHnmzKw_VMKq2Wta';
@@ -18,6 +19,7 @@
   function setStatus(message, tone = '') {
     status.textContent = message;
     status.className = `submit-status ${tone}`.trim();
+    form.dataset.state = tone.replace('is-', '') || 'idle';
   }
 
   let previewUrl = '';
@@ -39,10 +41,28 @@
       preview.hidden = false;
       previewName.textContent = `選択中：${file.name}`;
       previewName.hidden = false;
-      setStatus(`選択中：${file.name}`);
+      const megabytes = (file.size / 1024 / 1024).toFixed(file.size > 1024 * 1024 ? 1 : 2);
+      setStatus(`選択中：${file.name}（${megabytes}MB）`);
     } else {
       setStatus('選んだ写真は、王様が気まぐれに確認します。');
     }
+  });
+
+  ['dragenter', 'dragover'].forEach(type => fileDrop?.addEventListener(type, event => {
+    event.preventDefault();
+    fileDrop.classList.add('is-dragover');
+  }));
+  ['dragleave', 'drop'].forEach(type => fileDrop?.addEventListener(type, event => {
+    event.preventDefault();
+    fileDrop.classList.remove('is-dragover');
+  }));
+  fileDrop?.addEventListener('drop', event => {
+    const [file] = event.dataTransfer?.files || [];
+    if (!file) return;
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    fileInput.files = transfer.files;
+    fileInput.dispatchEvent(new Event('change', { bubbles: true }));
   });
 
   form.addEventListener('submit', async (event) => {
@@ -57,7 +77,8 @@
     const extension = file.name.split('.').pop().replace(/[^a-z0-9]/gi, '').toLowerCase() || 'jpg';
     const safeName = `${Date.now()}-${crypto.randomUUID()}.${extension}`;
     button.disabled = true;
-    setStatus('なおキングが写真を受け取っています…');
+    setStatus('なおキングが写真を受け取っています…', 'is-uploading');
+    let uploaded = false;
     try {
       const response = await fetch(`${endpoint}/${safeName}`, {
         method: 'POST',
@@ -65,6 +86,7 @@
         body: file
       });
       if (!response.ok) throw new Error('upload failed');
+      uploaded = true;
       const metadataResponse = await fetch(metadataEndpoint, {
         method: 'POST',
         headers: {
@@ -78,13 +100,20 @@
           nickname: creditInput.value.trim() || null
         })
       });
-      if (!metadataResponse.ok) throw new Error('metadata failed');
+      if (!metadataResponse.ok) {
+        await fetch(`${endpoint}/${safeName}`, {
+          method: 'DELETE',
+          headers: { apikey: publicKey, Authorization: `Bearer ${publicKey}` }
+        });
+        uploaded = false;
+        throw new Error('metadata failed');
+      }
       localStorage.setItem('naokingLastUpload', String(Date.now()));
       form.reset();
       clearPreview();
       setStatus('献上完了。なおキングが気まぐれに確認します。', 'is-success');
-    } catch {
-      setStatus('送信に失敗しました。少し待ってもう一度試してください。', 'is-error');
+    } catch (error) {
+      setStatus(uploaded ? '写真は届きましたが記録簿への登録に失敗しました。管理者へお知らせください。' : '送信に失敗しました。少し待ってもう一度試してください。', 'is-error');
     } finally {
       button.disabled = false;
     }

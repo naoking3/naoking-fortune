@@ -1,8 +1,7 @@
 /*
  * The only roulette controller.
  * A draw is resolved once into one immutable result object, then every visual
- * update reads from that object.  This intentionally replaces the old button
- * listener from script.js by cloning #spin after script.js has loaded.
+ * update reads from that object. No other file may bind a spin handler.
  */
 (() => {
   const card = document.querySelector('#card');
@@ -15,9 +14,9 @@
   const blast = document.querySelector('#blast');
   if (!card || !slot || !reel || !title || !message || !status || !oldButton) return;
 
-  // Removes every previously registered roulette listener from the button.
-  const button = oldButton.cloneNode(true);
-  oldButton.replaceWith(button);
+  if (oldButton.dataset.rouletteBound === 'true') return;
+  const button = oldButton;
+  button.dataset.rouletteBound = 'true';
 
   const normalTemplates = [
     '今日は少しだけ流れがある。使い切るな。', '小さな勝ちを拾える日。落とすなよ。',
@@ -37,16 +36,16 @@
     '今日は運が少し従順だ。扱いを間違えるな。', '終わりよければ全てよし。途中は知らん。'
   ];
   const normalDefs = [
-    ['海の支配者', 'naoking-1.png', '海が少しだけお前を認めた。'],
-    ['背びれ絶好調', 'naoking-2.png', '背びれの角度が良い。'],
-    ['エサ発見', 'naoking-3.png', 'エサ運だけは期待できる。'],
-    ['水槽の主', 'naoking-4.png', '水槽では王様らしい。'],
-    ['小魚メンタル', 'naoking-5.png', 'ビビっているが、まだ泳げる。'],
-    ['浅瀬で迷子', 'naoking-6.png', '浅瀬で方向を見失った。'],
-    ['干からび寸前', 'naoking-7.png', '干からびる前に水を探せ。'],
-    ['深海ぼんやり', 'naoking-sleepy.png', '眠そうななおキングが判定した。'],
-    ['あわあわ警報', 'naoking-panic.png', 'なおキングが少し慌てている。'],
-    ['サメ笑い', 'naoking-laugh.png', 'なおキングは何かを笑っている。']
+    ['海の支配者', 'assets/characters/naoking-1.webp', '海が少しだけお前を認めた。'],
+    ['背びれ絶好調', 'assets/characters/naoking-2.webp', '背びれの角度が良い。'],
+    ['エサ発見', 'assets/characters/naoking-3.webp', 'エサ運だけは期待できる。'],
+    ['水槽の主', 'assets/characters/naoking-4.webp', '水槽では王様らしい。'],
+    ['小魚メンタル', 'assets/characters/naoking-5.webp', 'ビビっているが、まだ泳げる。'],
+    ['浅瀬で迷子', 'assets/characters/naoking-6.webp', '浅瀬で方向を見失った。'],
+    ['干からび寸前', 'assets/characters/naoking-7.webp', '干からびる前に水を探せ。'],
+    ['深海ぼんやり', 'assets/characters/naoking-sleepy.webp', '眠そうななおキングが判定した。'],
+    ['あわあわ警報', 'assets/characters/naoking-panic.webp', 'なおキングが少し慌てている。'],
+    ['サメ笑い', 'assets/characters/naoking-laugh.webp', 'なおキングは何かを笑っている。']
   ];
   const makeNormal = ([resultTitle, image, prefix]) => ({
     kind: 'normal', key: resultTitle, title: resultTitle, image,
@@ -55,36 +54,36 @@
   const normalResults = normalDefs.map(makeNormal);
 
   const winResults = [
-    { key:'rainbow', kind:'win', title:'虹色の支配者', image:'naoking-jackpot.png', effect:'rainbow', duration:2350, messages:[
+    { key:'rainbow', kind:'win', title:'虹色の支配者', image:'assets/characters/naoking-jackpot.webp', effect:'rainbow', duration:2350, messages:[
       '虹が海底まで届いた。今日は王の客人として扱ってやる。','王冠が鳴った。お前、まさか本当に当てるとはな。','海が七色に割れた。運を使い切る前に深呼吸しろ。','なおキングが立ち上がった。これはかなり珍しい。','虹色判定。お前の背びれ、今だけ神々しいぞ。'
     ]},
-    { key:'crown', kind:'win', title:'王冠落下大当たり', image:'naoking-jackpot.png', effect:'crown', duration:2400, messages:[
+    { key:'crown', kind:'win', title:'王冠落下大当たり', image:'assets/characters/naoking-jackpot.webp', effect:'crown', duration:2400, messages:[
       '王冠が空から落ちてきた。避けなかったお前の勝ちだ。','落下した王冠が判定を直撃。これは文句なしの大当たり。','なおキングの王冠が増えた。一本はお前の運だ。','上を見ろ。王冠と幸運が同時に落ちてきた。','王冠落下演出。お前、今日だけは選ばれた側だ。'
     ]},
-    { key:'revival', kind:'win', title:'逆転・王冠大当たり', image:'naoking-jackpot.png', effect:'revival', duration:2850, messages:[
+    { key:'revival', kind:'win', title:'逆転・王冠大当たり', image:'assets/characters/naoking-jackpot.webp', effect:'revival', duration:2850, messages:[
       '外れたと思った？ 甘いな。海底から逆転大当たりだ。','沈んだ判定が浮上した。なおキングの気まぐれ復活。','終了演出からの王冠。心臓に悪いだろ、これ。','絶望の一拍後、虹が来た。お前、持ってるじゃん。','王が判定をひっくり返した。理由は聞くな。'
     ]},
-    { key:'comet', kind:'win', title:'流星王国ボーナス', image:'naoking-jackpot.png', effect:'comet', duration:2150, messages:[
+    { key:'comet', kind:'win', title:'流星王国ボーナス', image:'assets/characters/naoking-jackpot.webp', effect:'comet', duration:2150, messages:[
       '海を横切る流星が、お前の運を撃ち抜いた。','金色の流星がなおキングの背びれをかすめた。吉だ。','流星演出。願いを言う前に当たってしまったな。','王国上空から幸運が落ちてきた。拾え。','海底なのに流星。理屈はないが大当たりだ。'
     ]},
-    { key:'abyss', kind:'win', title:'深海照射大当たり', image:'naoking-jackpot.png', effect:'abyss', duration:2200, messages:[
+    { key:'abyss', kind:'win', title:'深海照射大当たり', image:'assets/characters/naoking-jackpot.webp', effect:'abyss', duration:2200, messages:[
       '深海の光が選んだ。静かに強い大当たりだ。','海底のサーチライトが、お前だけを照らしている。','深海モードからの特別判定。今日は少し誇れ。','見つかったな。なおキング王国の優良海民だ。','暗い場所ほど、当たりは派手に見える。'
     ]}
   ];
   const lossResults = [
-    { key:'dry', kind:'loss', title:'干からびた横取り', image:'naoking-7.png', effect:'dry', duration:2050, messages:[
+    { key:'dry', kind:'loss', title:'干からびた横取り', image:'assets/characters/naoking-7.webp', effect:'dry', duration:2050, messages:[
       '干からびたなおキングが画面外から来て、当たりを持っていった。悲しいな。','当たりはあった。だが干からびたサメが先に食べた。','大当たり寸前で干からび乱入。運は乾いた。','王冠の代わりに干からびが来た。受け入れろ。','当たりを信じたお前が悪い。干からびたなおキングより。'
     ]},
-    { key:'blackout', kind:'loss', title:'深海暗転ハズレ', image:'naoking-6.png', effect:'blackout', duration:1950, messages:[
+    { key:'blackout', kind:'loss', title:'深海暗転ハズレ', image:'assets/characters/naoking-6.webp', effect:'blackout', duration:1950, messages:[
       '大当たりっぽい暗転からのハズレ。お前のドキドキを返せ。','暗転しただけだった。判定は海流に流された。','期待させておいて通信断。なおキングは昼寝に入った。','深海の正体はハズレ。お前のドキドキを返せ。','大当たりっぽい暗転からの結果なし。海は冷たい。'
     ]},
-    { key:'net', kind:'loss', title:'網にかかった運', image:'naoking-3.png', effect:'net', duration:2050, messages:[
+    { key:'net', kind:'loss', title:'網にかかった運', image:'assets/characters/naoking-3.webp', effect:'net', duration:2050, messages:[
       '巨大な網が画面外から来て、運をさらっていった。','運勢が網に引っかかった。助ける気はない。','いい流れだったのに、網が全部止めた。海あるあるだ。','当たりの気配は網に回収された。次の海流を待て。','網だけは派手だった。結果はハズレだ。'
     ]},
-    { key:'alarm', kind:'loss', title:'緊急帰還', image:'naoking-5.png', effect:'alarm', duration:1950, messages:[
+    { key:'alarm', kind:'loss', title:'緊急帰還', image:'assets/characters/naoking-5.webp', effect:'alarm', duration:1950, messages:[
       '赤い警報が鳴ったので、なおキングは判定を中止した。','危険海域につき本日の運勢は撤収。お前も帰れ。','警報だけ派手で結果はハズレ。期待させるな。','サイレンが全部持っていった。今日は静かにしろ。','緊急帰還。運勢より避難を優先したらしい。'
     ]},
-    { key:'drain', kind:'loss', title:'水位低下', image:'naoking-7.png', effect:'drain', duration:1950, messages:[
+    { key:'drain', kind:'loss', title:'水位低下', image:'assets/characters/naoking-7.webp', effect:'drain', duration:1950, messages:[
       '水位と期待値が同時に下がった。悲しいな。','画面の明かりが消え、水だけが引いた。残ったのはハズレ。','運が蒸発した。干からびる前に諦めろ。','暗い、乾いた、ハズレた。三拍子そろった。','水位低下演出。お前の運も一緒に引いていった。'
     ]}
   ];
@@ -143,24 +142,59 @@
     spinsSinceWin = result.kind === 'win' ? 0 : spinsSinceWin + 1;
     return result;
   }
+  function resolveFinalResult() {
+    const template = chooseFinalResult();
+    return Object.freeze({
+      kind: template.kind,
+      key: template.key,
+      title: template.title,
+      image: template.image,
+      message: shuffledBag(template),
+      effect: template.effect,
+      duration: template.duration
+    });
+  }
   const tile = image => `<div class="shark-tile"><img class="shark-face" src="${image}" alt="なおキング"></div>`;
   const effectLayer = document.createElement('div'); effectLayer.className = 'roulette-fx'; card.append(effectLayer);
   const prop = document.createElement('div'); prop.className = 'roulette-scene-prop'; prop.setAttribute('aria-hidden','true'); card.append(prop);
-  const intruder = document.createElement('img'); intruder.className = 'dry-shark-intruder'; intruder.src = 'naoking-7.png'; intruder.alt = ''; card.append(intruder);
+  const intruder = document.createElement('img'); intruder.className = 'dry-shark-intruder'; intruder.src = 'assets/characters/naoking-7.webp'; intruder.alt = ''; card.append(intruder);
   const crowns = document.createElement('div'); crowns.className = 'crown-rain'; crowns.innerHTML = '<i>♛</i><i>♛</i><i>♛</i><i>♛</i><i>♛</i>'; card.append(crowns);
-  const flash = (kind, text, ms = 1650) => { effectLayer.className = `roulette-fx is-visible ${kind}`; effectLayer.textContent = text; window.setTimeout(() => { effectLayer.className = 'roulette-fx'; }, ms); };
-  const propIn = (kind, text, ms = 1600) => { prop.className = `roulette-scene-prop is-running ${kind}`; prop.textContent = text; window.setTimeout(() => { prop.className = 'roulette-scene-prop'; }, ms); };
 
   let busy = false;
   let locked = false;
   let taps = [];
   let activeTimers = [];
+  let drawToken = 0;
+  const historyList = document.querySelector('#fortune-history');
+  const displayHistory = [];
+  const later = (fn, ms, token = drawToken) => {
+    const id = window.setTimeout(() => {
+      activeTimers = activeTimers.filter(item => item !== id);
+      if (token === drawToken) fn();
+    }, ms);
+    activeTimers.push(id);
+    return id;
+  };
+  const flash = (kind, text, ms = 1650) => {
+    effectLayer.className = `roulette-fx is-visible ${kind}`;
+    effectLayer.textContent = text;
+    later(() => { effectLayer.className = 'roulette-fx'; }, ms);
+  };
+  const propIn = (kind, text, ms = 1600) => {
+    prop.className = `roulette-scene-prop is-running ${kind}`;
+    prop.textContent = text;
+    later(() => { prop.className = 'roulette-scene-prop'; }, ms);
+  };
   const resetVisualState = () => {
     activeTimers.forEach(window.clearTimeout); activeTimers = [];
     card.className = card.className.replace(/\bis-(jackpot|rainbow|crown|revival|comet|abyss|dry|blackout|net|alarm|drain|failed|exploded|searchlight|gold|deep|crown-drop|dry-steal|void-miss)\b/g, '').trim();
     slot.classList.remove('is-jackpot', 'is-long-spin', 'is-spinning');
+    effectLayer.className = 'roulette-fx';
+    prop.className = 'roulette-scene-prop';
+    intruder.classList.remove('is-running');
+    crowns.classList.remove('is-raining');
+    if (blast) blast.hidden = true;
   };
-  const later = (fn, ms) => { const id = window.setTimeout(() => { activeTimers = activeTimers.filter(item => item !== id); fn(); }, ms); activeTimers.push(id); return id; };
   const effectText = { rainbow:'RAINBOW JACKPOT', crown:'CROWN DROP!', revival:'REVIVAL!!', comet:'ROYAL COMET', abyss:'ABYSS BEAM', dry:'LUCK STOLEN', blackout:'DEEP BLACKOUT', net:'NET FAILURE', alarm:'RED ALERT', drain:'WATER DRAIN' };
   function applyStartEffect(result) {
     if (result.effect === 'comet') { card.classList.add('is-comet'); propIn('comet', '✦'); }
@@ -183,22 +217,31 @@
     }
     reel.innerHTML = tile(result.image);
     title.textContent = result.title;
-    message.textContent = shuffledBag(result);
+    message.textContent = result.message;
     status.textContent = result.kind === 'win' ? 'SPECIAL JACKPOT CONFIRMED' : result.kind === 'loss' ? 'SPECIAL MISS CONFIRMED' : 'JUDGMENT COMPLETE // TRY AGAIN';
     button.textContent = '運命を回す';
+    displayHistory.unshift(result);
+    displayHistory.splice(3);
+    if (historyList) {
+      historyList.innerHTML = displayHistory.map(item => `<li><span>${item.title}</span><small>${item.kind === 'win' ? '大当たり' : item.kind === 'loss' ? '特殊ハズレ' : '通常'}</small></li>`).join('');
+    }
     busy = false;
   }
   function spin() {
     if (locked) return;
     const now = Date.now(); taps = taps.filter(time => now - time < 2400); taps.push(now);
     if (taps.length >= 3) {
+      drawToken += 1;
       busy = false; locked = true; resetVisualState(); card.classList.add('is-exploded');
       title.textContent = 'なおキング激怒'; message.textContent = '連打されたので、なおキングは海へ帰りました。別ページに移動して戻るまで停止中。';
-      status.textContent = 'SYSTEM LOCKED // DO NOT TAP'; button.textContent = 'なおキング、怒って停止中…'; flash('fake', '連打厳禁', 1700); return;
+      status.textContent = 'SYSTEM LOCKED // DO NOT TAP'; button.textContent = 'なおキング、怒って停止中…';
+      if (blast) { blast.hidden = false; later(() => { blast.hidden = true; }, 1650); }
+      flash('fake', '連打厳禁', 1700); return;
     }
     if (busy) return;
+    drawToken += 1;
     busy = true; resetVisualState();
-    const result = chooseFinalResult(); // The one and only draw for this click.
+    const result = resolveFinalResult(); // The one immutable draw for this click.
     reel.innerHTML = Array.from({ length: 30 }, () => tile(normalResults[Math.floor(Math.random() * normalResults.length)].image)).join('');
     slot.classList.add('is-spinning');
     slot.classList.toggle('is-long-spin', result.effect === 'revival');
@@ -209,7 +252,7 @@
     later(() => {
       slot.classList.remove('is-spinning', 'is-long-spin');
       if (result.effect === 'revival') {
-        card.classList.add('is-failed'); reel.innerHTML = tile('naoking-7.png'); title.textContent = '干からび寸前'; message.textContent = '……終了。まあ、そういう日もある。'; status.textContent = 'JUDGMENT FAILED // ...';
+        card.classList.add('is-failed'); reel.innerHTML = tile('assets/characters/naoking-7.webp'); title.textContent = '干からび寸前'; message.textContent = '……終了。まあ、そういう日もある。'; status.textContent = 'JUDGMENT FAILED // ...';
         later(() => showFinal(result), 820); return;
       }
       if (result.effect === 'blackout') {
@@ -220,8 +263,19 @@
     }, result.duration);
   }
   button.addEventListener('click', spin);
-  document.querySelectorAll('[data-tab]').forEach(link => link.addEventListener('click', () => {
-    if (link.dataset.tab === 'fortune') return;
-    if (locked) { locked = false; taps = []; resetVisualState(); button.textContent = '運命を回す'; status.textContent = 'JUDGMENT SYSTEM / READY'; }
-  }));
+  window.addEventListener('naoking:pagechange', event => {
+    if (event.detail?.page === 'fortune') return;
+    drawToken += 1;
+    busy = false;
+    locked = false;
+    taps = [];
+    resetVisualState();
+    button.textContent = '運命を回す';
+    status.textContent = 'JUDGMENT SYSTEM / READY';
+  });
+
+  window.NaokingRouletteDebug = Object.freeze({
+    probabilities: Object.freeze({ normal: 0.76, specialWin: 0.14, specialLoss: 0.10, streakBonusAfter: 7 }),
+    getState: () => Object.freeze({ busy, locked, normalHistory: [...normalHistory], displayed: displayHistory.map(item => item.key) })
+  });
 })();
