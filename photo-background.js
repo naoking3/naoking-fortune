@@ -54,7 +54,10 @@
       const incomingPhoto = snapshots.find(photo => photo !== outgoingPhoto) || snapshots[0];
       incomingPhoto.src = source;
       incomingPhoto.alt = `なおキングダムの王国風景 ${nextIndex + 1}`;
+      incomingPhoto.removeAttribute('aria-hidden');
       incomingPhoto.classList.add('is-visible');
+      outgoingPhoto.alt = '';
+      outgoingPhoto.setAttribute('aria-hidden', 'true');
       outgoingPhoto.classList.remove('is-visible');
     }
     currentIndex = nextIndex;

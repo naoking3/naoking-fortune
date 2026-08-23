@@ -9,17 +9,25 @@
   <meta property="og:title" content="なおキングダム — Abyssal Court">
   <meta property="og:description" content="変なサメが統べる、静かでちょっとおかしい深海王国。">
   <meta property="og:image" content="https://naoking3.github.io/naoking-fortune/assets/backgrounds/vrchat-01.webp">
+  <meta property="og:image:width" content="1600">
+  <meta property="og:image:height" content="900">
+  <meta property="og:image:alt" content="深海に浮かぶ、なおキングダムの王国風景">
   <meta property="og:url" content="https://naoking3.github.io/naoking-fortune/">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="なおキングダム — Abyssal Court">
+  <meta name="twitter:description" content="変なサメが統べる、静かでちょっとおかしい深海王国。">
+  <meta name="twitter:image" content="https://naoking3.github.io/naoking-fortune/assets/backgrounds/vrchat-01.webp">
   <title>なおキングダム — Abyssal Court</title>
+  <link rel="canonical" href="https://naoking3.github.io/naoking-fortune/">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="assets/characters/naoking-hero.webp" as="image" type="image/webp">
   <link rel="preload" href="assets/backgrounds/vrchat-01.webp" as="image" type="image/webp">
-  <link rel="stylesheet" href="deep-sea.css?v=20260824b">
-  <link rel="stylesheet" href="roulette.css?v=20260824b">
-  <link rel="stylesheet" href="deep-sea-game.css?v=20260824b">
+  <link rel="stylesheet" href="deep-sea.css?v=20260824d">
+  <link rel="stylesheet" href="roulette.css?v=20260824d">
+  <link rel="stylesheet" href="deep-sea-game.css?v=20260824d">
 </head>
 <body data-page="home">
+  <noscript><style>.opening{display:none!important}</style><p class="noscript-notice">JavaScriptが無効なため、王国門のみ表示しています。</p></noscript>
   <a class="skip-link" href="#main-content">本文へ潜る</a>
   <div class="photo-background" id="photo-background" aria-hidden="true"></div>
   <div class="ocean-atmosphere" aria-hidden="true">
@@ -27,7 +35,7 @@
     <i class="drift drift-a"></i><i class="drift drift-b"></i><i class="drift drift-c"></i>
   </div>
 
-  <div class="opening" id="opening" aria-label="なおキングダムへ潜航中">
+  <div class="opening" id="opening" role="dialog" aria-modal="true" aria-label="なおキングダムへ潜航中">
     <div class="opening-horizon" aria-hidden="true"></div>
     <div class="opening-lockup">
       <p>NAOKING KINGDOM / GATE 00</p>
@@ -151,7 +159,7 @@
           <div class="roulette-marquee" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
           <div class="slot-window" id="slot" aria-label="今日の運勢"><div class="pointer" aria-hidden="true">▼</div><div class="roulette-flare" aria-hidden="true"></div><div class="slot-reel" id="reel"><div class="shark-tile"><img class="shark-face" id="shark" src="assets/characters/naoking-1.webp" alt="なおキング"></div></div></div>
           <p class="roulette-status" id="roulette-status">JUDGMENT SYSTEM / READY</p>
-          <div class="result" aria-live="polite"><span>本日のサメ式判定</span><strong id="fortune-name">海の支配者</strong><p id="message">ボタンを押せ。なおキングが、あなたの都合を見ずに今日の運勢を決める。</p></div>
+          <div class="result" aria-live="polite" aria-busy="false"><span>本日のサメ式判定</span><strong id="fortune-name">海の支配者</strong><p id="message">ボタンを押せ。なおキングが、あなたの都合を見ずに今日の運勢を決める。</p></div>
           <button type="button" id="spin"><span>運命を回す</span><small>HOLD YOUR BREATH</small></button>
           <p class="footnote">※ なおキングは結果に責任を取りません。王なので。</p><div class="blast" id="blast" hidden><b>反逆検知</b><span>おい、連打するな。</span></div>
         </div>
@@ -173,10 +181,11 @@
     <section class="page" id="submit" data-depth="6120" aria-labelledby="submit-title" hidden>
       <div class="page-hero offering-hero section-frame"><div><p class="kicker"><span>04</span> ROYAL MATERIAL OFFERING</p><h1 id="submit-title">写真素材<br><em>献上窓口。</em></h1></div><p>あなたが撮影した王国の記録を、動画素材としてなおキングへ献上できます。</p></div>
       <div class="offering-layout section-frame">
-        <aside class="offering-guidance"><span>OFFERING PROTOCOL</span><h2>送る前に、<br>三つだけ確認。</h2><ul><li>自分で撮影した、または使用許可がある</li><li>動画・SNSで使用される可能性に同意する</li><li>JPEG / PNG / WebP、10MB以内</li></ul><p>採用の保証はありません。王の気まぐれです。</p></aside>
+        <aside class="offering-guidance"><span>OFFERING PROTOCOL</span><h2>送る前に、<br>三つだけ確認。</h2><ul><li>自分で撮影した、または使用許可がある</li><li>動画・SNSで使用される可能性に同意する</li><li>JPEG / PNG / WebP、10MB以内</li></ul><p>採用の保証はありません。王の気まぐれです。</p><p class="privacy-note">写真・投稿日時・任意のニックネームは管理者用の記録庫に保存されます。削除を希望する場合は、なおキングへ直接お知らせください。</p></aside>
         <div class="submit-frame" id="submit-frame"><form class="photo-submit-form" id="photo-submit-form">
           <label class="file-drop" for="photo-file"><span class="file-index">01 / IMAGE</span><strong>写真を選ぶ</strong><small>DROP OR TAP TO SELECT</small><img class="photo-preview" id="photo-preview" alt="選択した写真のプレビュー" hidden><span class="photo-preview-name" id="photo-preview-name" hidden></span><input id="photo-file" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required></label>
           <label class="field-label"><span>02 / CREDIT</span>撮影者名・ニックネーム（任意）<input id="photo-credit" name="credit" type="text" maxlength="50" placeholder="例：なおキングの民" autocomplete="nickname"></label>
+          <label class="offering-trap" aria-hidden="true">この欄は空のままにしてください<input id="photo-company" name="company" type="text" tabindex="-1" autocomplete="off"></label>
           <label class="usage-check"><input id="photo-consent" type="checkbox" required><span>自分で撮影した、または使用許可のある写真であり、なおキングダムの動画・SNSで使われる場合があることに同意します。</span></label>
           <button class="submit-photo-button" type="submit">写真を献上する <span>↗</span></button><p class="submit-status" id="submit-status" aria-live="polite">選んだ写真は、王様が気まぐれに確認します。</p>
         </form></div>
@@ -196,6 +205,6 @@
   <footer class="site-footer"><span>NAOKING KINGDOM / EST. SOMEWHERE</span><p>© なおキングダム　海の支配者がたぶん管理中</p><button type="button" id="crest-secret" aria-label="王冠の紋章">♛</button></footer>
   <div class="secret-decree" id="secret-decree" role="status" aria-live="polite" hidden>秘密通達：今日はもう十分えらい。海へ帰れ。</div>
 
-  <script src="site.js?v=20260824b" defer></script><script src="photo-background.js?v=20260824b" defer></script><script src="submission.js?v=20260824b" defer></script><script src="roulette-controller.js?v=20260824b" defer></script><script src="deep-sea-game.js?v=20260824b" defer></script>
+  <script src="site.js?v=20260824d" defer></script><script src="photo-background.js?v=20260824d" defer></script><script src="submission.js?v=20260824d" defer></script><script src="roulette-controller.js?v=20260824d" defer></script><script src="deep-sea-game.js?v=20260824d" defer></script>
 </body>
 </html>

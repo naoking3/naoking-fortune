@@ -25,6 +25,7 @@ class Element {
     this.children = [];
   }
   append(...children) { this.children.push(...children); }
+  querySelector() { return null; }
   setAttribute(name, value) { this[name] = String(value); }
   addEventListener(type, listener) {
     const listeners = this.listeners.get(type) || [];
@@ -42,6 +43,7 @@ const windowListeners = new Map();
 const windowMock = {
   setTimeout,
   clearTimeout,
+  matchMedia: () => ({ matches: false }),
   addEventListener(type, listener) {
     const listeners = windowListeners.get(type) || [];
     listeners.push(listener);

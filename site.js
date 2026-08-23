@@ -6,16 +6,46 @@
   const navigation = document.querySelector('#site-nav');
   const menuButton = document.querySelector('#menu-button');
   const header = document.querySelector('#site-header');
+  const main = document.querySelector('#main-content');
+  const siteFooter = document.querySelector('.site-footer');
+  const brand = document.querySelector('.brand');
+  const skipLink = document.querySelector('.skip-link');
+  const opening = document.querySelector('#opening');
+  const skipOpening = document.querySelector('#skip-opening');
   const depthValue = document.querySelector('#header-depth-value');
   const depthProgress = document.querySelector('#depth-progress');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const validPages = new Set(pages.map(page => page.id));
   let activePage = 'home';
+  let menuOpen = false;
+  let openingActive = Boolean(opening);
 
-  function closeMenu() {
+  function syncInteractiveState() {
+    const backgroundInert = openingActive || menuOpen;
+    [main, siteFooter, brand, skipLink].forEach(element => {
+      if (element) element.inert = backgroundInert;
+    });
+    if (navigation) navigation.inert = openingActive;
+    if (menuButton) menuButton.inert = openingActive;
+  }
+
+  function closeMenu({ restoreFocus = false } = {}) {
+    const wasOpen = menuOpen;
+    menuOpen = false;
     navigation?.classList.remove('is-open');
     menuButton?.setAttribute('aria-expanded', 'false');
     body.classList.remove('menu-open');
+    syncInteractiveState();
+    if (wasOpen && restoreFocus) menuButton?.focus();
+  }
+
+  function openMenu() {
+    menuOpen = true;
+    navigation?.classList.add('is-open');
+    menuButton?.setAttribute('aria-expanded', 'true');
+    body.classList.add('menu-open');
+    syncInteractiveState();
+    window.requestAnimationFrame(() => navigation?.querySelector('.nav-link')?.focus());
   }
 
   function setPage(name, { updateHistory = true, focus = true } = {}) {
@@ -72,15 +102,38 @@
   });
 
   menuButton?.addEventListener('click', () => {
-    const isOpen = navigation?.classList.toggle('is-open') ?? false;
-    menuButton.setAttribute('aria-expanded', String(isOpen));
-    body.classList.toggle('menu-open', isOpen);
+    menuOpen ? closeMenu({ restoreFocus: true }) : openMenu();
   });
 
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') closeMenu();
+    if (openingActive && event.key === 'Tab') {
+      event.preventDefault();
+      skipOpening?.focus();
+      return;
+    }
+    if (!menuOpen) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeMenu({ restoreFocus: true });
+      return;
+    }
+    if (event.key === 'Tab') {
+      const focusable = [menuButton, ...navigation.querySelectorAll('.nav-link')].filter(Boolean);
+      const current = focusable.indexOf(document.activeElement);
+      const next = event.shiftKey
+        ? (current <= 0 ? focusable.length - 1 : current - 1)
+        : (current === focusable.length - 1 ? 0 : current + 1);
+      event.preventDefault();
+      focusable[next].focus();
+    }
   });
-  window.addEventListener('popstate', () => setPage(window.location.hash.slice(1), { updateHistory: false }));
+  function syncRouteFromLocation() {
+    const route = window.location.hash.slice(1);
+    const next = validPages.has(route) ? route : 'home';
+    if (next !== activePage) setPage(next, { updateHistory: false });
+  }
+  window.addEventListener('popstate', syncRouteFromLocation);
+  window.addEventListener('hashchange', syncRouteFromLocation);
 
   let scrollTicking = false;
   function updateScrollState() {
@@ -100,20 +153,31 @@
     }
   }, { passive: true });
 
-  const opening = document.querySelector('#opening');
-  const skipOpening = document.querySelector('#skip-opening');
   let openingTimer = 0;
+  let manageOpeningFocus = false;
   function finishOpening() {
     if (!opening || opening.classList.contains('is-finished')) return;
     window.clearTimeout(openingTimer);
+    openingActive = false;
+    syncInteractiveState();
     opening.classList.add('is-finished');
     opening.setAttribute('aria-hidden', 'true');
     try { window.sessionStorage.setItem('naokingOpeningSeen', '1'); } catch { /* storage may be blocked */ }
     window.setTimeout(() => opening.remove(), reducedMotion.matches ? 0 : 900);
+    if (manageOpeningFocus) {
+      const heading = document.querySelector('.page:not([hidden]) h1');
+      if (heading) {
+        heading.tabIndex = -1;
+        window.setTimeout(() => heading.focus({ preventScroll: true }), reducedMotion.matches ? 0 : 100);
+      }
+    }
   }
   if (opening) {
     let seen = false;
     try { seen = window.sessionStorage.getItem('naokingOpeningSeen') === '1'; } catch { /* ignore */ }
+    manageOpeningFocus = !seen && !reducedMotion.matches;
+    syncInteractiveState();
+    if (manageOpeningFocus) window.requestAnimationFrame(() => skipOpening?.focus());
     openingTimer = window.setTimeout(finishOpening, seen || reducedMotion.matches ? 250 : 2600);
     skipOpening?.addEventListener('click', finishOpening);
   }

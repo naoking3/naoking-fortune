@@ -8,6 +8,7 @@
   const status = document.querySelector('#submit-status');
   const button = form.querySelector('button[type="submit"]');
   const creditInput = document.querySelector('#photo-credit');
+  const trapInput = document.querySelector('#photo-company');
   const fileDrop = form.querySelector('.file-drop');
   const endpoint = 'https://xagrwinvrsjhtyxtnyrh.supabase.co/storage/v1/object/naoking-photos';
   const metadataEndpoint = 'https://xagrwinvrsjhtyxtnyrh.supabase.co/rest/v1/photo_submissions';
@@ -15,6 +16,14 @@
   const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
   const maxBytes = 10 * 1024 * 1024;
   const cooldownMs = 30 * 1000;
+
+  async function hasValidImageSignature(file) {
+    const bytes = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+    const isJpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+    const isPng = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a].every((value, index) => bytes[index] === value);
+    const isWebp = String.fromCharCode(...bytes.slice(0, 4)) === 'RIFF' && String.fromCharCode(...bytes.slice(8, 12)) === 'WEBP';
+    return isJpeg || isPng || isWebp;
+  }
 
   function setStatus(message, tone = '') {
     status.textContent = message;
@@ -68,13 +77,18 @@
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const file = fileInput.files[0];
+    if (trapInput?.value) return setStatus('送信を受け付けられませんでした。', 'is-error');
     if (!file) return setStatus('まず写真を選んでください。', 'is-error');
     if (!allowedTypes.includes(file.type)) return setStatus('JPEG、PNG、WebPだけ送れます。サメの決まりです。', 'is-error');
     if (file.size > maxBytes) return setStatus('10MBを超えています。少し軽くしてから送ってください。', 'is-error');
-    const lastUpload = Number(localStorage.getItem('naokingLastUpload') || 0);
+    let signatureValid = false;
+    try { signatureValid = await hasValidImageSignature(file); } catch { /* unreadable local file */ }
+    if (!signatureValid) return setStatus('画像ファイルの内容を確認できませんでした。別の写真を選んでください。', 'is-error');
+    let lastUpload = 0;
+    try { lastUpload = Number(localStorage.getItem('naokingLastUpload') || 0); } catch { /* storage may be blocked */ }
     if (Date.now() - lastUpload < cooldownMs) return setStatus('連投しすぎです。30秒ほど待ってください。', 'is-error');
 
-    const extension = file.name.split('.').pop().replace(/[^a-z0-9]/gi, '').toLowerCase() || 'jpg';
+    const extension = ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' })[file.type];
     const safeName = `${Date.now()}-${crypto.randomUUID()}.${extension}`;
     button.disabled = true;
     setStatus('なおキングが写真を受け取っています…', 'is-uploading');
@@ -110,7 +124,7 @@
         uploaded = !cleanupResponse.ok;
         throw new Error('metadata failed');
       }
-      localStorage.setItem('naokingLastUpload', String(Date.now()));
+      try { localStorage.setItem('naokingLastUpload', String(Date.now())); } catch { /* storage may be blocked */ }
       form.reset();
       clearPreview();
       setStatus('献上完了。なおキングが気まぐれに確認します。', 'is-success');

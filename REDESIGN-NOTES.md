@@ -19,9 +19,9 @@
 | Background and snapshot crossfade | `photo-background.js` |
 | Fortune data, draw, effects and result rendering | `roulette-controller.js` |
 | Fortune-only visual effects | `roulette.css` |
-| Migration game | `deep-sea-game.js` / `deep-sea-game.css` |
+| Migration game logic and controls | `deep-sea-game.js` / `deep-sea-game.css` |
 | Supabase offering form | `submission.js` |
-| Shared design system and page layouts | `deep-sea.css` |
+| Shared design system, page and game-shell layouts | `deep-sea.css` |
 
 Only `roulette-controller.js` may bind `#spin`. A fortune click resolves one frozen final result before animation begins.
 

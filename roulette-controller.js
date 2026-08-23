@@ -9,6 +9,7 @@
   const reel = document.querySelector('#reel');
   const title = document.querySelector('#fortune-name');
   const message = document.querySelector('#message');
+  const resultRegion = document.querySelector('.result');
   const status = document.querySelector('#roulette-status');
   const oldButton = document.querySelector('#spin');
   const blast = document.querySelector('#blast');
@@ -17,6 +18,18 @@
   if (oldButton.dataset.rouletteBound === 'true') return;
   const button = oldButton;
   button.dataset.rouletteBound = 'true';
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function setButtonCopy(label, hint = 'HOLD YOUR BREATH') {
+    const labelElement = button.querySelector('span');
+    const hintElement = button.querySelector('small');
+    if (labelElement && hintElement) {
+      labelElement.textContent = label;
+      hintElement.textContent = hint;
+    } else {
+      button.textContent = label;
+    }
+  }
 
   const normalTemplates = [
     '今日は少しだけ流れがある。使い切るな。', '小さな勝ちを拾える日。落とすなよ。',
@@ -155,10 +168,10 @@
     });
   }
   const tile = image => `<div class="shark-tile"><img class="shark-face" src="${image}" alt="なおキング"></div>`;
-  const effectLayer = document.createElement('div'); effectLayer.className = 'roulette-fx'; card.append(effectLayer);
+  const effectLayer = document.createElement('div'); effectLayer.className = 'roulette-fx'; effectLayer.setAttribute('aria-hidden', 'true'); card.append(effectLayer);
   const prop = document.createElement('div'); prop.className = 'roulette-scene-prop'; prop.setAttribute('aria-hidden','true'); card.append(prop);
   const intruder = document.createElement('img'); intruder.className = 'dry-shark-intruder'; intruder.src = 'assets/characters/naoking-7.webp'; intruder.alt = ''; card.append(intruder);
-  const crowns = document.createElement('div'); crowns.className = 'crown-rain'; crowns.innerHTML = '<i>♛</i><i>♛</i><i>♛</i><i>♛</i><i>♛</i>'; card.append(crowns);
+  const crowns = document.createElement('div'); crowns.className = 'crown-rain'; crowns.setAttribute('aria-hidden', 'true'); crowns.innerHTML = '<i>♛</i><i>♛</i><i>♛</i><i>♛</i><i>♛</i>'; card.append(crowns);
 
   let busy = false;
   let locked = false;
@@ -168,10 +181,11 @@
   const historyList = document.querySelector('#fortune-history');
   const displayHistory = [];
   const later = (fn, ms, token = drawToken) => {
+    const delay = reducedMotion.matches ? Math.min(ms, 180) : ms;
     const id = window.setTimeout(() => {
       activeTimers = activeTimers.filter(item => item !== id);
       if (token === drawToken) fn();
-    }, ms);
+    }, delay);
     activeTimers.push(id);
     return id;
   };
@@ -218,8 +232,9 @@
     reel.innerHTML = tile(result.image);
     title.textContent = result.title;
     message.textContent = result.message;
+    resultRegion?.setAttribute('aria-busy', 'false');
     status.textContent = result.kind === 'win' ? 'SPECIAL JACKPOT CONFIRMED' : result.kind === 'loss' ? 'SPECIAL MISS CONFIRMED' : 'JUDGMENT COMPLETE // TRY AGAIN';
-    button.textContent = '運命を回す';
+    setButtonCopy('運命を回す');
     displayHistory.unshift(result);
     displayHistory.splice(3);
     if (historyList) {
@@ -234,7 +249,8 @@
       drawToken += 1;
       busy = false; locked = true; resetVisualState(); card.classList.add('is-exploded');
       title.textContent = 'なおキング激怒'; message.textContent = '連打されたので、なおキングは海へ帰りました。別ページに移動して戻るまで停止中。';
-      status.textContent = 'SYSTEM LOCKED // DO NOT TAP'; button.textContent = 'なおキング、怒って停止中…';
+      resultRegion?.setAttribute('aria-busy', 'false');
+      status.textContent = 'SYSTEM LOCKED // DO NOT TAP'; setButtonCopy('なおキング、怒って停止中…', 'SYSTEM LOCKED');
       if (blast) { blast.hidden = false; later(() => { blast.hidden = true; }, 1650); }
       flash('fake', '連打厳禁', 1700); return;
     }
@@ -245,8 +261,9 @@
     reel.innerHTML = Array.from({ length: 30 }, () => tile(normalResults[Math.floor(Math.random() * normalResults.length)].image)).join('');
     slot.classList.add('is-spinning');
     slot.classList.toggle('is-long-spin', result.effect === 'revival');
-    button.textContent = 'なおキング採点中・連打厳禁…';
+    setButtonCopy('なおキング採点中・連打厳禁…', 'DO NOT TAP');
     status.textContent = result.kind === 'win' ? 'SPECIAL SIGNAL DETECTED' : result.kind === 'loss' ? 'UNSTABLE SEA CONDITIONS' : 'JUDGMENT SYSTEM / SPINNING';
+    resultRegion?.setAttribute('aria-busy', 'true');
     message.textContent = result.effect === 'revival' ? '……判定が妙に長い。なおキングが何か企んでいる。' : 'なおキングが今日の運勢を読んでいる……たぶん適当だ。';
     applyStartEffect(result);
     later(() => {
@@ -270,7 +287,8 @@
     locked = false;
     taps = [];
     resetVisualState();
-    button.textContent = '運命を回す';
+    setButtonCopy('運命を回す');
+    resultRegion?.setAttribute('aria-busy', 'false');
     status.textContent = 'JUDGMENT SYSTEM / READY';
     title.textContent = '海の支配者';
     message.textContent = 'ボタンを押せ。なおキングが、あなたの都合を見ずに今日の運勢を決める。';
