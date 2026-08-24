@@ -287,12 +287,9 @@ img { max-width: 100%; }
 .hero-king figcaption small { font: 700 7px var(--mono); letter-spacing: .14em; }
 .hero-king figcaption strong { font: 600 20px var(--display); }
 .hero-king figcaption span { font-size: 10px; }
-.royal-orbit { position: absolute; z-index: -1; top: 5%; left: 4%; width: 90%; aspect-ratio: 1; border: 1px dashed rgba(141,235,255,.18); border-radius: 50%; animation: orbit-turn 30s linear infinite; }
-.royal-orbit span { position: absolute; top: 50%; left: -11%; color: rgba(191,238,245,.4); font: 600 7px var(--mono); letter-spacing: .12em; }
 .dive-cue { position: absolute; bottom: 24px; left: 50%; display: grid; justify-items: center; gap: 7px; padding: 8px; border: 0; color: var(--muted); background: none; font: 700 7px var(--mono); letter-spacing: .2em; cursor: pointer; transform: translateX(-50%); }
 .dive-cue i { color: var(--cyan); font: normal 18px/1 var(--sans); animation: dive-nudge 1.8s ease-in-out infinite; }
 @keyframes sovereign-float { 50% { transform: translateY(-12px) rotate(-1.2deg); } }
-@keyframes orbit-turn { to { transform: rotate(1turn); } }
 @keyframes dive-nudge { 50% { transform: translateY(7px); } }
 
 .kingdom-overview, .portal-section, .royal-index { padding-block: clamp(90px, 12vw, 170px); }
