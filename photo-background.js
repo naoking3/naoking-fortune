@@ -4,7 +4,8 @@
   const background = document.querySelector('#photo-background');
   if (!background) return;
 
-  const photos = Array.from({ length: 7 }, (_, index) => `assets/backgrounds/vrchat-${String(index + 1).padStart(2, '0')}.webp`);
+  // Keep the background and snapshot gallery on the same 26-image source of truth.
+  const photos = Array.from({ length: 26 }, (_, index) => `assets/backgrounds/vrchat-${String(index + 1).padStart(2, '0')}.webp`);
   const layers = [document.createElement('i'), document.createElement('i')];
   const snapshots = [...document.querySelectorAll('.snapshot-photo')];
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
