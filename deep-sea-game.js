@@ -63,12 +63,16 @@
     const GAME_DURATION = 30;
     const OXYGEN_START = 78;
     const PLAYER_Y = WORLD.height - 92;
+    const PHASE_TIMES = [4.5, 9, 13.5, 18];
+    const DOUBLE_GATE_OFFSET = 0.88;
+    const SWEEP_GATE_OFFSET = 0.7;
+    const LATE_SPEED_RAMP = 3.4;
     const PHASES = [
-      { drain: 8.4, gap: 198, speed: 220, warning: 0.95, shift: 230, current: 92, reward: 42 },
-      { drain: 11.2, gap: 188, speed: 260, warning: 0.84, shift: 255, current: 103, reward: 52 },
-      { drain: 14.8, gap: 176, speed: 300, warning: 0.74, shift: 280, current: 114, reward: 64 },
-      { drain: 18.5, gap: 164, speed: 340, warning: 0.66, shift: 305, current: 126, reward: 78 },
-      { drain: 21.5, gap: 152, speed: 380, warning: 0.58, shift: 330, current: 140, reward: 92 }
+      { drain: 8.4, gap: 196, speed: 235, warning: 0.92, shift: 238, current: 98, reward: 42 },
+      { drain: 11.2, gap: 184, speed: 280, warning: 0.8, shift: 268, current: 112, reward: 52 },
+      { drain: 14.8, gap: 172, speed: 325, warning: 0.69, shift: 298, current: 128, reward: 64 },
+      { drain: 18.5, gap: 158, speed: 370, warning: 0.6, shift: 330, current: 146, reward: 78 },
+      { drain: 21.5, gap: 146, speed: 420, warning: 0.52, shift: 360, current: 166, reward: 92 }
     ];
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const keyState = { left: false, right: false };
@@ -290,10 +294,10 @@
     function clamp(value, minimum, maximum) { return Math.max(minimum, Math.min(maximum, value)); }
     function difficulty() { return clamp(game.elapsed / GAME_DURATION, 0, 1); }
     function phaseIndex() {
-      if (game.elapsed >= 20) return 4;
-      if (game.elapsed >= 15) return 3;
-      if (game.elapsed >= 10) return 2;
-      if (game.elapsed >= 5) return 1;
+      if (game.elapsed >= PHASE_TIMES[3]) return 4;
+      if (game.elapsed >= PHASE_TIMES[2]) return 3;
+      if (game.elapsed >= PHASE_TIMES[1]) return 2;
+      if (game.elapsed >= PHASE_TIMES[0]) return 1;
       return 0;
     }
     function phaseConfig() { return PHASES[phaseIndex()]; }
@@ -550,7 +554,7 @@
     }
 
     function hazardSpeed() {
-      return phaseConfig().speed + Math.random() * 18 + Math.max(0, game.elapsed - 20) * 2.5;
+      return phaseConfig().speed + Math.random() * 18 + Math.max(0, game.elapsed - PHASE_TIMES[3]) * LATE_SPEED_RAMP;
     }
 
     function hazardHeight(hazardType) {
@@ -652,7 +656,7 @@
       if (pattern === 'double-gate') {
         const secondType = Math.random() < 0.5 ? 'netGate' : 'rockGate';
         telegraphGate({ ...first, hazardType: 'rockGate', delay: warningTime, speed, label: '1 / 2' });
-        schedule(0.96, () => {
+        schedule(DOUBLE_GATE_OFFSET, () => {
           const second = chooseReachableGap(true, 155);
           telegraphGate({
             ...second, hazardType: secondType, delay: warningTime, speed,
@@ -660,7 +664,7 @@
           });
         });
         announce('連続波。次の隙間まで見て。');
-        return patternCooldown({ hazardType: secondType, speed, warningDelay: warningTime, spawnOffset: 0.96 });
+        return patternCooldown({ hazardType: secondType, speed, warningDelay: warningTime, spawnOffset: DOUBLE_GATE_OFFSET });
       }
       if (pattern === 'current-gate') {
         const direction = Math.random() < 0.5 ? -1 : 1;
@@ -673,11 +677,11 @@
         return patternCooldown({ hazardType: 'netGate', speed, warningDelay: warningTime + 0.2 });
       }
       telegraphGate({ ...first, hazardType: 'mineGate', delay: warningTime, speed, label: '1 / 3' });
-      schedule(0.78, () => {
+      schedule(SWEEP_GATE_OFFSET, () => {
         const second = chooseReachableGap(true, 145);
         telegraphGate({ ...second, hazardType: 'rockGate', delay: warningTime, speed, label: 'NEXT 2 / 3', previewOnly: true });
       });
-      schedule(1.56, () => {
+      schedule(SWEEP_GATE_OFFSET * 2, () => {
         const third = chooseReachableGap(true, 145);
         telegraphGate({
           ...third, hazardType: 'netGate', delay: warningTime, speed,
@@ -685,7 +689,7 @@
         });
       });
       announce('三連続波。止まるな。');
-      return patternCooldown({ hazardType: 'netGate', speed, warningDelay: warningTime, spawnOffset: 1.56 });
+      return patternCooldown({ hazardType: 'netGate', speed, warningDelay: warningTime, spawnOffset: SWEEP_GATE_OFFSET * 2 });
     }
 
     function intersects(entity) {
