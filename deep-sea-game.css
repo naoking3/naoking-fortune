@@ -94,8 +94,67 @@
   transform: translateY(1px) scale(.985);
 }
 
+/* Runtime state feedback stays short so a failed run can restart immediately. */
+.deep-sea-game.is-fever #game-canvas {
+  border-color: rgba(255, 222, 118, .82);
+  box-shadow:
+    inset 0 0 42px rgba(255, 213, 84, .12),
+    0 0 0 1px rgba(255, 224, 126, .16),
+    0 0 34px rgba(255, 199, 70, .16);
+}
+
+.deep-sea-game.has-current #game-canvas {
+  border-color: rgba(113, 222, 255, .58);
+}
+
+.deep-sea-game.is-dying #game-canvas {
+  border-color: rgba(255, 137, 120, .8);
+  animation: game-impact .34s cubic-bezier(.2, .82, .32, 1) both;
+}
+
+.deep-sea-game.is-game-over #game-canvas {
+  border-color: rgba(255, 157, 128, .5);
+  box-shadow: inset 0 0 58px rgba(73, 7, 14, .24);
+}
+
+.deep-sea-game.is-clear #game-canvas {
+  border-color: rgba(255, 224, 126, .75);
+  box-shadow:
+    inset 0 0 58px rgba(255, 218, 102, .1),
+    0 0 32px rgba(255, 200, 70, .14);
+}
+
+#start-game.is-retry-ready {
+  border-color: rgba(255, 240, 179, .9);
+  animation: retry-ready 1.15s ease-in-out infinite;
+}
+
+@keyframes game-impact {
+  0% { transform: translate3d(0, 0, 0) scale(1); filter: brightness(1); }
+  20% { transform: translate3d(-3px, 1px, 0) scale(.997); filter: brightness(1.35) saturate(.75); }
+  42% { transform: translate3d(3px, -1px, 0) scale(1.002); }
+  64% { transform: translate3d(-1px, 0, 0) scale(1); }
+  100% { transform: translate3d(0, 0, 0) scale(1); filter: brightness(1); }
+}
+
+@keyframes retry-ready {
+  0%, 100% { box-shadow: 0 8px 24px rgba(255, 190, 63, .18); }
+  50% { box-shadow: 0 9px 32px rgba(255, 205, 79, .36); }
+}
+
 @media (max-width: 680px) {
   #game-canvas { min-height: 0; border-radius: 15px; }
+
+  #start-game,
+  #left-control,
+  #right-control {
+    min-height: 58px;
+  }
+
+  #left-control,
+  #right-control {
+    font-size: 17px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
