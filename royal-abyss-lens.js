@@ -46,7 +46,6 @@
     uniform float uDive;
     uniform float uImpact;
     uniform float uMobile;
-    uniform sampler2D uKing;
     uniform sampler2D uKingdom;
 
     float hash(vec2 p) {
@@ -74,7 +73,7 @@
       float aspect = uResolution.x / max(uResolution.y, 1.0);
       float time = uTime * mix(1.0, 0.72, uMobile);
 
-      vec2 inertia = (uPointer - 0.5) * vec2(0.036, 0.028);
+      vec2 inertia = (uPointer - 0.5) * vec2(0.024, 0.019);
       vec2 center = vec2(0.515, 0.515 - uDive * 0.038) + inertia;
       vec2 p = uv - center;
       p.x *= aspect;
@@ -89,51 +88,48 @@
 
       float currentA = noise(lensPoint * 2.8 + vec2(time * 0.075, -time * 0.052));
       float currentB = noise(lensPoint * 6.2 + vec2(-time * 0.11, time * 0.068));
+      float ambientBreath = 0.5 + 0.5 * sin(time * 0.72 + currentA * 2.6);
+      float ambientWake = sin(lensPoint.y * 13.0 + lensPoint.x * 4.0 - time * 1.15);
+      ambientWake *= smoothstep(1.0, 0.18, radial);
       vec2 current = vec2(currentA - 0.5, currentB - 0.5);
+      current += vec2(ambientWake * 0.12, cos(lensPoint.x * 9.0 + time * 0.68) * 0.045);
 
       float pointerDistance = length(lensPoint - (uPointer - 0.5) * 1.45);
       float pointerRing = sin(pointerDistance * 31.0 - time * 3.0 - uImpact * 4.5);
       pointerRing *= exp(-pointerDistance * 3.8) * (0.012 + uImpact * 0.024);
 
       vec2 normal = normalize(lensPoint + vec2(0.0001));
-      vec2 refraction = normal * (0.032 + depth * 0.018);
-      refraction += current * (0.018 + uImpact * 0.012);
-      refraction += uVelocity * 0.06 * depth;
+      vec2 refraction = normal * (0.024 + depth * 0.022);
+      refraction += current * (0.022 + ambientBreath * 0.007 + uImpact * 0.012);
+      refraction += uVelocity * 0.048 * depth;
       refraction += normal * pointerRing;
 
       vec2 sampleUv = center + (uv - center) * mix(0.79, 0.86, uDive) + refraction;
       sampleUv = clamp(sampleUv, vec2(0.001), vec2(0.999));
 
-      float chroma = (0.0028 + uImpact * 0.0022) * depth;
-      vec4 kingCenter = texture2D(uKing, sampleUv);
-      vec4 kingRed = texture2D(uKing, clamp(sampleUv + normal * chroma, vec2(0.001), vec2(0.999)));
-      vec4 kingBlue = texture2D(uKing, clamp(sampleUv - normal * chroma, vec2(0.001), vec2(0.999)));
-      vec3 kingColor = vec3(kingRed.r, kingCenter.g, kingBlue.b);
-
       vec2 kingdomUv = sampleUv;
       kingdomUv.x = fract(kingdomUv.x * 0.82 + 0.09 + currentA * 0.012);
       vec3 kingdomColor = texture2D(uKingdom, kingdomUv).rgb;
-      kingdomColor *= vec3(0.28, 0.72, 0.82);
-
-      float kingAlpha = smoothstep(0.02, 0.8, kingCenter.a);
-      vec3 refracted = mix(kingdomColor, kingColor, kingAlpha * 0.92);
-      refracted = mix(refracted, vec3(0.16, 0.62, 0.72), (1.0 - depth) * 0.17);
+      vec3 refracted = kingdomColor * vec3(0.34, 0.77, 0.88);
+      refracted = mix(refracted, vec3(0.12, 0.57, 0.7), (1.0 - depth) * 0.2);
 
       float light = pow(max(0.0, dot(normalize(vec3(normal, depth)), normalize(vec3(-0.48, 0.72, 0.75)))), 7.0);
       float crownGold = pow(max(0.0, dot(normal, normalize(vec2(-0.5, 0.86)))), 14.0) * rim;
       float waterLight = caustic(lensPoint * 1.42, time) * innerMask;
+      float travellingLight = pow(max(0.0, 1.0 - abs(ambientWake)), 8.0) * innerMask;
       float impactRing = smoothstep(0.055, 0.0, abs(radial - (0.24 + uImpact * 0.58))) * uImpact;
 
       refracted += vec3(0.48, 0.95, 0.96) * light * 0.34;
       refracted += vec3(0.32, 0.92, 0.91) * waterLight * (0.08 + uImpact * 0.12);
+      refracted += vec3(0.55, 0.96, 0.98) * travellingLight * (0.025 + ambientBreath * 0.045);
       refracted += vec3(0.98, 0.79, 0.31) * crownGold * 0.48;
       refracted += vec3(0.58, 0.95, 1.0) * impactRing * 0.32;
 
       float rimAlpha = rim * (0.38 + light * 0.42 + crownGold * 0.5);
-      float alpha = lensMask * (0.22 + kingAlpha * 0.67 + depth * 0.08);
+      float alpha = lensMask * (0.28 + depth * 0.2 + waterLight * 0.08 + travellingLight * 0.05);
       alpha += rimAlpha + impactRing * 0.2;
       alpha *= 1.0 - uDive * 0.14;
-      alpha = clamp(alpha, 0.0, 0.96);
+      alpha = clamp(alpha, 0.0, 0.82);
 
       gl_FragColor = vec4(refracted, alpha);
     }
@@ -182,7 +178,7 @@
   gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
 
   const uniforms = Object.fromEntries([
-    'uResolution', 'uPointer', 'uVelocity', 'uTime', 'uDive', 'uImpact', 'uMobile', 'uKing', 'uKingdom'
+    'uResolution', 'uPointer', 'uVelocity', 'uTime', 'uDive', 'uImpact', 'uMobile', 'uKingdom'
   ].map(name => [name, gl.getUniformLocation(program, name)]));
 
   const state = {
@@ -215,10 +211,9 @@
     return texture;
   };
 
-  const kingTexture = createTexture([34, 114, 138, 0]);
   const kingdomTexture = createTexture([8, 73, 104, 255]);
   let textureToken = 0;
-  let kingReady = false;
+  let kingdomReady = false;
 
   const uploadTexture = (texture, image) => {
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -232,7 +227,7 @@
     const image = new Image();
     image.decoding = 'async';
     image.onload = () => {
-      if (token < textureToken - 1) return;
+      if (token !== textureToken) return;
       try {
         uploadTexture(texture, image);
         callback?.();
@@ -244,24 +239,13 @@
     image.src = source;
   };
 
-  const prepareKingTexture = () => {
-    if (!heroImage.complete || !heroImage.naturalWidth) return;
-    try {
-      uploadTexture(kingTexture, heroImage);
-      kingReady = true;
-      canvas.classList.add('is-ready');
-      start();
-    } catch (error) {
-      fallback(error);
-    }
-  };
-
-  if (heroImage.complete) prepareKingTexture();
-  else heroImage.addEventListener('load', prepareKingTexture, { once: true });
-
   const firstKingdom = window.NaokingPhotos?.sources?.[window.NaokingPhotos.current?.() || 0]
     || 'assets/backgrounds/vrchat-01.webp';
-  loadTexture(kingdomTexture, firstKingdom);
+  loadTexture(kingdomTexture, firstKingdom, () => {
+    kingdomReady = true;
+    canvas.classList.add('is-ready');
+    start();
+  });
 
   const resize = () => {
     if (state.destroyed) return;
@@ -300,7 +284,7 @@
   };
 
   function start() {
-    if (state.running || state.destroyed || document.hidden || !state.visible || !kingReady) return;
+    if (state.running || state.destroyed || document.hidden || !state.visible || !kingdomReady) return;
     state.running = true;
     state.lastFrame = 0;
     state.frame = window.requestAnimationFrame(render);
@@ -334,11 +318,8 @@
     gl.uniform1f(uniforms.uImpact, state.impact);
     gl.uniform1f(uniforms.uMobile, compactViewport.matches ? 1 : 0);
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, kingTexture);
-    gl.uniform1i(uniforms.uKing, 0);
-    gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, kingdomTexture);
-    gl.uniform1i(uniforms.uKingdom, 1);
+    gl.uniform1i(uniforms.uKingdom, 0);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
     if (reducedMotion.matches && state.targetImpact === 0 && Math.abs(state.dive - state.targetDive) < 0.003) {
@@ -389,7 +370,11 @@
 
   const onPhotoChange = event => {
     const source = event.detail?.source;
-    if (source) loadTexture(kingdomTexture, source);
+    if (source) loadTexture(kingdomTexture, source, () => {
+      kingdomReady = true;
+      canvas.classList.add('is-ready');
+      start();
+    });
   };
 
   const onVisibility = () => {
@@ -426,7 +411,6 @@
     window.clearTimeout(state.impactTimer);
     window.cancelAnimationFrame(pointerFrame);
     window.cancelAnimationFrame(scrollFrame);
-    gl.deleteTexture(kingTexture);
     gl.deleteTexture(kingdomTexture);
     gl.deleteBuffer(buffer);
     gl.deleteProgram(program);
