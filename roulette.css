@@ -851,11 +851,11 @@ html.oracle-tier-fake-loss .fortune-card{background:radial-gradient(ellipse 70% 
 .fortune-card.is-jackpot .slot-window{border-color:rgba(255,232,151,.9)!important;background:radial-gradient(ellipse 44% 70% at 50% 44%,rgba(216,253,255,.28),transparent 68%),linear-gradient(160deg,#135f78,#081d3c 52%,#3c3355)!important;box-shadow:inset 0 0 72px rgba(0,3,16,.72),inset 0 1px rgba(255,255,255,.2),0 0 48px rgba(118,229,241,.22)!important}
 .fortune-card.is-premium .slot-window::before{border-color:rgba(255,233,158,.42);box-shadow:inset 0 0 38px rgba(255,216,90,.06),0 0 28px rgba(139,235,246,.09)}
 
-html.is-oracle-suspended .oracle-environment *,html.is-oracle-suspended .oracle-environment::before,html.is-oracle-suspended .oracle-environment::after,html.is-oracle-suspended .fortune-card *,html.is-oracle-suspended .fortune-card::before,html.is-oracle-suspended .fortune-card::after{animation-play-state:paused!important}
+html.is-oracle-suspended .oracle-environment,html.is-oracle-suspended .oracle-environment *,html.is-oracle-suspended .oracle-environment::before,html.is-oracle-suspended .oracle-environment::after,html.is-oracle-suspended .oracle-takeover,html.is-oracle-suspended .fortune-card *,html.is-oracle-suspended .fortune-card::before,html.is-oracle-suspended .fortune-card::after{animation-play-state:paused!important}
 
 @keyframes oracle-pointer-breathe{50%{opacity:.42}}
 @keyframes oracle-sweep{from{transform:translateX(-80%)}to{transform:translateX(90%)}}
-@keyframes oracle-witness-roll{0%{opacity:.1;filter:blur(8px) brightness(.65);transform:translateY(-132%) rotateX(-34deg)}38%{opacity:.78;filter:blur(2px) brightness(1.18)}52%{opacity:1;filter:blur(0) brightness(1);transform:translateY(0) rotateX(0)}68%{opacity:.66;filter:blur(2px) brightness(.92)}100%{opacity:.08;filter:blur(9px) brightness(.52);transform:translateY(132%) rotateX(34deg)}}
+@keyframes oracle-witness-roll{0%{opacity:.42;filter:blur(4px) brightness(.72);transform:translateY(-34%) rotateX(-12deg)}24%{opacity:.78;filter:blur(2px) brightness(1.08)}50%{opacity:1;filter:blur(0) brightness(1);transform:translateY(0) rotateX(0)}76%{opacity:.78;filter:blur(2px) brightness(.92)}100%{opacity:.42;filter:blur(4px) brightness(.68);transform:translateY(34%) rotateX(12deg)}}
 @keyframes oracle-witness-lock{0%{opacity:.25;filter:blur(4px) brightness(1.5);transform:translateY(-28%)}68%{opacity:1;filter:blur(0) brightness(1.14);transform:translateY(3%)}100%{opacity:1;filter:none;transform:none}}
 @keyframes oracle-decree-reveal{0%{opacity:0;clip-path:inset(0 100% 0 0)}100%{opacity:1;clip-path:inset(0)}}
 @keyframes oracle-fx-cut{0%{opacity:0;clip-path:inset(0 52%)}18%,72%{opacity:1;clip-path:inset(0)}100%{opacity:0;clip-path:inset(0 0 0 100%)}}
@@ -943,7 +943,7 @@ html.is-oracle-suspended .oracle-environment *,html.is-oracle-suspended .oracle-
 
 @media (prefers-reduced-motion: reduce) {
   .oracle-environment { display:none!important; }
-  .oracle-takeover { transition:none; }
+  .oracle-takeover { display:none!important; animation:none!important; transition:none; }
   .pointer,.roulette-flare,.oracle-crown-field>i,.oracle-intruder,.roulette-fx,.roulette-scene-prop,.oracle-tier-badge>i { animation:none!important; }
   .slot-window[data-reel-motion] .shark-tile { animation:none!important; opacity:1!important; filter:none!important; transform:none!important; }
   .slot-window[data-reel-motion] .shark-tile:not(.is-stopped) .shark-face { opacity:.5; }

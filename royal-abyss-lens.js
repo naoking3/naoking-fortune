@@ -184,6 +184,7 @@
   const state = {
     running: false,
     visible: true,
+    pageActive: document.body?.dataset?.page === 'home',
     destroyed: false,
     disabled: false,
     pointerX: 0.5,
@@ -234,13 +235,23 @@
         callback?.();
         start();
       } catch (error) {
-        console.warn('[ROYAL ABYSS LENS] Texture upload skipped.', error);
+        if (!kingdomReady) {
+          state.disabled = true;
+          stop();
+          fallback(error);
+        } else {
+          console.warn('[ROYAL ABYSS LENS] Texture upload skipped.', error);
+        }
       }
     };
     image.onerror = () => {
       if (token !== textureToken) return;
       const reason = `Unable to load ${source}`;
-      if (!kingdomReady) fallback(reason);
+      if (!kingdomReady) {
+        state.disabled = true;
+        stop();
+        fallback(reason);
+      }
       else console.warn('[ROYAL ABYSS LENS] Keeping the previous texture.', reason);
     };
     image.src = source;
@@ -291,7 +302,16 @@
   };
 
   function start() {
-    if (state.running || state.destroyed || state.disabled || document.hidden || !state.visible || !kingdomReady) return;
+    if (
+      state.running
+      || state.destroyed
+      || state.disabled
+      || document.hidden
+      || !state.visible
+      || !state.pageActive
+      || document.body?.dataset?.page !== 'home'
+      || !kingdomReady
+    ) return;
     state.running = true;
     state.lastFrame = 0;
     state.frame = window.requestAnimationFrame(render);
@@ -305,8 +325,6 @@
       return;
     }
     state.lastFrame = timestamp;
-    resize();
-
     const previousX = state.pointerX;
     const previousY = state.pointerY;
     state.pointerX += (state.targetPointerX - state.pointerX) * 0.075;
@@ -398,6 +416,18 @@
     else start();
   };
 
+  const onPageChange = event => {
+    const isHome = event.detail?.page === 'home';
+    state.pageActive = isHome;
+    if (!isHome) {
+      stop();
+      return;
+    }
+    resize();
+    updateDive();
+    start();
+  };
+
   const onReducedMotion = () => {
     if (!reducedMotion.matches) {
       start();
@@ -413,12 +443,13 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', resize, { passive: true });
   window.addEventListener('naoking:photochange', onPhotoChange);
-  window.addEventListener('naoking:pagechange', start);
+  window.addEventListener('naoking:pagechange', onPageChange);
   document.addEventListener('visibilitychange', onVisibility);
   compactViewport.addEventListener?.('change', resize);
   reducedMotion.addEventListener?.('change', onReducedMotion);
 
   let observer = null;
+  let resizeObserver = null;
   if ('IntersectionObserver' in window) {
     observer = new IntersectionObserver(entries => {
       state.visible = entries.some(entry => entry.isIntersecting);
@@ -426,6 +457,10 @@
       else stop();
     }, { rootMargin: '16% 0px', threshold: 0.01 });
     observer.observe(hero);
+  }
+  if ('ResizeObserver' in window) {
+    resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(canvas);
   }
 
   const destroy = () => {
@@ -437,6 +472,7 @@
     window.cancelAnimationFrame(pointerFrame);
     window.cancelAnimationFrame(scrollFrame);
     observer?.disconnect();
+    resizeObserver?.disconnect();
     gl.deleteTexture(kingdomTexture);
     gl.deleteBuffer(buffer);
     gl.deleteProgram(program);

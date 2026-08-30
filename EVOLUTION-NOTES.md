@@ -50,7 +50,7 @@ No external component or effect source code was copied.
 ## Implemented experience
 
 - Reworked first-visit entry as a 3.2-second silent short film: surface loss, increasing pressure, kingdom signal, passing sovereign silhouette, title lock-up and a circular underwater handoff into Hero. Skip and short return visits remain.
-- Added the `ROYAL ABYSS LENS`: a custom WebGL liquid lens that combines the current kingdom photograph with Naoking, refracts both under pointer inertia, accepts impact ripples, and visually sinks into Scroll = Dive. The existing crown, pressure/current rings and light rays remain as the HTML/CSS fallback.
+- Added the `ROYAL ABYSS LENS`: a custom WebGL liquid lens that refracts only the current kingdom photograph under pointer inertia and impact ripples. The real Naoking image stays as a sharp, stable HTML foreground above the canvas while light, water and rings move around it. The existing crown, pressure/current rings and light rays remain as the HTML/CSS fallback.
 - Added the shared WebGL waterfield so Opening, Hero, transitions and Oracle feel like one continuous scene instead of separate effects.
 - Multi-layer blue/blue-green underwater space; no black-only surface and no sci-fi dot grid.
 - Scroll-reactive depth and section-specific depth zones.
@@ -61,10 +61,11 @@ No external component or effect source code was copied.
 - Pause/resume control for automatic photo rotation; latest-selection-wins image loading.
 - Daily royal decree, tide, relic and seven-day local passport.
 - Browser-local VRChat Royal Frame Studio with three frame styles and PNG/WebP download fallback.
-- Rebuilt the visible Oracle as the `ABYSSAL ROYAL SLOT / 王国の神託装置`: a submerged royal cabinet with tier display, edge lighting, large reel/result surfaces and distinct machine phases. Environment states (`normal`, `hot`, `superhot`, `jackpot`, `fake-loss`, `revival`) synchronize the photograph, waterfield, currents, rays, bubbles, pressure ring, depth UI, navigation and surrounding page with the existing result timeline. Its one-draw data model and every probability stage remain untouched.
+- Rebuilt the visible Oracle as `ROYAL ORACLE // FIVE WITNESSES`: a submerged pressure-hull cabinet rather than a conventional rounded card. One frozen verdict travels through descent → cruise → signal → judgment → braking → staggered witness stops → verdict → reveal/fake/revival → rest. Thirty-two compatible presentation routes span normal, false-signal, intrusion, environment, reel-event, rule-change, typography, blackout, revival, premium and secret families. They synchronize the photograph, waterfield, currents, rays, bubbles, pressure ring, depth UI, navigation and page edges without changing the frozen result or its probability stage.
+- Added session route history, daily first/fifth/echo/long-silence reactions and recent-route weighting. These alter presentation only; they never alter special-win or special-loss probability. Expensive Roulette-only environment classes are removed after settlement, page change or cancellation.
 - Mobile-safe five-tile roulette reel uses fixed 230px/190px tiles and explicit image visibility so Naoking cannot disappear halfway through a spin.
-- LIFE 1 hunting game keeps its 78% OXYGEN start but now drains at 8.4→11.2→14.8→18.5→21.5% per second over five phases. With no food it reaches zero at about 8.215 seconds. Every gate places a precisely collectible, high-value O2 feed at the reachable edge of its safe lane, making risk mandatory rather than optional.
-- Difficulty begins its first pattern at 1.95 seconds and forces a real movement decision at about 4.7–5.0 seconds while retaining the previously validated gaps, speeds and .95→.58-second warnings. Risk feeds restore 42→92% O2 and produce a short `RISK CLEARED` impact. The existing taunts remain; oxygen, greed, opening and personal-best-near categories bring the total to 99 lines across 17 categories.
+- LIFE 1 hunting game keeps its 78% OXYGEN start and retry contract while using five clearer pressure phases at 4.5/9/13.5/18 seconds. No-food oxygen still expires at about 8.092 seconds. Gate speed rises 235→420px/s, safe gaps tighten 196→146px, warning time steps .92→.52 seconds, and current pressure rises 98→166px/s without producing an impossible late lane.
+- Difficulty was tuned against human-like reaction/error models rather than frame-perfect automation. A 12,000-run-per-model simulation produced a deliberate skill curve from effectively no first-play clears through practiced/expert improvement, while the worst late reachability margin remained positive at +49.9px/s.
 
 ## Performance and accessibility guardrails
 
@@ -85,22 +86,21 @@ No external component or effect source code was copied.
 - JavaScript syntax checks: `site.js`, `photo-background.js`, `kingdom-experience.js`, `signature-water.js`, `roulette-controller.js`, `deep-sea-game.js` passed.
 - `git diff --check`: passed.
 - Referenced local assets: no missing files.
-- Oracle simulation: 100,000 draws; one click listener; no normal-result immediate repeats; no immediate message repeats; no data-integrity mismatches; no shuffle-bag duplicates; no timer leak after page change.
-- Oracle probability sample (100,000 draws): 70.681% normal, 20.018% special win and 9.301% special loss. Immediate normal repeats, message repeats, integrity mismatches, duplicate listeners and leaked timers were all zero.
+- Oracle simulation: 100,000 verdict draws plus 100,000 presentation draws; one click listener; no normal-result immediate repeats; no immediate message repeats; no data-integrity mismatches; no shuffle-bag duplicates; no mutable results/presentations and no timer leak after page change.
+- All 32 presentation routes were covered. Immediate route repeats, incompatible routes and result/presentation contradictions were zero; the largest route share stayed below 10% and the minimum estimated visible rotation count was ten.
 - Manual PC and 390px roulette checks retained five visible images while spinning and one visible result image after reveal; no console warnings/errors.
-- No-food oxygen model reaches zero at about 8.215 seconds. A 50,000-run strict risk-feed model reached 30 seconds every time with a minimum post-feed oxygen of 8.38%, confirming severe but reachable tuning.
-- Manual game browser check: PC and 390px HUDs, opening-pattern death at 4.8 seconds in an idle run, enabled immediate retry, oxygen reset/drain and no console warnings/errors.
+- Human-like Hunt simulation ran 12,000 trials for each of five ability models. First-play, learning, practiced, expert and near-optimal clear rates were 0%, 0.05%, 1.18%, 7.13% and 24.82%; their median survival times were 8.08, 8.18, 12.12, 17.10 and 21.40 seconds. The no-food oxygen model reached zero at about 8.092 seconds.
+- Manual game browser checks cover PC and compact HUDs, opening death, immediate retry, oxygen reset/drain, keyboard/touch input and no new console errors.
 - Manual browser checks: desktop and 390px Opening/Hero, WebGL/no-WebGL guard, circular section passage, Oracle spin, game HUD/game over/retry and responsive layouts.
 
 ## Signature Impact Pass verification
 
 - `ROYAL ABYSS LENS` reached its WebGL-ready state, responded to pointer inertia and impact input, followed Hero photo changes and visibly transformed into the initial dive. A context-loss/no-WebGL path keeps the sovereign CSS composition usable.
-- The lens caps DPR and frame rate separately for desktop/mobile, renders a static reduced-motion frame, pauses when hidden or out of view, and releases textures, buffers and listeners on final page exit.
-- Oracle simulation: 100,000 draws with one click listener; zero immediate normal repeats, immediate message repeats, result-integrity mismatches, shuffle-bag duplicates or leaked timers. All eleven result images exist.
-- PC and 390px Oracle checks retained five visible Naoking images during spin and a visible result image after reveal. Normal, Very Hot and Jackpot states were observed without console errors.
-- No-food game model reaches zero O2 at about 8.215 seconds. A strict 50,000-run model that collected only the mandatory risk feed reached 30 seconds every time; the minimum post-feed oxygen was 8.38%.
-- Manual game browser check confirmed an opening-pattern death at 4.8 seconds, category-specific taunt, immediate retry, disabled in-run start button, and oxygen restarting from 78%.
-- Two review passes completed: Art/Motion checked composition, state contrast and environment response; Frontend/Game/QA checked syntax, asset integrity, responsive bounds, logic isolation, fallback paths, fairness and retry tempo.
+- The lens caps DPR and frame rate separately for desktop/mobile, renders a static reduced-motion frame, pauses when hidden or out of view, and releases textures, buffers and listeners on final page exit. Reduced-motion also suppresses optional impact motion; pointer/touch RAFs recenter safely; texture failure and permanent context-loss paths retain the CSS fallback.
+- Oracle diagnostics cover 100,000 verdict draws and 100,000 independent presentation selections. All 20 verdict definitions and all 32 routes were exercised with zero title/image/message mismatch, immediate normal repeat, immediate message repeat, immediate route repeat, incompatible route, contradiction, leaked timer or settled environment class.
+- PC and 390×844 Oracle checks retained five loaded and visible Naoking witnesses throughout idle, spin and final phases, including fake/revival. The final readable result remained stable; there was no horizontal overflow or console warning/error.
+- Hunt tuning was validated with 60,000 total human-like runs. The deliberately difficult curve remains learnable, and late-pattern reachability remains positive rather than frame-perfect.
+- Three review passes cover: slot/game presentation and staggered reel rhythm; web-art/motion composition, stable Hero and environment release; frontend/game/QA syntax, asset integrity, responsive bounds, logic isolation, fallback paths, fairness and retry tempo.
 
 ## Maintenance notes
 

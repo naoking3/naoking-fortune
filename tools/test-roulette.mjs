@@ -161,5 +161,20 @@ pagechangeListeners[0]?.({ detail: { page: 'home' } });
 const afterVisibilityCancel = debug.getState();
 if (afterVisibilityCancel.timerCount !== 0 || afterVisibilityCancel.busy || afterVisibilityCancel.phase !== '') failures.push('page change after visibility resume did not fully cancel the draw');
 
-console.log(JSON.stringify({ ...diagnostic, bagDiagnostic, presentationDiagnostic, clickListeners: clickListeners.length, pagechangeListeners: pagechangeListeners.length, visibilityListeners: visibilityListeners.length, resultCount, clickLifecycle: { beforeClick, duringClick, afterPageChange, afterSettle, beforeHide, whileHidden, afterResume, afterVisibilityCancel }, failures }, null, 2));
+// The intentional three-tap ROYAL LOCK may keep its locked machine copy, but
+// page-wide currents/bubbles must still stop after the short lock impact.
+clickListeners[0]?.();
+clickListeners[0]?.();
+clickListeners[0]?.();
+await new Promise(resolve => setTimeout(resolve, 500));
+const afterRoyalLock = debug.getState();
+if (!afterRoyalLock.locked || afterRoyalLock.phase !== 'locked') failures.push('three taps did not preserve the ROYAL LOCK state');
+if (afterRoyalLock.busy) failures.push('ROYAL LOCK left a draw busy');
+if (afterRoyalLock.timerCount !== 0) failures.push(`ROYAL LOCK left ${afterRoyalLock.timerCount} timers active`);
+if (afterRoyalLock.environmentClassCount !== 0) failures.push(`ROYAL LOCK left ${afterRoyalLock.environmentClassCount} high-cost environment classes`);
+pagechangeListeners[0]?.({ detail: { page: 'home' } });
+const afterLockPageChange = debug.getState();
+if (afterLockPageChange.locked || afterLockPageChange.phase !== '' || afterLockPageChange.timerCount !== 0) failures.push('page change did not release ROYAL LOCK');
+
+console.log(JSON.stringify({ ...diagnostic, bagDiagnostic, presentationDiagnostic, clickListeners: clickListeners.length, pagechangeListeners: pagechangeListeners.length, visibilityListeners: visibilityListeners.length, resultCount, clickLifecycle: { beforeClick, duringClick, afterPageChange, afterSettle, beforeHide, whileHidden, afterResume, afterVisibilityCancel, afterRoyalLock, afterLockPageChange }, failures }, null, 2));
 if (failures.length) process.exitCode = 1;

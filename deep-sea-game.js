@@ -74,7 +74,8 @@
       { drain: 18.5, gap: 158, speed: 370, warning: 0.6, shift: 330, current: 146, reward: 78 },
       { drain: 21.5, gap: 146, speed: 420, warning: 0.52, shift: 360, current: 166, reward: 92 }
     ];
-    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reducedMotionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+    let reducedMotion = reducedMotionQuery.matches;
     const keyState = { left: false, right: false };
     const pointerState = { left: false, right: false };
     const entities = [];
@@ -1186,6 +1187,9 @@
     bindControl(leftControl, 'left');
     bindControl(rightControl, 'right');
     window.addEventListener('keydown', (event) => {
+      const target = event.target;
+      const isEditableTarget = target instanceof Element && Boolean(target.closest('input, textarea, select, [contenteditable="true"]'));
+      if (document.body?.dataset?.page !== 'game' || isEditableTarget) return;
       if (game.mode === 'finished' && event.key.toLowerCase() === 'r') { startGame(); event.preventDefault(); return; }
       if (game.mode !== 'playing') return;
       if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') { keyState.left = true; event.preventDefault(); }
@@ -1195,13 +1199,26 @@
       if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') keyState.left = false;
       if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') keyState.right = false;
     });
+    window.addEventListener('blur', () => {
+      keyState.left = keyState.right = false;
+      pointerState.left = pointerState.right = false;
+    });
+    reducedMotionQuery.addEventListener?.('change', (event) => {
+      reducedMotion = event.matches;
+      if (!reducedMotion) return;
+      game.shakeFor = 0;
+      game.hitStopFor = 0;
+      game.flashFor = 0;
+      game.oxygenFlashFor = 0;
+      particles.length = 0;
+    });
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && ['playing', 'dying'].includes(game.mode)) {
         game.lastFrame = performance.now(); keyState.left = keyState.right = false; pointerState.left = pointerState.right = false;
       }
     });
     window.addEventListener('naoking:pagechange', (event) => {
-      if (event.detail?.page !== 'game' && ['playing', 'dying'].includes(game.mode)) {
+      if (event.detail?.page !== 'game' && game.mode !== 'idle') {
         cancelAnimationFrame(game.animationFrame);
         clearRunState();
         Object.assign(game, {

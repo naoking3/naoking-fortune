@@ -477,6 +477,18 @@
     scheduledTasks = [];
   }
 
+  function onReducedMotionChange() {
+    if (!reducedMotion.matches || scheduledTasks.length === 0) return;
+    const now = Date.now();
+    scheduledTasks.forEach(task => {
+      if (task.id !== null) window.clearTimeout(task.id);
+      const unscaledRemaining = task.id === null ? task.remaining : Math.max(0, task.due - now);
+      task.remaining = Math.max(35, Math.round(unscaledRemaining * .075));
+      task.id = null;
+      armTask(task);
+    });
+  }
+
   function flash(kind, text, ms = 1550) {
     effectLayer.style.setProperty('--roulette-fx-duration', `${timelineDelay(ms)}ms`);
     effectLayer.className = `roulette-fx is-visible ${kind}`;
@@ -637,7 +649,13 @@
       resultRegion?.setAttribute('aria-busy', 'false'); status.textContent = 'SYSTEM LOCKED // DO NOT TAP';
       setButtonCopy('なおキング、怒って停止中…', 'SYSTEM LOCKED');
       if (blast) { blast.hidden = false; later(() => { blast.hidden = true; }, 1650); }
-      flash('fake', '連打厳禁', 1700); return;
+      flash('fake', '連打厳禁', 1700);
+      later(() => {
+        if (!locked) return;
+        syncOracleEnvironment('resting');
+        oracleTierLabel.textContent = 'LOCKED';
+      }, 1900);
+      return;
     }
     if (busy) return;
 
@@ -693,6 +711,7 @@
     if (visibilityPausedAt) { visibilityPausedAt = 0; scheduledTasks.forEach(task => armTask(task)); }
   }
   document.addEventListener?.('visibilitychange', syncVisibilityState);
+  reducedMotion.addEventListener?.('change', onReducedMotionChange);
   window.addEventListener?.('pagehide', event => { if (event.persisted) return; drawToken += 1; clearScheduledTasks(); clearOracleEnvironment(); });
   syncVisibilityState();
 
