@@ -100,7 +100,7 @@
     { key:'blackout', kind:'loss', title:'深海暗転ハズレ', image:'assets/characters/naoking-6.webp', effect:'blackout', duration:1950, messages:[
       '大当たりっぽい暗転からのハズレ。お前のドキドキを返せ。','暗転しただけだった。判定は海流に流された。','期待させておいて通信断。なおキングは昼寝に入った。','深海の正体はハズレ。お前のドキドキを返せ。','大当たりっぽい暗転からの結果なし。海は冷たい。'
     ]},
-    { key:'net', kind:'loss', title:'網にかかった運', image:'assets/characters/naoking-3.webp', effect:'net', duration:2050, messages:[
+    { key:'net', kind:'loss', title:'網にかかった運', image:'assets/characters/naoking-panic.webp', effect:'net', duration:2050, messages:[
       '巨大な網が画面外から来て、運をさらっていった。','運勢が網に引っかかった。助ける気はない。','いい流れだったのに、網が全部止めた。海あるあるだ。','当たりの気配は網に回収された。次の海流を待て。','網だけは派手だった。結果はハズレだ。'
     ]},
     { key:'alarm', kind:'loss', title:'緊急帰還', image:'assets/characters/naoking-5.webp', effect:'alarm', duration:1950, messages:[
@@ -186,14 +186,14 @@
     { id:'blue-hour', family:'normal', kinds:['normal'], weight:1.05, tier:'normal', world:'blue-hour', motion:'synchronous', duration:4100, cue:'BLUE HOUR', detail:'海が青白く静まり、五枚が同時に息をする。' },
     { id:'false-crown', family:'false-signal', kinds:['normal'], weight:.46, tier:'hot', world:'false-crown', motion:'center-last', duration:4750, cue:'CROWN SIGNAL?', detail:'王冠信号を検知。……一秒後、何事もなく消えた。', fake:true, freeze:true },
     { id:'sleeping-king', family:'intrusion', kinds:['normal'], weight:.5, tier:'signal', world:'sleep', motion:'lazy', duration:4400, cue:'SLEEPING KING', detail:'眠い王が画面外から一度だけ覗く。', intrusion:'sleepy' },
-    { id:'royal-lunch-break', family:'chaos', kinds:['normal'], weight:.42, tier:'signal', world:'lunch', motion:'lazy', duration:6200, cue:'ROYAL LUNCH BREAK', detail:'判定中だが、王が先に昼食を始めた。', scene:'lunch', sequence:'chaos', twistMotion:'brake' },
-    { id:'abyss-news-break', family:'broadcast', kinds:['normal'], weight:.38, tier:'signal', world:'news', motion:'synchronous', duration:6000, cue:'ABYSS NEWS 4810', detail:'速報「神託は、まだ回っています」。', scene:'news', sequence:'broadcast', twistMotion:'cruise' },
-    { id:'emergency-council', family:'rule-change', kinds:['normal'], weight:.3, tier:'hot', world:'council', motion:'witnesses', duration:6750, cue:'EMERGENCY COUNCIL', detail:'三枚の布告が揉め、王の木槌で停止順を決める。', scene:'council', sequence:'tribunal', twistMotion:'stopping' },
-    { id:'sixth-witness', family:'rule-change', kinds:['normal'], weight:.26, tier:'hot', world:'sixth', motion:'center-last', duration:6500, cue:'SIXTH WITNESS?', detail:'呼んでいない六枚目が証言席へ割り込む。', scene:'sixth', sequence:'anomaly', twistMotion:'respin' },
-    { id:'reel-labor-strike', family:'chaos', kinds:['normal'], weight:.34, tier:'signal', world:'strike', motion:'lazy', duration:6500, cue:'REEL ON BREAK', detail:'第三証人が「休憩中」の札を出した。', scene:'strike', sequence:'breakdown', twistMotion:'respin' },
-    { id:'giant-fish-traffic', family:'environment', kinds:['normal'], weight:.36, tier:'signal', world:'giant-fish', motion:'wave', duration:5850, cue:'UNSCHEDULED TRAFFIC', detail:'ルーレットとは無関係な巨大魚が通過する。', scene:'giant-fish', sequence:'passage', twistMotion:'anticipation' },
-    { id:'royal-commercial', family:'broadcast', kinds:['normal'], weight:.3, tier:'signal', world:'commercial', motion:'skip', duration:6250, cue:'A WORD FROM THE KING', detail:'突然、王国海藻のCMが始まる。買わなくていい。', scene:'commercial', sequence:'broadcast', twistMotion:'brake' },
-    { id:'do-not-press-seal', family:'interactive', kinds:['normal'], weight:.22, tier:'hot', world:'royal-seal', motion:'edge-first', duration:6600, cue:'DO NOT PRESS', detail:'押すなと言われた王印が、こちらを見ている。', scene:'royal-seal', sequence:'interactive', twistMotion:'respin', interactive:true },
+    { id:'royal-lunch-break', family:'chaos', kinds:['normal'], weight:.42, tier:'signal', world:'lunch', motion:'lazy', duration:7800, cue:'ROYAL LUNCH BREAK', detail:'判定中だが、王が先に昼食を始めた。', scene:'lunch', sequence:'chaos', twistMotion:'brake' },
+    { id:'abyss-news-break', family:'broadcast', kinds:['normal'], weight:.38, tier:'signal', world:'news', motion:'synchronous', duration:7800, cue:'ABYSS NEWS 4810', detail:'速報「神託は、まだ回っています」。', scene:'news', sequence:'broadcast', twistMotion:'cruise' },
+    { id:'emergency-council', family:'rule-change', kinds:['normal'], weight:.3, tier:'hot', world:'council', motion:'witnesses', duration:8500, cue:'EMERGENCY COUNCIL', detail:'三枚の布告が揉め、王の木槌で停止順を決める。', scene:'council', sequence:'tribunal', twistMotion:'stopping' },
+    { id:'sixth-witness', family:'rule-change', kinds:['normal'], weight:.26, tier:'hot', world:'sixth', motion:'center-last', duration:8300, cue:'SIXTH WITNESS?', detail:'呼んでいない六枚目が証言席へ割り込む。', scene:'sixth', sequence:'anomaly', twistMotion:'respin' },
+    { id:'reel-labor-strike', family:'chaos', kinds:['normal'], weight:.34, tier:'signal', world:'strike', motion:'lazy', duration:8200, cue:'REEL ON BREAK', detail:'第三証人が「休憩中」の札を出した。', scene:'strike', sequence:'breakdown', twistMotion:'respin' },
+    { id:'giant-fish-traffic', family:'environment', kinds:['normal'], weight:.36, tier:'signal', world:'giant-fish', motion:'wave', duration:7600, cue:'UNSCHEDULED TRAFFIC', detail:'ルーレットとは無関係な巨大魚が通過する。', scene:'giant-fish', sequence:'passage', twistMotion:'anticipation' },
+    { id:'royal-commercial', family:'broadcast', kinds:['normal'], weight:.3, tier:'signal', world:'commercial', motion:'skip', duration:7900, cue:'A WORD FROM THE KING', detail:'突然、王国海藻のCMが始まる。買わなくていい。', scene:'commercial', sequence:'broadcast', twistMotion:'brake' },
+    { id:'do-not-press-seal', family:'interactive', kinds:['normal'], weight:.22, tier:'hot', world:'royal-seal', motion:'edge-first', duration:8400, cue:'DO NOT PRESS', detail:'押すなと言われた王印が、こちらを見ている。', scene:'royal-seal', sequence:'interactive', twistMotion:'respin', interactive:true },
 
     { id:'royal-intrusion', family:'intrusion', kinds:['win'], weight:1.15, tier:'superhot', world:'royal', motion:'push', duration:5200, cue:'THE KING INTERVENES', detail:'なおキングが五枚目を自分で押し込む。', intrusion:'king' },
     { id:'palace-floodlights', family:'environment', kinds:['win'], weight:1.05, tier:'superhot', world:'floodlights', motion:'outside-in', duration:5000, cue:'PALACE FLOODLIGHTS', detail:'宮殿の光がサイト全体から一点へ集まる。' },
@@ -202,9 +202,9 @@
     { id:'crown-lock', family:'reel-event', kinds:['win'], weight:.88, tier:'superhot', world:'crown-lock', motion:'edge-first', duration:5250, cue:'ROYAL FREEZE', detail:'全世界が凍結し、王冠だけが動く。', freeze:true },
     { id:'tidal-ascension', family:'environment', kinds:['win'], weight:1.08, tier:'hot', world:'ascension', motion:'wave', duration:4900, cue:'TIDAL ASCENSION', detail:'上向きの海流が装置を持ち上げる。' },
     { id:'five-witnesses', family:'rule-change', kinds:['win'], weight:1.2, tier:'hot', world:'tribunal', motion:'witnesses', duration:5050, cue:'FIVE WITNESSES', detail:'五人の証言を一枚ずつ採決する。' },
-    { id:'reel-jam-repair', family:'reel-event', kinds:['win'], weight:.56, tier:'superhot', world:'repair', motion:'edge-first', duration:7250, cue:'ROYAL MAINTENANCE', detail:'噛んだ証人を、王が雑な木槌で直して再始動。', scene:'repair', sequence:'breakdown', twistMotion:'reverse', intrusion:'king' },
-    { id:'surface-breach', family:'environment', kinds:['win'], weight:.52, tier:'superhot', world:'surface', motion:'wave', duration:7100, cue:'SURFACE BREACH', detail:'神託装置ごと海面へ急浮上し、もう一度潜る。', scene:'surface', sequence:'journey', twistMotion:'reverse' },
-    { id:'witness-escape', family:'intrusion', kinds:['win'], weight:.46, tier:'hot', world:'escape', motion:'push', duration:6900, cue:'WITNESS ESCAPED', detail:'証人が王冠を咥えて筐体外へ逃げ、戻ってくる。', scene:'escape', sequence:'chase', twistMotion:'respin', intrusion:'king' },
+    { id:'reel-jam-repair', family:'reel-event', kinds:['win'], weight:.56, tier:'superhot', world:'repair', motion:'edge-first', duration:9000, cue:'ROYAL MAINTENANCE', detail:'噛んだ証人を、王が雑な木槌で直して再始動。', scene:'repair', sequence:'breakdown', twistMotion:'reverse', intrusion:'king' },
+    { id:'surface-breach', family:'environment', kinds:['win'], weight:.52, tier:'superhot', world:'surface', motion:'wave', duration:8800, cue:'SURFACE BREACH', detail:'神託装置ごと海面へ急浮上し、もう一度潜る。', scene:'surface', sequence:'journey', twistMotion:'reverse' },
+    { id:'witness-escape', family:'intrusion', kinds:['win'], weight:.46, tier:'hot', world:'escape', motion:'push', duration:8800, cue:'WITNESS ESCAPED', detail:'証人が王冠を咥えて筐体外へ逃げ、戻ってくる。', scene:'escape', sequence:'chase', twistMotion:'respin', intrusion:'king' },
 
     { id:'dry-shark-theft', family:'intrusion', kinds:['loss'], weight:1.2, tier:'fake-loss', world:'dry', motion:'theft', duration:4750, cue:'VERDICT STOLEN', detail:'干からびた王が当たり札だけ持ち去る。', intrusion:'dry', fake:true },
     { id:'power-failure', family:'blackout', kinds:['loss'], weight:1.05, tier:'fake-loss', world:'blackout', motion:'power-cut', duration:4800, cue:'POWER FAILURE', detail:'装置も海流も消え、非常灯だけが残る。', blackout:true, freeze:true },
@@ -213,19 +213,19 @@
     { id:'undertow-ejection', family:'environment', kinds:['loss'], weight:1.0, tier:'fake-loss', world:'undertow', motion:'reverse', duration:4700, cue:'UNDERTOW', detail:'逆流が五枚の証言を画面外へ流す。', reversal:true },
     { id:'cold-court', family:'typography', kinds:['loss'], weight:1.08, tier:'fake-loss', world:'cold', motion:'synchronous', duration:4450, cue:'CASE DISMISSED', detail:'宮廷システムが一行だけで冷たく棄却。' },
     { id:'depth-collapse', family:'typography', kinds:['loss'], weight:.95, tier:'fake-loss', world:'depth-collapse', motion:'skip', duration:4750, cue:'DEPTH // -99999', detail:'深度表示が壊れ、判定も海底へ落ちる。' },
-    { id:'cardboard-crown', family:'false-signal', kinds:['loss'], weight:.66, tier:'fake-loss', world:'cardboard', motion:'center-last', duration:6100, cue:'PREMIUM CROWN?', detail:'大当たり風の王冠が着地し、段ボールだと判明する。', scene:'cardboard', sequence:'fake-object', twistMotion:'brake', fake:true },
-    { id:'cracked-kingdom-tank', family:'power-failure', kinds:['loss'], weight:.55, tier:'fake-loss', world:'cracked-tank', motion:'power-cut', duration:6350, cue:'PRESSURE LEAK', detail:'王国水槽にひび。王が雑なテープを貼って終了する。', scene:'cracked-tank', sequence:'breakdown', twistMotion:'stopping', blackout:true, freeze:true },
+    { id:'cardboard-crown', family:'false-signal', kinds:['loss'], weight:.66, tier:'fake-loss', world:'cardboard', motion:'center-last', duration:8200, cue:'PREMIUM CROWN?', detail:'大当たり風の王冠が着地し、段ボールだと判明する。', scene:'cardboard', sequence:'fake-object', twistMotion:'brake', fake:true },
+    { id:'cracked-kingdom-tank', family:'power-failure', kinds:['loss'], weight:.55, tier:'fake-loss', world:'cracked-tank', motion:'power-cut', duration:8500, cue:'PRESSURE LEAK', detail:'王国水槽にひび。王が雑なテープを貼って終了する。', scene:'cracked-tank', sequence:'breakdown', twistMotion:'stopping', blackout:true, freeze:true },
 
     { id:'crown-defibrillator', family:'revival', kinds:['win'], effects:['revival'], weight:1.15, tier:'revival', world:'defibrillator', motion:'center-last', duration:6500, cue:'CROWN DEFIBRILLATOR', detail:'停止した海へ王冠が一撃。世界が再起動する。', fake:true, freeze:true },
     { id:'oracle-rewind', family:'revival', kinds:['win'], effects:['revival'], weight:1.0, tier:'revival', world:'rewind', motion:'reverse', duration:6700, cue:'ORACLE REWIND', detail:'敗北の一秒を海流ごと巻き戻す。', fake:true, reversal:true },
     { id:'king-return', family:'revival', kinds:['win'], effects:['revival'], weight:.9, tier:'revival', world:'king-return', motion:'push', duration:6400, cue:'THE KING RETURNS', detail:'帰ったはずのなおキングが結果を裏返す。', fake:true, intrusion:'king' },
     { id:'light-reboot', family:'revival', kinds:['win'], effects:['revival'], weight:1.05, tier:'revival', world:'reboot', motion:'outside-in', duration:6600, cue:'KINGDOM REBOOT', detail:'非常灯から順に王国の光が蘇る。', fake:true, blackout:true },
-    { id:'verdict-book-reversal', family:'revival', kinds:['win'], effects:['revival'], weight:.62, tier:'revival', world:'verdict-book', motion:'reverse', duration:7900, cue:'THE CLOSED VERDICT', detail:'敗北判定書が閉じ、王冠のしおりから逆向きに開く。', scene:'verdict-book', sequence:'book-revival', twistMotion:'reverse', fake:true, freeze:true },
-    { id:'single-golden-bubble', family:'revival', kinds:['win'], effects:['revival'], weight:.58, tier:'revival', world:'golden-bubble', motion:'center-last', duration:8300, cue:'ONE BUBBLE REMAINS', detail:'完全停止した海で、金の一泡だけが戻ってくる。', scene:'golden-bubble', sequence:'silent-revival', twistMotion:'revival', fake:true, blackout:true, freeze:true },
+    { id:'verdict-book-reversal', family:'revival', kinds:['win'], effects:['revival'], weight:.62, tier:'revival', world:'verdict-book', motion:'reverse', duration:9000, cue:'THE CLOSED VERDICT', detail:'敗北判定書が閉じ、王冠のしおりから逆向きに開く。', scene:'verdict-book', sequence:'book-revival', twistMotion:'reverse', fake:true, freeze:true },
+    { id:'single-golden-bubble', family:'revival', kinds:['win'], effects:['revival'], weight:.58, tier:'revival', world:'golden-bubble', motion:'center-last', duration:9500, cue:'ONE BUBBLE REMAINS', detail:'完全停止した海で、金の一泡だけが戻ってくる。', scene:'golden-bubble', sequence:'silent-revival', twistMotion:'revival', fake:true, blackout:true, freeze:true },
 
-    { id:'royal-audience', family:'premium', kinds:['win'], effects:['rainbow','crown','abyss'], weight:.16, tier:'extreme', world:'audience', motion:'witnesses', duration:9100, cue:'ROYAL CORONATION', detail:'筐体が王座へ組み替わり、五証人が一枚ずつ礼をする。', premium:true, intrusion:'king', freeze:true, scene:'coronation', sequence:'coronation', twistMotion:'stopping' },
+    { id:'royal-audience', family:'premium', kinds:['win'], effects:['rainbow','crown','abyss'], weight:.16, tier:'extreme', world:'audience', motion:'witnesses', duration:11000, cue:'ROYAL CORONATION', detail:'筐体が王座へ組み替わり、五証人が一枚ずつ礼をする。', premium:true, intrusion:'king', freeze:true, scene:'coronation', sequence:'coronation', twistMotion:'stopping' },
     { id:'golden-tide', family:'premium', kinds:['win'], effects:['rainbow','crown'], weight:.14, tier:'extreme', world:'golden-tide', motion:'wave', duration:6800, cue:'GOLDEN TIDE', detail:'金の海流がページの端から端まで満ちる。', premium:true },
-    { id:'secret-4810', family:'secret', kinds:['win'], weight:.09, tier:'extreme', world:'secret-4810', motion:'skip', duration:9800, cue:'DEPTH 4810 // VAULT', detail:'四個の封印が順に外れ、金庫から寝た王が結果を押し出す。', premium:true, blackout:true, scene:'vault-4810', sequence:'vault', twistMotion:'respin' },
+    { id:'secret-4810', family:'secret', kinds:['win'], weight:.09, tier:'extreme', world:'secret-4810', motion:'skip', duration:11600, cue:'DEPTH 4810 // VAULT', detail:'四個の封印が順に外れ、金庫から寝た王が結果を押し出す。', premium:true, blackout:true, scene:'vault-4810', sequence:'vault', twistMotion:'respin' },
     { id:'palace-open', family:'premium', kinds:['win'], effects:['rainbow','comet'], weight:.13, tier:'extreme', world:'palace-open', motion:'outside-in', duration:7000, cue:'THE PALACE OPENS', detail:'背景の海が割れ、その奥に王宮の光が現れる。', premium:true, freeze:true }
   ].map(route => Object.freeze(route)));
 
@@ -248,24 +248,32 @@
    */
   const sequenceBlueprints = Object.freeze({
     classic:Object.freeze({ signal:.38, judgment:.61, stop:.76 }),
-    chaos:Object.freeze({ signal:.20, twist:.47, judgment:.67, stop:.81 }),
-    broadcast:Object.freeze({ signal:.18, twist:.45, judgment:.68, stop:.82 }),
-    tribunal:Object.freeze({ signal:.21, twist:.51, judgment:.69, stop:.82 }),
-    anomaly:Object.freeze({ signal:.19, twist:.49, judgment:.68, stop:.82 }),
-    breakdown:Object.freeze({ signal:.18, twist:.46, judgment:.67, stop:.81 }),
-    passage:Object.freeze({ signal:.24, twist:.54, judgment:.70, stop:.82 }),
-    interactive:Object.freeze({ signal:.19, twist:.50, judgment:.69, stop:.82 }),
-    journey:Object.freeze({ signal:.18, twist:.47, judgment:.68, stop:.81 }),
-    chase:Object.freeze({ signal:.18, twist:.48, judgment:.68, stop:.82 }),
-    'fake-object':Object.freeze({ signal:.20, twist:.52, judgment:.70, stop:.82 }),
-    'book-revival':Object.freeze({ signal:.16, twist:.45, judgment:.67, stop:.81 }),
-    'silent-revival':Object.freeze({ signal:.15, twist:.44, judgment:.66, stop:.81 }),
-    coronation:Object.freeze({ signal:.15, twist:.42, judgment:.66, stop:.81 }),
-    vault:Object.freeze({ signal:.14, twist:.39, judgment:.64, stop:.80 })
+    chaos:Object.freeze({ signal:.12, twist:.53, judgment:.70, stop:.85 }),
+    broadcast:Object.freeze({ signal:.11, twist:.52, judgment:.70, stop:.85 }),
+    tribunal:Object.freeze({ signal:.12, twist:.55, judgment:.72, stop:.86 }),
+    anomaly:Object.freeze({ signal:.12, twist:.56, judgment:.72, stop:.86 }),
+    breakdown:Object.freeze({ signal:.11, twist:.53, judgment:.70, stop:.85 }),
+    passage:Object.freeze({ signal:.14, twist:.56, judgment:.72, stop:.86 }),
+    interactive:Object.freeze({ signal:.12, twist:.56, judgment:.72, stop:.86 }),
+    journey:Object.freeze({ signal:.11, twist:.54, judgment:.71, stop:.85 }),
+    chase:Object.freeze({ signal:.12, twist:.55, judgment:.72, stop:.86 }),
+    'fake-object':Object.freeze({ signal:.12, twist:.55, judgment:.72, stop:.86 }),
+    'book-revival':Object.freeze({ signal:.10, twist:.50, judgment:.68, stop:.85 }),
+    'silent-revival':Object.freeze({ signal:.10, twist:.52, judgment:.70, stop:.85 }),
+    coronation:Object.freeze({ signal:.09, twist:.50, judgment:.68, stop:.86 }),
+    vault:Object.freeze({ signal:.08, twist:.48, judgment:.66, stop:.84 })
   });
 
   function sequenceFor(presentation) {
     return sequenceBlueprints[presentation.sequence] || sequenceBlueprints.classic;
+  }
+
+  function cutinDuration(presentation, phase = 'signal') {
+    const premium = Boolean(presentation.premium || presentation.tier === 'extreme');
+    const heated = premium || ['hot', 'superhot', 'revival', 'fake-loss'].includes(presentation.tier);
+    if (premium) return phase === 'signal' ? 3500 : 3300;
+    if (heated) return phase === 'signal' ? 3150 : 2900;
+    return phase === 'signal' ? 2700 : 2500;
   }
 
   function routeCompatible(route, result) {
@@ -720,10 +728,11 @@
   function applyRouteMoment(presentation, phase) {
     if (phase === 'signal') {
       setRouteReadout(presentation, phase);
-      if (presentation.scene) showChaosScene(presentation, 'signal', presentation.interactive ? 2050 : presentation.premium ? 2100 : 1720);
-      else showTakeover(presentation, 'signal', presentation.premium ? 1750 : 1150);
+      const cutinMs = cutinDuration(presentation, 'signal');
+      if (presentation.scene) showChaosScene(presentation, 'signal', cutinMs);
+      else showTakeover(presentation, 'signal', presentation.premium ? cutinMs : presentation.tier === 'normal' ? 1350 : 2100);
       dispatchOracleBeat(routeBeatCue(presentation, phase), { intensity:presentation.premium ? .92 : presentation.tier === 'superhot' ? .78 : .52 });
-      if (presentation.intrusion) { setIntruder(presentation, true); later(() => setIntruder(presentation, false), 1650); }
+      if (presentation.intrusion) { setIntruder(presentation, true); later(() => setIntruder(presentation, false), Math.min(cutinMs, 2600)); }
       if (presentation.world === 'constellation') crowns.classList.add('is-constellation');
       if (presentation.world === 'crown-sink') crowns.classList.add('is-sinking');
       if (presentation.world === 'golden-tide' || presentation.world === 'audience') crowns.classList.add('is-raining');
@@ -736,8 +745,9 @@
       card.classList.add('is-chaos-twist');
       later(() => card.classList.remove('is-chaos-twist'), 920);
       refreshSpinCandidates(activeVisualResult);
-      if (presentation.scene) showChaosScene(presentation, 'twist', presentation.premium ? 2250 : 1780);
-      else showTakeover({ ...presentation, cue:'CURRENT SHIFT', detail:'航路が途中で書き換わった。', modifier:{ cue:'', detail:'' } }, 'twist', 1050);
+      const cutinMs = cutinDuration(presentation, 'twist');
+      if (presentation.scene) showChaosScene(presentation, 'twist', cutinMs);
+      else showTakeover({ ...presentation, cue:'CURRENT SHIFT', detail:'航路が途中で書き換わった。', modifier:{ cue:'', detail:'' } }, 'twist', presentation.premium ? cutinMs : 1900);
       dispatchOracleBeat(routeBeatCue(presentation, phase), {
         intensity:presentation.premium ? 1 : presentation.tier === 'hot' || presentation.tier === 'superhot' ? .78 : .58,
         silenceMs:['verdict-book'].includes(presentation.scene) ? 720 : undefined
@@ -796,19 +806,21 @@
   }
 
   function runFalseEnding(result, presentation) {
+    const fakeHold = presentation.scene ? 1500 : 1800;
+    const revivalHold = presentation.scene ? 2000 : 1600;
     setPhase('fake', 'fake-loss'); setReelMotion('settled'); card.classList.add('is-failed', 'is-fake');
     reel.innerHTML = fiveTiles('assets/characters/naoking-7.webp', true); title.textContent = '判定終了';
     message.textContent = '……王冠信号なし。神託装置を停止します。'; resultRegion?.classList.add('is-false-ending');
     status.textContent = 'NO SIGNAL // SESSION CLOSED'; flash('void', 'END', 900);
-    if (presentation.scene) showChaosScene(presentation, 'signal', 980);
-    dispatchOracleBeat('silence', { silenceMs:900, intensity:.2 });
+    if (presentation.scene) showTakeover({ ...presentation, cue:'VERDICT CLOSED', detail:'判定書は閉じた。海は、まだ黙っている。', modifier:{ cue:'', detail:'' } }, 'fake', fakeHold);
+    dispatchOracleBeat('silence', { silenceMs:Math.min(1200, fakeHold), intensity:.2 });
     later(() => {
       card.classList.remove('is-failed'); setPhase('revival', 'revival');
-      if (presentation.scene) showChaosScene(presentation, 'twist', 1500);
-      else showTakeover({ ...presentation, cue:'WAIT // VERDICT REVERSED', detail:'王が終了判定を却下した。', modifier:{ cue:'', detail:'' } }, 'revival', 1450);
-      flash('revival', 'RE:START', 1450); setReelMotion(presentation.reversal ? 'reverse' : 'revival'); slot.classList.add('is-spinning');
-      later(() => showFinal(result, presentation), 1320);
-    }, 1080);
+      if (presentation.scene) showTakeover({ ...presentation, cue:'ONE LAST CURRENT', detail:'最後の海流が、閉じた判定を押し戻す。', modifier:{ cue:'', detail:'' } }, 'revival', revivalHold);
+      else showTakeover({ ...presentation, cue:'WAIT // VERDICT REVERSED', detail:'王が終了判定を却下した。', modifier:{ cue:'', detail:'' } }, 'revival', revivalHold);
+      flash('revival', 'RE:START', Math.min(1800, revivalHold)); setReelMotion(presentation.reversal ? 'reverse' : 'revival'); slot.classList.add('is-spinning');
+      later(() => showFinal(result, presentation), Math.max(1320, revivalHold - 220));
+    }, fakeHold);
   }
 
   function stopWitnesses(result, presentation, onComplete) {
@@ -981,13 +993,37 @@
     return Object.freeze({ iterations:sampleSize, routeDefinitions:presentationRoutes.length, routes:Object.freeze(routes), families:Object.freeze(families), normalRouteCount:normalRoutes.size, missingRoutes:Object.freeze(missingRoutes), immediateRouteRepeat, incompatibleRoutes, resultPresentationContradictions, nonFrozenPresentations, largestRouteShare, minEstimatedRotations });
   }
 
+  function runCutinDiagnostics() {
+    const scenes = presentationRoutes.filter(route => route.scene).map(route => {
+      const sequence = sequenceFor(route);
+      const signalAt = Math.round(route.duration * sequence.signal);
+      const twistAt = Math.round(route.duration * sequence.twist);
+      return Object.freeze({
+        id:route.id,
+        signalDwell:cutinDuration(route, 'signal'),
+        twistDwell:cutinDuration(route, 'twist'),
+        signalToTwist:twistAt - signalAt,
+        signalAt,
+        twistAt
+      });
+    });
+    return Object.freeze({
+      sceneCount:scenes.length,
+      shortestSignalDwell:Math.min(...scenes.map(scene => scene.signalDwell)),
+      shortestTwistDwell:Math.min(...scenes.map(scene => scene.twistDwell)),
+      shortestSignalToTwist:Math.min(...scenes.map(scene => scene.signalToTwist)),
+      netLossImage:resultByKey.get('net')?.image || '',
+      scenes:Object.freeze(scenes)
+    });
+  }
+
   reel.innerHTML = fiveTiles(normalResults[0].image, true); status.textContent = 'ROYAL ORACLE // DORMANT';
   if (!window.location || ['localhost', '127.0.0.1'].includes(window.location.hostname)) {
     window.NaokingRouletteDebug = Object.freeze({
       baseProbabilities:Object.freeze({ normal:0.76, specialWin:0.14, specialLoss:0.10 }), pityRule:'The eighth consecutive non-winning draw becomes rainbow.',
       presentationRule:'A frozen result is chosen before an independent compatible presentation route.', routeCount:presentationRoutes.length,
       getState:() => Object.freeze({ busy, locked, resolvedDraws, timerCount:scheduledTasks.length, phase:card.dataset.roulettePhase || '', motion:card.dataset.reelMotion || '', route:activePresentation?.id || '', environmentClassCount:activeEnvironmentClasses.size, environmentClasses:[...activeEnvironmentClasses], normalHistory:[...normalHistory], presentationHistory:[...presentationHistory], displayed:displayHistory.map(item => item.key) }),
-      runDiagnostics, runMessageBagDiagnostics, runPresentationDiagnostics
+      runDiagnostics, runMessageBagDiagnostics, runPresentationDiagnostics, runCutinDiagnostics
     });
   }
 })();

@@ -112,6 +112,7 @@ if (!debug) throw new Error('NaokingRouletteDebug was not installed.');
 const diagnostic = debug.runDiagnostics(100000);
 const bagDiagnostic = debug.runMessageBagDiagnostics();
 const presentationDiagnostic = debug.runPresentationDiagnostics(100000);
+const cutinDiagnostic = debug.runCutinDiagnostics();
 const clickListeners = selectors.get('#spin').listeners.get('click') || [];
 const pagechangeListeners = windowListeners.get('naoking:pagechange') || [];
 const resultCount = Object.keys(diagnostic.byResult).length;
@@ -138,6 +139,11 @@ if (presentationDiagnostic.nonFrozenPresentations !== 0) failures.push(`${presen
 if (presentationDiagnostic.normalRouteCount !== 18) failures.push(`only ${presentationDiagnostic.normalRouteCount} of 18 normal routes appeared`);
 if (presentationDiagnostic.largestRouteShare > 0.15) failures.push(`largest presentation share was ${presentationDiagnostic.largestRouteShare}`);
 if (presentationDiagnostic.minEstimatedRotations < 10) failures.push(`minimum estimated rotations was ${presentationDiagnostic.minEstimatedRotations}`);
+if (cutinDiagnostic.sceneCount !== 17) failures.push(`scene route count was ${cutinDiagnostic.sceneCount}; expected 17`);
+if (cutinDiagnostic.shortestSignalDwell < 2700) failures.push(`shortest signal cut-in was only ${cutinDiagnostic.shortestSignalDwell}ms`);
+if (cutinDiagnostic.shortestTwistDwell < 2500) failures.push(`shortest twist cut-in was only ${cutinDiagnostic.shortestTwistDwell}ms`);
+if (cutinDiagnostic.shortestSignalToTwist < 3000) failures.push(`a signal cut-in was replaced after only ${cutinDiagnostic.shortestSignalToTwist}ms`);
+if (cutinDiagnostic.netLossImage !== 'assets/characters/naoking-panic.webp') failures.push(`net loss image was ${cutinDiagnostic.netLossImage}`);
 
 const beforeClick = debug.getState();
 clickListeners[0]?.();
@@ -246,5 +252,5 @@ pagechangeListeners[0]?.({ detail: { page: 'home' } });
 const afterLockPageChange = debug.getState();
 if (afterLockPageChange.locked || afterLockPageChange.phase !== '' || afterLockPageChange.timerCount !== 0) failures.push('page change did not release ROYAL LOCK');
 
-console.log(JSON.stringify({ ...diagnostic, bagDiagnostic, presentationDiagnostic, clickListeners: clickListeners.length, pagechangeListeners: pagechangeListeners.length, visibilityListeners: visibilityListeners.length, resultCount, eventLifecycle:{ drawEvents:drawEvents.length, resultEvents:resultEvents.length, stopEvents:stopEvents.length, beatEvents:beatEvents.length, phaseEvents:phaseEvents.length, earlyLeaks:earlyLeaks.length, settledRoute }, clickLifecycle: { beforeClick, duringClick, afterPageChange, afterSettle, beforeHide, whileHidden, afterResume, afterVisibilityCancel, afterRoyalLock, afterLockPageChange }, failures }, null, 2));
+console.log(JSON.stringify({ ...diagnostic, bagDiagnostic, presentationDiagnostic, cutinDiagnostic, clickListeners: clickListeners.length, pagechangeListeners: pagechangeListeners.length, visibilityListeners: visibilityListeners.length, resultCount, eventLifecycle:{ drawEvents:drawEvents.length, resultEvents:resultEvents.length, stopEvents:stopEvents.length, beatEvents:beatEvents.length, phaseEvents:phaseEvents.length, earlyLeaks:earlyLeaks.length, settledRoute }, clickLifecycle: { beforeClick, duringClick, afterPageChange, afterSettle, beforeHide, whileHidden, afterResume, afterVisibilityCancel, afterRoyalLock, afterLockPageChange }, failures }, null, 2));
 if (failures.length) process.exitCode = 1;
