@@ -101,6 +101,9 @@
     ]}
   ];
 
+  const allResults = [...normalResults, ...winResults, ...lossResults];
+  const resultByKey = new Map(allResults.map(result => [result.key, result]));
+
   const messageBags = new Map();
   const lastMessageByResult = new Map();
   function shuffledBag(result) {
@@ -178,8 +181,13 @@
   let taps = [];
   let activeTimers = [];
   let drawToken = 0;
+  let resolvedDraws = 0;
   const historyList = document.querySelector('#fortune-history');
   const displayHistory = [];
+  const setPhase = phase => {
+    if (phase) card.dataset.roulettePhase = phase;
+    else delete card.dataset.roulettePhase;
+  };
   const later = (fn, ms, token = drawToken) => {
     const delay = reducedMotion.matches ? Math.min(ms, 180) : ms;
     const id = window.setTimeout(() => {
@@ -190,6 +198,7 @@
     return id;
   };
   const flash = (kind, text, ms = 1650) => {
+    effectLayer.style.setProperty('--roulette-fx-duration', `${ms}ms`);
     effectLayer.className = `roulette-fx is-visible ${kind}`;
     effectLayer.textContent = text;
     later(() => { effectLayer.className = 'roulette-fx'; }, ms);
@@ -204,9 +213,12 @@
     card.className = card.className.replace(/\bis-(jackpot|rainbow|crown|revival|comet|abyss|dry|blackout|net|alarm|drain|failed|exploded|searchlight|gold|deep|crown-drop|dry-steal|void-miss)\b/g, '').trim();
     slot.classList.remove('is-jackpot', 'is-long-spin', 'is-spinning');
     effectLayer.className = 'roulette-fx';
+    effectLayer.style.removeProperty('--roulette-fx-duration');
     prop.className = 'roulette-scene-prop';
     intruder.classList.remove('is-running');
     crowns.classList.remove('is-raining');
+    resultRegion?.classList.remove('is-revealing');
+    setPhase('');
     if (blast) blast.hidden = true;
   };
   const effectText = { rainbow:'RAINBOW JACKPOT', crown:'CROWN DROP!', revival:'REVIVAL!!', comet:'ROYAL COMET', abyss:'ABYSS BEAM', dry:'LUCK STOLEN', blackout:'DEEP BLACKOUT', net:'NET FAILURE', alarm:'RED ALERT', drain:'WATER DRAIN' };
@@ -218,6 +230,7 @@
     if (result.effect === 'drain') { card.classList.add('is-drain'); propIn('drain', '↓'); }
   }
   function showFinal(result) {
+    setPhase('revealed');
     if (result.kind === 'win') {
       card.classList.add('is-jackpot', `is-${result.effect}`); slot.classList.add('is-jackpot');
       if (result.effect === 'crown') { crowns.classList.add('is-raining'); later(() => crowns.classList.remove('is-raining'), 1800); }
@@ -232,6 +245,8 @@
     reel.innerHTML = tile(result.image);
     title.textContent = result.title;
     message.textContent = result.message;
+    resultRegion?.classList.add('is-revealing');
+    later(() => resultRegion?.classList.remove('is-revealing'), result.kind === 'normal' ? 760 : 1080);
     resultRegion?.setAttribute('aria-busy', 'false');
     status.textContent = result.kind === 'win' ? 'SPECIAL JACKPOT CONFIRMED' : result.kind === 'loss' ? 'SPECIAL MISS CONFIRMED' : 'JUDGMENT COMPLETE // TRY AGAIN';
     setButtonCopy('運命を回す');
@@ -258,7 +273,14 @@
     drawToken += 1;
     busy = true; resetVisualState();
     const result = resolveFinalResult(); // The one immutable draw for this click.
-    reel.innerHTML = Array.from({ length: 30 }, () => tile(normalResults[Math.floor(Math.random() * normalResults.length)].image)).join('');
+    resolvedDraws += 1;
+    setPhase('descent');
+    later(() => setPhase('judgment'), Math.min(520, Math.round(result.duration * 0.32)));
+    later(() => setPhase('verdict'), Math.max(820, result.duration - 420));
+    // Five tiles keep the full promoted strip below 4096 device pixels even at
+    // DPR 3 (5 x 230px x 3 = 3450), avoiding mobile GPU texture clipping.
+    const reelTileCount = 5;
+    reel.innerHTML = Array.from({ length: reelTileCount }, () => tile(normalResults[Math.floor(Math.random() * normalResults.length)].image)).join('');
     slot.classList.add('is-spinning');
     slot.classList.toggle('is-long-spin', result.effect === 'revival');
     setButtonCopy('なおキング採点中・連打厳禁…', 'DO NOT TAP');
@@ -307,10 +329,17 @@
     let lastNormalKey = null;
     let repeatedNormal = 0;
     let immediateMessageRepeat = 0;
+    let integrityMismatches = 0;
+    let nonFrozenResults = 0;
 
     try {
       for (let index = 0; index < sampleSize; index += 1) {
         const result = resolveFinalResult();
+        const template = resultByKey.get(result.key);
+        if (!Object.isFrozen(result)) nonFrozenResults += 1;
+        if (!template || result.kind !== template.kind || result.title !== template.title || result.image !== template.image || result.effect !== template.effect || result.duration !== template.duration || !template.messages.includes(result.message)) {
+          integrityMismatches += 1;
+        }
         counts[result.kind] += 1;
         byResult[result.key] = (byResult[result.key] || 0) + 1;
         if (result.kind === 'normal') {
@@ -335,8 +364,42 @@
       rates: Object.freeze(Object.fromEntries(Object.entries(counts).map(([key, value]) => [key, value / sampleSize]))),
       byResult: Object.freeze(byResult),
       repeatedNormal,
-      immediateMessageRepeat
+      immediateMessageRepeat,
+      integrityMismatches,
+      nonFrozenResults
     });
+  }
+
+  function runMessageBagDiagnostics() {
+    const bagSnapshot = new Map([...messageBags].map(([key, bag]) => [key, [...bag]]));
+    const lastMessageSnapshot = new Map(lastMessageByResult);
+    let duplicateWithinBag = 0;
+    let boundaryRepeats = 0;
+
+    try {
+      messageBags.clear();
+      lastMessageByResult.clear();
+      allResults.forEach(result => {
+        let previous = null;
+        for (let cycle = 0; cycle < 2; cycle += 1) {
+          const seen = new Set();
+          for (let index = 0; index < result.messages.length; index += 1) {
+            const next = shuffledBag(result);
+            if (seen.has(next)) duplicateWithinBag += 1;
+            if (next === previous) boundaryRepeats += 1;
+            seen.add(next);
+            previous = next;
+          }
+        }
+      });
+    } finally {
+      messageBags.clear();
+      bagSnapshot.forEach((bag, key) => messageBags.set(key, [...bag]));
+      lastMessageByResult.clear();
+      lastMessageSnapshot.forEach((value, key) => lastMessageByResult.set(key, value));
+    }
+
+    return Object.freeze({ definitions: allResults.length, duplicateWithinBag, boundaryRepeats });
   }
 
   // Keep heavy diagnostics available on local/test hosts without exposing a
@@ -345,8 +408,9 @@
     window.NaokingRouletteDebug = Object.freeze({
       baseProbabilities: Object.freeze({ normal: 0.76, specialWin: 0.14, specialLoss: 0.10 }),
       pityRule: 'The eighth consecutive non-winning draw becomes rainbow.',
-      getState: () => Object.freeze({ busy, locked, normalHistory: [...normalHistory], displayed: displayHistory.map(item => item.key) }),
-      runDiagnostics
+      getState: () => Object.freeze({ busy, locked, resolvedDraws, timerCount: activeTimers.length, phase: card.dataset.roulettePhase || '', normalHistory: [...normalHistory], displayed: displayHistory.map(item => item.key) }),
+      runDiagnostics,
+      runMessageBagDiagnostics
     });
   }
 })();

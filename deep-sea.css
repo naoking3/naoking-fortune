@@ -359,12 +359,12 @@ img { max-width: 100%; }
 .machine-plate i { color: #77edb8; font-style: normal; }
 .roulette-marquee { display: flex; justify-content: space-around; padding: 7px; background: #06334e; }
 .roulette-marquee i { width: 5px; height: 5px; border-radius: 50%; background: var(--gold-light); box-shadow: 0 0 9px rgba(244,223,160,.74); }
-.slot-window { --reel-travel: -6670px; position: relative; height: 230px; overflow: hidden; border: 1px solid rgba(141,235,255,.55); background: radial-gradient(circle at 50% 28%, #2b91a9, #0b5674 46%, #06314f 100%); box-shadow: inset 0 0 60px rgba(2,27,55,.54); }
+.slot-window { --reel-travel: -920px; position: relative; height: 230px; overflow: hidden; border: 1px solid rgba(141,235,255,.55); background: radial-gradient(circle at 50% 28%, #2b91a9, #0b5674 46%, #06314f 100%); box-shadow: inset 0 0 60px rgba(2,27,55,.54); }
 .pointer { position: absolute; z-index: 6; top: 4px; left: 50%; color: var(--gold-light); font-size: 21px; transform: translateX(-50%); }
 .slot-reel { position: absolute; inset: 0; display: grid; place-items: center; }
 .shark-tile { display: grid; width: 100%; height: 230px; min-height: 230px; place-items: center; }
 .shark-face { width: min(78%, 280px); height: 214px; object-fit: contain; image-rendering: auto; filter: drop-shadow(0 15px 20px rgba(0,0,0,.4)); }
-.is-spinning .slot-reel { display: flex; flex-direction: column; animation: oracle-roll 1.7s cubic-bezier(.13,.72,.24,1) both; }
+.is-spinning .slot-reel { display: flex; flex-direction: column; will-change: transform; backface-visibility: hidden; animation: oracle-roll 1.7s cubic-bezier(.13,.72,.24,1) both; }
 @keyframes oracle-roll { to { transform: translateY(var(--reel-travel)); } }
 .roulette-status { min-height: 16px; margin: 12px 0 0; color: var(--gold-light); font: 700 8px var(--mono); letter-spacing: .08em; }
 .result { min-height: 158px; margin: 14px 0; padding: 18px 19px; border: 1px solid rgba(141,235,255,.24); color: var(--mist); background: rgba(221,248,255,.06); text-align: left; }
@@ -561,7 +561,7 @@ img { max-width: 100%; }
   .archive-ledger { grid-template-columns: 1fr; }
   .oracle-layout { display: block; }
   .fortune-card { padding: 12px; }
-  .slot-window { --reel-travel: -5510px; }
+  .slot-window { --reel-travel: -760px; }
   .slot-window, .shark-tile { height: 190px; min-height: 190px; }
   .shark-face { height: 180px; }
   .result { min-height: 170px; }
