@@ -62,17 +62,40 @@
     const WORLD = { width: 960, height: 540 };
     const GAME_DURATION = 30;
     const OXYGEN_START = 78;
-    const PLAYER_Y = WORLD.height - 92;
-    const PHASE_TIMES = [4.5, 9, 13.5, 18];
-    const DOUBLE_GATE_OFFSET = 0.88;
-    const SWEEP_GATE_OFFSET = 0.7;
-    const LATE_SPEED_RAMP = 3.4;
+    const PLAYER_WIDTH = 112;
+    const PLAYER_HEIGHT = 62;
+    const PLAYER_BOTTOM_OFFSET = 92;
+    const PLAYER_Y = WORLD.height - PLAYER_BOTTOM_OFFSET;
+    const PLAYER_ACCELERATION = 1500;
+    const PLAYER_MAX_SPEED = 465;
+    const PLAYER_HIT_WIDTH_RATIO = 0.61;
+    const PLAYER_HIT_HEIGHT_RATIO = 0.56;
+    const PRECISE_PICKUP_HIT_RATIO = 0.12;
+    const RISK_PICKUP_WIDTH = 24;
+    const RISK_SAFE_OFFSET_MIN = 28;
+    const RISK_SAFE_OFFSET_MAX = 50;
+    const PLAYER_EDGE_PADDING = 12;
+    const FORCED_SHIFT_MINIMUM = 105;
+    const GAP_EDGE_PADDING = 46;
+    const PATTERN_INITIAL_DELAY = 1.95;
+    const PATTERN_RECOVERY_TIME = 0.16;
+    const HAZARD_RANDOM_SPEED = 18;
+    const MINE_SPEED_BONUS = 18;
+    const NET_SPEED_BONUS = 8;
+    const CURRENT_GATE_DELAY = 0.2;
+    const CURRENT_DURATION = 2.35;
+    const FEVER_OBSTACLE_SCALE = 0.84;
+    const HAZARD_MIN_SPEED_SCALE = 0.84;
+    const PHASE_TIMES = [4.2, 8.4, 12.6, 16.8];
+    const DOUBLE_GATE_OFFSET = 0.84;
+    const SWEEP_GATE_OFFSET = 0.66;
+    const LATE_SPEED_RAMP = 3.7;
     const PHASES = [
-      { drain: 8.4, gap: 196, speed: 235, warning: 0.92, shift: 238, current: 98, reward: 42 },
-      { drain: 11.2, gap: 184, speed: 280, warning: 0.8, shift: 268, current: 112, reward: 52 },
-      { drain: 14.8, gap: 172, speed: 325, warning: 0.69, shift: 298, current: 128, reward: 64 },
-      { drain: 18.5, gap: 158, speed: 370, warning: 0.6, shift: 330, current: 146, reward: 78 },
-      { drain: 21.5, gap: 146, speed: 420, warning: 0.52, shift: 360, current: 166, reward: 92 }
+      { drain: 8.4, gap: 196, speed: 238, warning: 0.88, shift: 238, current: 102, reward: 42 },
+      { drain: 11.2, gap: 184, speed: 286, warning: 0.76, shift: 268, current: 118, reward: 52 },
+      { drain: 14.8, gap: 172, speed: 333, warning: 0.65, shift: 298, current: 136, reward: 64 },
+      { drain: 18.5, gap: 158, speed: 381, warning: 0.56, shift: 330, current: 156, reward: 78 },
+      { drain: 21.5, gap: 146, speed: 432, warning: 0.48, shift: 360, current: 178, reward: 92 }
     ];
     const reducedMotionQuery = matchMedia('(prefers-reduced-motion: reduce)');
     let reducedMotion = reducedMotionQuery.matches;
@@ -93,8 +116,8 @@
     const player = {
       x: WORLD.width / 2,
       y: PLAYER_Y,
-      width: 112,
-      height: 62,
+      width: PLAYER_WIDTH,
+      height: PLAYER_HEIGHT,
       velocityX: 0,
       direction: 1,
       lives: 1,
@@ -136,7 +159,10 @@
       bestCombo: readNumber('naoking-deep-sea-best-combo'),
       runs: readNumber('naoking-deep-sea-runs'),
       resultTaunt: '',
-      resultTitle: '未判定'
+      resultTitle: '未判定',
+      deathCueSent: false,
+      gateSequence: 0,
+      lastNearMissGate: 0
     };
 
     const TAUNTS = {
@@ -293,6 +319,18 @@
       return message;
     }
     function clamp(value, minimum, maximum) { return Math.max(minimum, Math.min(maximum, value)); }
+    function emitGameAudio(cue, detail = {}) {
+      const intensity = clamp(Number(detail.intensity ?? 0.5), 0, 1);
+      const oxygen = Math.round(clamp(Number(detail.oxygen ?? game.oxygen), 0, 100));
+      window.dispatchEvent(new CustomEvent('naoking:gameaudio', {
+        detail: {
+          ...detail,
+          cue,
+          intensity,
+          oxygen
+        }
+      }));
+    }
     function difficulty() { return clamp(game.elapsed / GAME_DURATION, 0, 1); }
     function phaseIndex() {
       if (game.elapsed >= PHASE_TIMES[3]) return 4;
@@ -331,13 +369,14 @@
       clearRunState();
       Object.assign(game, {
         mode: 'playing', score: 0, combo: 0, runBestCombo: 0, comboWindow: 0, multiplier: 1,
-        elapsed: 0, pickupTimer: 0.35, patternTimer: 1.95, crownTimer: 7.5 + Math.random() * 3,
+        elapsed: 0, pickupTimer: 0.35, patternTimer: PATTERN_INITIAL_DELAY, crownTimer: 7.5 + Math.random() * 3,
         oxygen: OXYGEN_START, oxygenWarningStage: 0, oxygenFlashFor: 0,
         riskRewardFor: 0, riskAttemptFor: 0,
         feverFor: 0, currentFor: 0, currentStrength: 0, flashFor: 0, shakeFor: 0,
         hitStopFor: 0, deathTimer: 0, deathCause: 'unknown', lastSafeX: WORLD.width / 2,
         recentPatterns: [], announcementTimer: 3.8, lastFrame: performance.now(),
-        resultTaunt: '', resultTitle: '回遊中'
+        resultTaunt: '', resultTitle: '回遊中', deathCueSent: false,
+        gateSequence: 0, lastNearMissGate: 0
       });
       Object.assign(player, {
         x: WORLD.width / 2, y: PLAYER_Y, velocityX: 0, direction: 1, lives: 1, shieldFor: 0
@@ -356,9 +395,11 @@
     }
 
     function startGame() {
+      const cue = game.mode === 'finished' ? 'retry' : 'start';
       cancelAnimationFrame(game.animationFrame);
       if (curtain) curtain.hidden = true;
       resetGame();
+      emitGameAudio(cue, { intensity: cue === 'retry' ? 0.7 : 0.62 });
       announce('LIFE 1。O2は時間で減る。予兆の安全帯で王国餌を取れ。');
       canvas.focus({ preventScroll: true });
       game.animationFrame = requestAnimationFrame(frame);
@@ -455,6 +496,11 @@
       gameRoot.classList.toggle('is-clear', cleared);
       const bestSuffix = isBest ? ' NEW BEST!' : ` BEST ${game.bestTime.toFixed(1)}秒`;
       announce(`「${taunt}」 ${survivalTime.toFixed(1)}秒 / ${game.score}点。${rankDescription}${bestSuffix}`);
+      emitGameAudio(cleared ? 'clear' : 'game-over', {
+        intensity: cleared ? 1 : 0.84,
+        cause,
+        cleared
+      });
       updateHud();
       draw();
     }
@@ -485,6 +531,7 @@
         game.shakeFor = reducedMotion ? 0 : 0.16;
         game.score += 35;
         addParticles(entity.x, entity.y, '#ffe178', 24, true);
+        emitGameAudio('shield-hit', { intensity: 0.78, cause: entity.type || 'unknown' });
         announce('王冠シールド消費。次は当たれば終わり。');
         return;
       }
@@ -500,6 +547,9 @@
       player.velocityX = 0;
       gameRoot.classList.add('is-dying');
       addParticles(entity.x, entity.y, game.deathCause === 'oxygen' ? '#89eaff' : '#ff7779', 32);
+      if (game.deathCause !== 'oxygen') {
+        emitGameAudio('damage', { intensity: 1, cause: game.deathCause });
+      }
       announce(game.deathCause === 'oxygen' ? '酸素ゼロ。なおキング、静かに沈む……' : '被弾。なおキング判定中……');
     }
 
@@ -519,12 +569,12 @@
 
     function spawnRiskFood({ gapX, gapWidth, speed, hazardType, rewardBoost = 0 }) {
       const phase = phaseConfig();
-      const playerHitHalf = player.width * 0.61 / 2;
-      const safeOffset = clamp(gapWidth / 2 - playerHitHalf - 6, 28, 50);
+      const playerHitHalf = player.width * PLAYER_HIT_WIDTH_RATIO / 2;
+      const safeOffset = clamp(gapWidth / 2 - playerHitHalf - 6, RISK_SAFE_OFFSET_MIN, RISK_SAFE_OFFSET_MAX);
       const direction = Math.random() < 0.5 ? -1 : 1;
       entities.push({
         type: 'royalTuna', x: gapX + safeOffset * direction, y: -hazardHeight(hazardType),
-        width: 24, height: 16, points: 45 + phaseIndex() * 20 + rewardBoost * 3,
+        width: RISK_PICKUP_WIDTH, height: 16, points: 45 + phaseIndex() * 20 + rewardBoost * 3,
         oxygenGain: phase.reward + rewardBoost, hazard: false, riskReward: true, precisePickup: true,
         speed, sway: 0, phase: Math.random() * Math.PI * 2, rotation: 0
       });
@@ -543,19 +593,19 @@
     function chooseReachableGap(forceShift = true, shiftLimit = null) {
       const maximumShift = shiftLimit ?? phaseConfig().shift;
       let shift = (Math.random() * 2 - 1) * maximumShift;
-      if (forceShift && Math.abs(shift) < Math.min(105, maximumShift * 0.68)) {
-        const minimumShift = Math.min(105, maximumShift * 0.68);
+      if (forceShift && Math.abs(shift) < Math.min(FORCED_SHIFT_MINIMUM, maximumShift * 0.68)) {
+        const minimumShift = Math.min(FORCED_SHIFT_MINIMUM, maximumShift * 0.68);
         shift = (shift < 0 ? -1 : 1) * (minimumShift + Math.random() * (maximumShift - minimumShift));
       }
       const gapWidth = gapWidthForCurrentDifficulty();
-      const edge = gapWidth / 2 + 46;
+      const edge = gapWidth / 2 + GAP_EDGE_PADDING;
       const gapX = clamp(game.lastSafeX + shift, edge, WORLD.width - edge);
       game.lastSafeX = gapX;
       return { gapX, gapWidth };
     }
 
     function hazardSpeed() {
-      return phaseConfig().speed + Math.random() * 18 + Math.max(0, game.elapsed - PHASE_TIMES[3]) * LATE_SPEED_RAMP;
+      return phaseConfig().speed + Math.random() * HAZARD_RANDOM_SPEED + Math.max(0, game.elapsed - PHASE_TIMES[3]) * LATE_SPEED_RAMP;
     }
 
     function hazardHeight(hazardType) {
@@ -566,13 +616,14 @@
 
     function patternCooldown({ hazardType, speed, warningDelay, spawnOffset = 0 }) {
       const height = hazardHeight(hazardType);
-      const playerHitHeight = player.height * 0.56;
+      const playerHitHeight = player.height * PLAYER_HIT_HEIGHT_RATIO;
       const distanceUntilClear = PLAYER_Y + (height + playerHitHeight) / 2 + height;
-      const slowestPossibleSpeed = speed * 0.84;
-      return spawnOffset + warningDelay + distanceUntilClear / slowestPossibleSpeed + 0.16;
+      const slowestPossibleSpeed = speed * HAZARD_MIN_SPEED_SCALE;
+      return spawnOffset + warningDelay + distanceUntilClear / slowestPossibleSpeed + PATTERN_RECOVERY_TIME;
     }
 
     function spawnGate({ gapX, gapWidth, hazardType, speed }) {
+      const gateId = ++game.gateSequence;
       const leftWidth = gapX - gapWidth / 2;
       const rightStart = gapX + gapWidth / 2;
       const rightWidth = WORLD.width - rightStart;
@@ -581,7 +632,7 @@
         if (width < 18) return;
         entities.push({
           type: hazardType, x, y: -height, width, height, points: 0, hazard: true,
-          speed, sway: 0, phase: 0, rotation: 0
+          speed, sway: 0, phase: 0, rotation: 0, gateId, nearMissChecked: false
         });
       };
       pushSegment(leftWidth / 2, leftWidth);
@@ -602,13 +653,17 @@
     }
 
     function triggerCurrent(direction) {
-      game.currentFor = 2.35;
+      game.currentFor = CURRENT_DURATION;
       game.currentStrength = direction * phaseConfig().current;
       game.flashFor = 0.08;
       announce(direction > 0 ? '海流発生。右へ流される。逆らえ。' : '海流発生。左へ流される。逆らえ。');
     }
 
     function telegraphCurrent(direction, delay = 0.85) {
+      emitGameAudio('current-warning', {
+        intensity: 0.54 + phaseIndex() * 0.08,
+        pattern: 'current-gate'
+      });
       warnings.push({
         kind: 'current', direction, life: delay, maxLife: delay,
         onExpire: () => triggerCurrent(direction)
@@ -636,6 +691,12 @@
       const warningTime = phaseConfig().warning;
       const first = chooseReachableGap(true);
       const speed = hazardSpeed();
+      if (pattern !== 'current-gate') {
+        emitGameAudio('pattern-warning', {
+          intensity: 0.38 + phase * 0.1,
+          pattern
+        });
+      }
 
       if (pattern === 'rock-gate') {
         telegraphGate({ ...first, hazardType: 'rockGate', delay: warningTime, speed, label: 'ROCK + O2', reward: true });
@@ -643,13 +704,13 @@
         return patternCooldown({ hazardType: 'rockGate', speed, warningDelay: warningTime });
       }
       if (pattern === 'mine-gate') {
-        const mineSpeed = speed + 18;
+        const mineSpeed = speed + MINE_SPEED_BONUS;
         telegraphGate({ ...first, hazardType: 'mineGate', delay: warningTime, speed: mineSpeed, label: 'MINE + O2', reward: true });
         announce('機雷列接近。点滅する隙間を見ろ。');
         return patternCooldown({ hazardType: 'mineGate', speed: mineSpeed, warningDelay: warningTime });
       }
       if (pattern === 'net-gate') {
-        const netSpeed = speed + 8;
+        const netSpeed = speed + NET_SPEED_BONUS;
         telegraphGate({ ...first, hazardType: 'netGate', delay: warningTime, speed: netSpeed, label: 'NET + O2', reward: true });
         announce('漁網接近。開いている場所へ。');
         return patternCooldown({ hazardType: 'netGate', speed: netSpeed, warningDelay: warningTime });
@@ -671,11 +732,11 @@
         const direction = Math.random() < 0.5 ? -1 : 1;
         telegraphCurrent(direction, warningTime);
         telegraphGate({
-          ...first, hazardType: 'netGate', delay: warningTime + 0.2, speed,
+          ...first, hazardType: 'netGate', delay: warningTime + CURRENT_GATE_DELAY, speed,
           label: 'CURRENT + O2', reward: true, rewardBoost: 3
         });
         announce('海流予兆。矢印と隙間を同時に見ろ。');
-        return patternCooldown({ hazardType: 'netGate', speed, warningDelay: warningTime + 0.2 });
+        return patternCooldown({ hazardType: 'netGate', speed, warningDelay: warningTime + CURRENT_GATE_DELAY });
       }
       telegraphGate({ ...first, hazardType: 'mineGate', delay: warningTime, speed, label: '1 / 3' });
       schedule(SWEEP_GATE_OFFSET, () => {
@@ -694,8 +755,8 @@
     }
 
     function intersects(entity) {
-      const playerHitWidth = player.width * (entity.precisePickup ? 0.12 : 0.61);
-      const playerHitHeight = player.height * (entity.precisePickup ? 0.38 : 0.56);
+      const playerHitWidth = player.width * (entity.precisePickup ? PRECISE_PICKUP_HIT_RATIO : PLAYER_HIT_WIDTH_RATIO);
+      const playerHitHeight = player.height * (entity.precisePickup ? 0.38 : PLAYER_HIT_HEIGHT_RATIO);
       return Math.abs(entity.x - player.x) < (entity.width + playerHitWidth) / 2
         && Math.abs(entity.y - player.y) < (entity.height + playerHitHeight) / 2;
     }
@@ -711,6 +772,7 @@
         game.runBestCombo = Math.max(game.runBestCombo, game.combo);
         game.flashFor = 0.42;
         addParticles(entity.x, entity.y, '#ffd66b', 30, true);
+        emitGameAudio('crown', { intensity: 0.96 });
         announce('王冠獲得。3.2秒スコア2倍＋一瞬だけシールド。無敵ではない。');
         return;
       }
@@ -726,6 +788,9 @@
         game.oxygenFlashFor = entity.riskReward ? 0.46 : 0.24;
       }
       addParticles(entity.x, entity.y, entity.type === 'pearl' ? '#dffcff' : '#ffd66b', entity.type === 'pearl' ? 18 : 9);
+      emitGameAudio(entity.type === 'pearl' || entity.riskReward ? 'rare-pickup' : 'pickup', {
+        intensity: entity.riskReward ? 0.88 : (entity.type === 'pearl' ? 0.72 : 0.38)
+      });
       if (entity.riskReward) {
         game.riskRewardFor = 0.58;
         game.riskAttemptFor = 0.55;
@@ -762,6 +827,10 @@
       }
       const slowDelta = delta * (reducedMotion ? 1 : 0.32);
       game.deathTimer -= delta;
+      if (!game.deathCueSent && game.deathTimer <= (reducedMotion ? 0.08 : 0.22)) {
+        game.deathCueSent = true;
+        emitGameAudio('death', { intensity: 0.92, cause: game.deathCause });
+      }
       game.flashFor = Math.max(0, game.flashFor - delta);
       game.oxygenFlashFor = Math.max(0, game.oxygenFlashFor - delta);
       game.riskRewardFor = Math.max(0, game.riskRewardFor - delta);
@@ -792,10 +861,12 @@
       game.oxygen = Math.max(0, game.oxygen - phaseConfig().drain * delta);
       if (game.oxygen <= 40 && game.oxygenWarningStage === 0) {
         game.oxygenWarningStage = 1;
+        emitGameAudio('oxygen-warning', { intensity: 0.58, oxygen: Math.round(game.oxygen) });
         announce('O2 40%. 餌を取らないと、避けても沈む。');
       }
       if (game.oxygen <= 20 && game.oxygenWarningStage === 1) {
         game.oxygenWarningStage = 2;
+        emitGameAudio('oxygen-warning', { intensity: 0.94, oxygen: Math.round(game.oxygen) });
         announce('O2 CRITICAL. 危険帯の王国餌へ。');
       }
       if (game.currentFor <= 0) game.currentStrength = 0;
@@ -804,13 +875,16 @@
       const movingLeft = keyState.left || pointerState.left;
       const movingRight = keyState.right || pointerState.right;
       const input = Number(movingRight) - Number(movingLeft);
-      const acceleration = 1500;
-      const maxSpeed = game.feverFor > 0 ? 525 : 465;
-      player.velocityX += input * acceleration * delta;
+      const maxSpeed = game.feverFor > 0 ? 525 : PLAYER_MAX_SPEED;
+      player.velocityX += input * PLAYER_ACCELERATION * delta;
       player.velocityX *= Math.pow(input ? 0.16 : 0.009, delta);
       player.velocityX = clamp(player.velocityX, -maxSpeed, maxSpeed);
       player.x += (player.velocityX + game.currentStrength) * delta;
-      player.x = clamp(player.x, player.width / 2 + 12, WORLD.width - player.width / 2 - 12);
+      player.x = clamp(
+        player.x,
+        player.width / 2 + PLAYER_EDGE_PADDING,
+        WORLD.width - player.width / 2 - PLAYER_EDGE_PADDING
+      );
       if (Math.abs(player.velocityX) > 10) player.direction = Math.sign(player.velocityX);
 
       if (game.pickupTimer <= 0) {
@@ -832,7 +906,7 @@
       }
 
       updateAmbient(delta);
-      const obstacleScale = game.feverFor > 0 ? 0.84 : 1;
+      const obstacleScale = game.feverFor > 0 ? FEVER_OBSTACLE_SCALE : 1;
       for (let index = entities.length - 1; index >= 0; index -= 1) {
         const entity = entities[index];
         entity.y += entity.speed * delta * (entity.hazard || entity.riskReward ? obstacleScale : 1);
@@ -848,7 +922,24 @@
           entities.splice(index, 1);
           if (entity.hazard) beginDeath(entity); else collect(entity);
           if (game.mode === 'dying') break;
-        } else if (entity.y > WORLD.height + 90) entities.splice(index, 1);
+        } else {
+          const passedPlayer = entity.hazard
+            && !entity.nearMissChecked
+            && entity.y >= PLAYER_Y + (entity.height + player.height * PLAYER_HIT_HEIGHT_RATIO) / 2;
+          if (passedPlayer) {
+            entity.nearMissChecked = true;
+            const clearance = Math.abs(entity.x - player.x)
+              - (entity.width + player.width * PLAYER_HIT_WIDTH_RATIO) / 2;
+            if (clearance >= 0 && clearance <= 22 && game.lastNearMissGate !== entity.gateId) {
+              game.lastNearMissGate = entity.gateId;
+              emitGameAudio('near-miss', {
+                intensity: clamp(1 - clearance / 30, 0.55, 0.96),
+                cause: entity.type
+              });
+            }
+          }
+          if (entity.y > WORLD.height + 90) entities.splice(index, 1);
+        }
       }
 
       if (game.mode === 'playing' && game.oxygen <= 0) {
@@ -1218,6 +1309,7 @@
       }
     });
     window.addEventListener('naoking:pagechange', (event) => {
+      if (event.detail?.page !== 'game') emitGameAudio('exit', { intensity: 0 });
       if (event.detail?.page !== 'game' && game.mode !== 'idle') {
         cancelAnimationFrame(game.animationFrame);
         clearRunState();
@@ -1228,7 +1320,8 @@
           riskRewardFor: 0, riskAttemptFor: 0, feverFor: 0,
           currentFor: 0, currentStrength: 0, flashFor: 0, shakeFor: 0, hitStopFor: 0,
           deathTimer: 0, deathCause: 'unknown', lastSafeX: WORLD.width / 2,
-          recentPatterns: [], announcementTimer: 0, resultTaunt: '', resultTitle: '未判定'
+          recentPatterns: [], announcementTimer: 0, resultTaunt: '', resultTitle: '未判定',
+          deathCueSent: false, gateSequence: 0, lastNearMissGate: 0
         });
         Object.assign(player, { x: WORLD.width / 2, y: PLAYER_Y, velocityX: 0, direction: 1, lives: 1, shieldFor: 0 });
         keyState.left = keyState.right = false; pointerState.left = pointerState.right = false;
