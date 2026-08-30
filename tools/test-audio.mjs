@@ -18,10 +18,22 @@ const gameCues = [
   'start', 'retry', 'pickup', 'rare-pickup', 'crown', 'oxygen-warning', 'pattern-warning',
   'current-warning', 'near-miss', 'shield-hit', 'damage', 'death', 'clear', 'game-over', 'exit'
 ];
+const eventSceneCues = [
+  'battle-signal','battle-twist','sports-signal','sports-twist','court-signal','court-twist',
+  'news-signal','news-twist','commercial-signal','commercial-twist','repair-signal','repair-twist',
+  'abandon-signal','abandon-twist','chase-signal','chase-twist','lunch-signal','lunch-twist',
+  'gravity-signal','gravity-twist','giant-signal','giant-twist','pixel-signal','pixel-twist'
+];
 
 requiredLayers.forEach(layer => assert.match(source, new RegExp(`['"]${layer}['"]`), `missing audio layer: ${layer}`));
 requiredEvents.forEach(eventName => assert.match(source, new RegExp(eventName), `missing integration event: ${eventName}`));
 gameCues.forEach(cue => assert.match(source, new RegExp(`['"]${cue}['"]`), `missing game cue: ${cue}`));
+eventSceneCues.forEach(cue => {
+  const [scene, phase] = cue.split('-');
+  assert.match(source, new RegExp(`['"]${scene}['"]`), `missing event sound scene: ${scene}`);
+  assert.match(source, new RegExp(`['"]${phase}['"]`), `missing event sound phase: ${phase}`);
+});
+assert.match(source, /pixel-palace-bonus/, 'premium route sound classification is missing pixel palace');
 assert.doesNotMatch(source, /new\s+Audio\s*\(|\.mp3\b|\.wav\b|\.ogg\b|fetch\s*\(/i, 'audio must remain procedural and asset-free');
 assert.match(source, /visibilitychange/);
 assert.match(source, /pagehide/);
@@ -250,6 +262,13 @@ window.dispatchEvent(new FakeCustomEvent('naoking:oraclebeat', { detail: { cue: 
 window.dispatchEvent(new FakeCustomEvent('naoking:oraclebeat', { detail: { cue: 'abyssal-reboot', intensity: 1 } }));
 assert.equal(window.NaokingAudio.snapshot().silenceActive, false, 'abyssal reboot must release the blackout silence');
 
+for (const sceneCue of eventSceneCues) {
+  window.dispatchEvent(new FakeCustomEvent('naoking:oraclebeat', { detail: { cue: sceneCue, intensity: 0.7 } }));
+}
+assert.ok(window.NaokingAudio.snapshot().voicesByLayer.event > 0, 'event-specific sound scenes did not create procedural voices');
+window.dispatchEvent(new FakeCustomEvent('naoking:oraclebeat', { detail: { cue: 'abyssal-reboot', intensity: 1 } }));
+assert.equal(window.NaokingAudio.snapshot().silenceActive, false, 'event-scene silence did not release for the next scene');
+
 window.dispatchEvent(new FakeCustomEvent('naoking:gameaudio', { detail: { cue: 'start', intensity: 0.6 } }));
 for (let index = 0; index < 10; index += 1) {
   window.dispatchEvent(new FakeCustomEvent('naoking:gameaudio', { detail: { cue: 'retry', intensity: 0.6 } }));
@@ -299,6 +318,7 @@ console.log(JSON.stringify({
   layers: requiredLayers.length,
   events: requiredEvents.length,
   gameCues: gameCues.length,
+  eventSceneCues: eventSceneCues.length,
   contextsCreated: FakeAudioContext.instances.length,
   final: window.NaokingAudio.snapshot()
 }, null, 2));

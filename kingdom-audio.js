@@ -22,7 +22,7 @@
     transition: 0.46
   });
   const ORACLE_LAYERS = Object.freeze(['reel', 'signal', 'tension', 'event']);
-  const PREMIUM_ROUTES = new Set(['royal-audience', 'golden-tide', 'secret-4810', 'palace-open']);
+  const PREMIUM_ROUTES = new Set(['royal-audience', 'golden-tide', 'secret-4810', 'palace-open', 'pixel-palace-bonus']);
 
   const state = {
     enabled: readStoredBoolean(STORAGE_ENABLED, false),
@@ -411,6 +411,125 @@
     [0, 0.28].forEach(delay => tone({ layer, frequency: 410, endFrequency: 360, duration: 0.18, type: 'sawtooth', gain: 0.075 * intensity, delay, release: 0.09 }));
   }
 
+  /* Every Random Event Show family owns a recognisable procedural sound scene. */
+  function playEventSoundScene(scene, phase, intensity = 0.6) {
+    const twist = phase === 'twist';
+    switch (scene) {
+      case 'battle':
+        if (twist) {
+          impact(0.86 * intensity, 'event');
+          noise({ layer:'event', duration:.62, gain:.14 * intensity, frequency:1800, endFrequency:130, pan:-.55 });
+          noise({ layer:'event', duration:.62, gain:.14 * intensity, frequency:1800, endFrequency:130, pan:.55, delay:.11 });
+        } else {
+          lowPulse(.82 * intensity, 0, 'tension'); lowPulse(.68 * intensity, .38, 'tension');
+          tone({ layer:'event', frequency:58, endFrequency:44, duration:1.4, gain:.1 * intensity, release:.7 });
+        }
+        break;
+      case 'sports':
+        if (twist) {
+          tone({ layer:'event', frequency:1240, endFrequency:960, duration:.11, type:'sine', gain:.08 * intensity, release:.06 });
+          chord([330,495,660], { layer:'event', duration:.55, gain:.05 * intensity, delay:.22, release:.32, spread:.02 });
+          noise({ layer:'event', duration:.75, gain:.055 * intensity, frequency:520, endFrequency:900, delay:.18 });
+        } else {
+          tone({ layer:'event', frequency:1320, endFrequency:1540, duration:.34, type:'sine', gain:.08 * intensity, release:.24 });
+          tone({ layer:'event', frequency:1320, endFrequency:1120, duration:.18, type:'sine', gain:.055 * intensity, delay:.42, release:.12 });
+        }
+        break;
+      case 'court':
+        if (twist) {
+          impact(.72 * intensity, 'event');
+          tone({ layer:'event', frequency:210, endFrequency:78, duration:.38, type:'triangle', gain:.12 * intensity, release:.22 });
+        } else {
+          noise({ layer:'event', duration:.55, gain:.045 * intensity, frequency:2200, endFrequency:900, q:1.1 });
+          chord([196,247,294], { layer:'event', duration:.72, gain:.04 * intensity, release:.48, spread:.08 });
+        }
+        break;
+      case 'news':
+        if (twist) {
+          glitch(.46 * intensity);
+          chord([392,523,659], { layer:'event', duration:.62, gain:.06 * intensity, delay:.12, release:.38, spread:.04 });
+        } else {
+          chord([262,392,523], { layer:'event', duration:.42, type:'square', gain:.035 * intensity, release:.2, spread:.055 });
+          tone({ layer:'event', frequency:990, endFrequency:760, duration:.12, gain:.05 * intensity, delay:.42, release:.08 });
+        }
+        break;
+      case 'commercial':
+        if (twist) {
+          tone({ layer:'event', frequency:880, endFrequency:882, duration:.055, type:'square', gain:.028 * intensity, release:.03 });
+          scheduleTimer(() => silence(520, { fade:.015, depth:0 }), 90, 'oracle');
+        } else {
+          [0,.14,.28,.42].forEach((delay,index) => tone({ layer:'event', frequency:[330,440,392,523][index], duration:.12, type:'square', gain:.035 * intensity, delay, release:.07, pan:index % 2 ? .35 : -.35 }));
+          sillyKing(.42 * intensity);
+        }
+        break;
+      case 'repair':
+        if (twist) {
+          impact(.52 * intensity, 'event'); glitch(.38 * intensity);
+          tone({ layer:'event', frequency:118, endFrequency:72, duration:.52, type:'sawtooth', gain:.075 * intensity, delay:.18, release:.32 });
+        } else {
+          [0,.11,.23,.38].forEach((delay,index) => tone({ layer:'event', frequency:760 - index * 95, endFrequency:410 - index * 35, duration:.09, type:'triangle', gain:.045 * intensity, delay, release:.05, pan:(index - 1.5) / 2 }));
+          noise({ layer:'event', duration:.42, gain:.045 * intensity, frequency:2400, endFrequency:620, delay:.46 });
+        }
+        break;
+      case 'abandon':
+        if (twist) {
+          stopOracleScene();
+          silence(1650, { fade:.045, depth:0 });
+        } else {
+          [0,.28,.6].forEach((delay,index) => tone({ layer:'event', frequency:180 - index * 22, endFrequency:82, duration:.18, type:'triangle', gain:.05 * intensity, delay, release:.12, pan:-.2 + index * .28 }));
+          scheduleTimer(() => silence(900, { fade:.08, depth:0 }), 780, 'oracle');
+        }
+        break;
+      case 'chase':
+        if (twist) {
+          noise({ layer:'event', duration:.75, gain:.12 * intensity, frequency:160, endFrequency:2100, pan:-.8 });
+          noise({ layer:'event', duration:.72, gain:.1 * intensity, frequency:1900, endFrequency:240, pan:.8, delay:.18 });
+        } else {
+          [0,.18,.36,.54].forEach((delay,index) => tone({ layer:'event', frequency:170 + index * 36, endFrequency:260 + index * 44, duration:.1, type:'triangle', gain:.05 * intensity, delay, release:.05, pan:-.8 + index * .52 }));
+        }
+        break;
+      case 'lunch':
+        if (twist) {
+          tone({ layer:'event', frequency:520, endFrequency:180, duration:.22, type:'triangle', gain:.05 * intensity, release:.16 });
+          sillyKing(.32 * intensity);
+        } else {
+          [0,.12,.25].forEach((delay,index) => tone({ layer:'event', frequency:920 + index * 140, endFrequency:620 + index * 70, duration:.08, type:'sine', gain:.035 * intensity, delay, release:.045, pan:index - 1 }));
+          bubble({ layer:'event', delay:.38, pan:.2, size:.32 });
+        }
+        break;
+      case 'gravity':
+        if (twist) {
+          noise({ layer:'event', duration:.9, gain:.13 * intensity, frequency:1900, endFrequency:120, q:.45 });
+          impact(.68 * intensity, 'event', .34);
+        } else {
+          tone({ layer:'event', frequency:74, endFrequency:35, duration:1.35, type:'sine', gain:.13 * intensity, release:.75 });
+          noise({ layer:'event', duration:1.05, gain:.07 * intensity, frequency:240, endFrequency:1100 });
+        }
+        break;
+      case 'giant':
+        if (twist) {
+          impact(.48 * intensity, 'event');
+          tone({ layer:'event', frequency:48, endFrequency:31, duration:1.1, gain:.13 * intensity, release:.68 });
+          sillyKing(.24 * intensity);
+        } else {
+          noise({ layer:'event', duration:1.4, gain:.09 * intensity, filterType:'lowpass', frequency:260, endFrequency:92, q:.5 });
+          lowPulse(.72 * intensity, .36, 'tension');
+        }
+        break;
+      case 'pixel':
+        if (twist) {
+          [0,.09,.18,.27,.36].forEach((delay,index) => tone({ layer:'event', frequency:[262,330,392,523,784][index], duration:.075, type:'square', gain:.035 * intensity, delay, release:.04, pan:index % 2 ? .45 : -.45 }));
+          royalBell(.62 * intensity, .52, 'event');
+        } else {
+          [0,.13,.26,.39].forEach((delay,index) => tone({ layer:'event', frequency:[131,196,262,330][index], endFrequency:[196,262,330,392][index], duration:.1, type:'square', gain:.03 * intensity, delay, release:.055 }));
+        }
+        break;
+      default:
+        return false;
+    }
+    return true;
+  }
+
   function reelLaunch(intensity = 0.62) {
     if (!allowCue('reel:launch', 180)) return;
     noise({ layer: 'reel', duration: 0.42, gain: 0.16 * intensity, frequency: 210, endFrequency: 1600, q: 0.6 });
@@ -759,6 +878,8 @@
     if (!canPlay() || !name) return false;
     const intensity = clamp(options.intensity ?? 0.58, 0.1, 1);
     const normalized = String(name).trim().toLowerCase().replace(/[\s_.:/]+/g, '-');
+    const eventScene = normalized.match(/^(battle|sports|court|news|commercial|repair|abandon|chase|lunch|gravity|giant|pixel)-(signal|twist)$/);
+    if (eventScene) return playEventSoundScene(eventScene[1], eventScene[2], intensity);
     switch (normalized) {
       case 'ui': uiTick(intensity); break;
       case 'opening': playOpening(options); break;
