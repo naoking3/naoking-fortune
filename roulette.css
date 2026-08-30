@@ -329,3 +329,379 @@ html.is-oracle-suspended .fortune-card::after { animation-play-state: paused !im
   html.is-oracle-active body[data-page="fortune"] .depth-rail b { animation: none !important; transform: none !important; }
   .shark-face { transform: none; }
 }
+
+/* Signature Impact Pass — ABYSSAL ROYAL SLOT
+   A real cabinet reads as one instrument: title, signal lamps, reel, verdict
+   and the surrounding kingdom all answer the same oracle tier. */
+#fortune {
+  --royal-metal: rgba(231, 216, 151, .78);
+  --royal-metal-soft: rgba(231, 216, 151, .24);
+  --royal-cyan: rgba(164, 239, 247, .88);
+  --royal-panel: rgba(3, 28, 48, .92);
+  --royal-panel-soft: rgba(10, 68, 91, .66);
+}
+#fortune .oracle-hero {
+  position: relative;
+  overflow: hidden;
+  border-bottom-color: rgba(158, 231, 241, .22);
+}
+#fortune .oracle-hero::before {
+  content: "";
+  position: absolute;
+  right: 6%;
+  bottom: -55%;
+  width: min(44vw, 620px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(173, 241, 247, .1);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 18px rgba(173, 241, 247, .018), inset 0 0 0 54px rgba(173, 241, 247, .014);
+  pointer-events: none;
+}
+#fortune .oracle-hero::after {
+  content: "ABYSSAL ORACLE  /  DEPTH 4810M";
+  position: absolute;
+  right: max(28px, calc((100vw - 1180px) / 2));
+  bottom: 32px;
+  color: rgba(179, 232, 239, .52);
+  font: 700 7px var(--mono);
+  letter-spacing: .18em;
+}
+#fortune .oracle-layout {
+  grid-template-columns: minmax(430px, 620px) minmax(270px, 340px);
+  gap: clamp(34px, 6vw, 88px);
+  align-items: start;
+  padding-top: 76px;
+}
+
+.fortune-card {
+  --cabinet-light: 126, 226, 239;
+  --cabinet-accent: 223, 202, 132;
+  padding: 16px 18px 20px;
+  border: 1px solid rgba(var(--cabinet-accent), .66) !important;
+  border-radius: 26px;
+  background:
+    radial-gradient(ellipse 82% 36% at 50% 0%, rgba(var(--cabinet-light), .12), transparent 68%),
+    linear-gradient(145deg, rgba(10, 69, 91, .98), rgba(2, 23, 42, .98) 48%, rgba(4, 41, 65, .98)) !important;
+  box-shadow:
+    0 34px 90px rgba(0, 12, 27, .68),
+    0 0 0 5px rgba(3, 28, 49, .88),
+    0 0 0 6px rgba(var(--cabinet-accent), .22),
+    0 0 48px rgba(var(--cabinet-light), .1),
+    inset 0 1px rgba(240, 254, 255, .14),
+    inset 0 -22px 40px rgba(0, 8, 20, .34) !important;
+  transform-origin: 50% 58%;
+}
+.fortune-card::before {
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, transparent 0 5%, rgba(var(--cabinet-light), .025) 5% 5.4%, transparent 5.4% 94.6%, rgba(var(--cabinet-light), .025) 94.6% 95%, transparent 95%),
+    repeating-linear-gradient(112deg, transparent 0 34px, rgba(215, 250, 252, .018) 35px, transparent 36px 70px);
+  opacity: .8;
+  animation: none;
+  pointer-events: none;
+}
+
+.machine-plate {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "identity tier"
+    "unit online";
+  align-items: end;
+  gap: 9px 18px;
+  min-height: 78px;
+  margin: 0 0 12px;
+  padding: 11px 13px 10px;
+  border: 1px solid rgba(var(--cabinet-light), .16);
+  border-radius: 14px 14px 6px 6px;
+  background: linear-gradient(180deg, rgba(2, 22, 39, .78), rgba(9, 58, 77, .38));
+  box-shadow: inset 0 1px rgba(236, 254, 255, .06), inset 0 -1px rgba(0, 0, 0, .38);
+  text-align: left;
+}
+.machine-plate > span { grid-area: unit; overflow: hidden; color: rgba(178, 220, 226, .54); text-overflow: ellipsis; white-space: nowrap; }
+.machine-plate > i { grid-area: online; align-self: center; color: #83d9ba; text-shadow: 0 0 9px rgba(103, 237, 191, .44); }
+.oracle-machine-identity {
+  grid-area: identity;
+  display: grid;
+  min-width: 0;
+  color: rgb(var(--cabinet-accent));
+  font-style: normal;
+  line-height: 1;
+}
+.oracle-machine-identity > span {
+  overflow: hidden;
+  font: 700 clamp(13px, 2vw, 20px) var(--mono);
+  letter-spacing: .095em;
+  text-overflow: ellipsis;
+  text-shadow: 0 0 18px rgba(var(--cabinet-accent), .14);
+  white-space: nowrap;
+}
+.oracle-machine-identity > small {
+  margin-top: 6px;
+  color: rgba(213, 243, 246, .7);
+  font: 600 10px var(--display);
+  letter-spacing: .14em;
+}
+.oracle-tier-badge {
+  grid-area: tier;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 86px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(var(--cabinet-light), .18);
+  border-radius: 999px;
+  color: rgba(205, 238, 242, .72);
+  background: rgba(2, 20, 35, .62);
+  font: 700 7px var(--mono);
+  letter-spacing: .13em;
+  white-space: nowrap;
+}
+.oracle-tier-badge > i {
+  width: 6px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(var(--cabinet-light));
+  box-shadow: 0 0 8px rgba(var(--cabinet-light), .68);
+}
+
+.roulette-marquee {
+  min-height: 22px;
+  margin: 0 2px 12px;
+  padding: 7px 11px;
+  border: 1px solid rgba(var(--cabinet-accent), .28);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(0, 8, 17, .9), rgba(4, 31, 49, .86));
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, .75), 0 1px rgba(255, 255, 255, .035);
+}
+.roulette-marquee i {
+  width: 6px;
+  height: 6px;
+  background: rgb(var(--cabinet-accent));
+  box-shadow: 0 0 8px rgba(var(--cabinet-accent), .62);
+  animation-duration: 1.4s;
+}
+
+.slot-window {
+  border: 1px solid rgba(var(--cabinet-accent), .8) !important;
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse 72% 58% at 50% 42%, rgba(var(--cabinet-light), .23), transparent 66%),
+    linear-gradient(180deg, rgba(5, 63, 84, .96), rgba(0, 14, 30, .98)) !important;
+  box-shadow:
+    inset 0 0 50px rgba(0, 4, 13, .82),
+    inset 0 1px rgba(229, 254, 255, .18),
+    0 0 0 5px rgba(2, 25, 43, .94),
+    0 0 0 6px rgba(var(--cabinet-accent), .18),
+    0 16px 28px rgba(0, 5, 15, .5) !important;
+}
+.slot-window::before {
+  inset: 10px;
+  border: 1px solid rgba(var(--cabinet-light), .28);
+  border-radius: 12px;
+  box-shadow: inset 0 0 24px rgba(var(--cabinet-light), .045);
+}
+.pointer {
+  top: 7px;
+  color: rgb(var(--cabinet-accent)) !important;
+  font-size: 18px;
+  text-shadow: 0 0 10px rgba(var(--cabinet-accent), .74), 0 2px rgba(0, 0, 0, .9) !important;
+}
+.shark-face {
+  max-width: 82%;
+  filter: drop-shadow(0 18px 22px rgba(0, 0, 0, .48)) drop-shadow(0 0 18px rgba(var(--cabinet-light), .12));
+}
+.roulette-status {
+  display: flex;
+  align-items: center;
+  min-height: 30px;
+  margin: 12px 2px 0;
+  padding: 0 12px;
+  border-right: 1px solid rgba(var(--cabinet-light), .16);
+  border-left: 1px solid rgba(var(--cabinet-light), .16);
+  color: rgba(201, 236, 241, .68);
+  background: linear-gradient(90deg, transparent, rgba(var(--cabinet-light), .055), transparent);
+  text-shadow: none;
+}
+.roulette-status::before {
+  content: "◆";
+  margin-right: 9px;
+  color: rgb(var(--cabinet-accent));
+  font-size: 7px;
+  text-shadow: 0 0 8px rgba(var(--cabinet-accent), .62);
+}
+.result {
+  min-height: 174px;
+  margin: 10px 2px 14px;
+  padding: 20px 21px 22px;
+  border: 1px solid rgba(var(--cabinet-light), .18);
+  border-radius: 15px;
+  color: rgba(224, 247, 249, .94);
+  background:
+    linear-gradient(135deg, rgba(var(--cabinet-light), .075), transparent 45%),
+    rgba(1, 20, 36, .72);
+  box-shadow: inset 0 1px rgba(239, 255, 255, .055), inset 4px 0 rgba(var(--cabinet-accent), .2);
+}
+.result > span { color: rgba(176, 218, 225, .58); letter-spacing: .17em; }
+.result strong {
+  margin: 8px 0 11px;
+  color: rgb(var(--cabinet-accent));
+  font-size: clamp(31px, 3.3vw, 45px);
+  letter-spacing: -.035em;
+  text-shadow: 0 0 22px rgba(var(--cabinet-accent), .12);
+}
+.result p { color: rgba(207, 231, 235, .84); line-height: 1.86; }
+.fortune-card > #spin {
+  min-height: 70px;
+  border: 1px solid rgba(255, 235, 164, .94) !important;
+  border-radius: 12px;
+  color: #08283a;
+  background: linear-gradient(180deg, #fff0b5, #d9bd67 64%, #b99741) !important;
+  box-shadow: 0 6px 0 #70571e, 0 10px 24px rgba(0, 6, 15, .5), 0 0 26px rgba(227, 204, 126, .14), inset 0 1px rgba(255, 255, 255, .74) !important;
+  text-shadow: 0 1px rgba(255, 255, 255, .4);
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+.fortune-card > #spin:hover { filter: brightness(1.055); transform: translateY(-1px); }
+.fortune-card > #spin:active { box-shadow: 0 2px 0 #70571e, 0 5px 16px rgba(0, 6, 15, .48), inset 0 1px rgba(255, 255, 255, .6) !important; transform: translateY(4px); }
+.fortune-card > #spin > span { font-size: 15px; letter-spacing: .1em; }
+.fortune-card > #spin > small { margin-top: 4px; color: rgba(7, 39, 54, .7); }
+.fortune-card > .footnote { color: rgba(175, 213, 220, .46); }
+
+.oracle-notes {
+  margin-top: 10px;
+  padding: 0 22px 22px;
+  border: 1px solid rgba(155, 224, 235, .14);
+  border-radius: 18px;
+  background: linear-gradient(155deg, rgba(9, 67, 88, .38), rgba(2, 27, 48, .56));
+  box-shadow: inset 0 1px rgba(238, 255, 255, .04), 0 24px 60px rgba(0, 14, 30, .2);
+}
+.oracle-notes header { padding-top: 25px; }
+.oracle-notes header b { color: rgba(232, 246, 247, .9); }
+.oracle-notes li span { color: var(--royal-metal); }
+.oracle-history { border-color: rgba(155, 224, 235, .12); }
+
+/* Cabinet-driven tiers. The rare state changes the whole instrument, not only
+   the result card, echoing physical game-driven edge lighting. */
+html.oracle-tier-normal .fortune-card { --cabinet-light: 126, 226, 239; --cabinet-accent: 223, 202, 132; }
+html.oracle-tier-hot .fortune-card { --cabinet-light: 112, 242, 236; --cabinet-accent: 242, 206, 102; }
+html.oracle-tier-superhot .fortune-card { --cabinet-light: 196, 250, 250; --cabinet-accent: 255, 198, 62; }
+html.oracle-tier-jackpot .fortune-card { --cabinet-light: 220, 252, 255; --cabinet-accent: 255, 222, 108; }
+html.oracle-tier-fake-loss .fortune-card { --cabinet-light: 92, 133, 151; --cabinet-accent: 176, 76, 73; }
+html.oracle-tier-revival .fortune-card { --cabinet-light: 220, 254, 255; --cabinet-accent: 255, 229, 128; }
+
+html.oracle-tier-hot .oracle-tier-badge,
+html.oracle-tier-superhot .oracle-tier-badge,
+html.oracle-tier-jackpot .oracle-tier-badge,
+html.oracle-tier-revival .oracle-tier-badge {
+  border-color: rgba(var(--cabinet-accent), .55);
+  color: rgb(var(--cabinet-accent));
+  box-shadow: 0 0 18px rgba(var(--cabinet-accent), .12), inset 0 0 12px rgba(var(--cabinet-accent), .06);
+}
+html.oracle-tier-fake-loss .oracle-tier-badge { border-color: rgba(205, 96, 91, .48); color: #d89089; }
+html.oracle-tier-fake-loss .oracle-tier-badge > i { background: #b64e4c; box-shadow: 0 0 8px rgba(194, 68, 67, .7); }
+html.oracle-tier-superhot .oracle-tier-badge > i,
+html.oracle-tier-jackpot .oracle-tier-badge > i,
+html.oracle-tier-revival .oracle-tier-badge > i { animation: royal-tier-lamp .48s ease-in-out infinite alternate; }
+
+html.oracle-tier-hot .fortune-card { box-shadow: 0 34px 90px rgba(0,12,27,.68), 0 0 0 5px rgba(3,28,49,.88), 0 0 0 6px rgba(var(--cabinet-accent),.34), 0 0 56px rgba(var(--cabinet-light),.18), inset 0 1px rgba(240,254,255,.14), inset 0 -22px 40px rgba(0,8,20,.34) !important; }
+html.oracle-tier-superhot .fortune-card { box-shadow: 0 34px 90px rgba(0,12,27,.7), 0 0 0 5px rgba(3,28,49,.9), 0 0 0 7px rgba(var(--cabinet-accent),.5), 0 0 72px rgba(var(--cabinet-accent),.26), inset 0 1px rgba(255,255,255,.2), inset 0 -22px 40px rgba(0,8,20,.34) !important; }
+html.oracle-tier-fake-loss .fortune-card { background: radial-gradient(ellipse 72% 32% at 50% 0%, rgba(139,50,50,.12), transparent 70%), linear-gradient(145deg,#16313c,#07141f 52%,#1e2025) !important; box-shadow: 0 34px 90px rgba(0,7,15,.75), 0 0 0 5px rgba(9,20,29,.92), 0 0 0 6px rgba(170,68,66,.22), inset 0 1px rgba(240,254,255,.06), inset 0 -22px 40px rgba(0,0,0,.4) !important; }
+html.oracle-tier-jackpot .fortune-card,
+html.oracle-tier-revival .fortune-card {
+  background:
+    radial-gradient(ellipse 72% 36% at 50% 0%, rgba(255, 222, 108, .18), transparent 64%),
+    linear-gradient(140deg, #153f61, #071a38 42%, #103d55 72%, #2c2850) !important;
+  box-shadow: 0 38px 100px rgba(0,8,25,.76), 0 0 0 5px rgba(3,24,45,.94), 0 0 0 7px rgba(var(--cabinet-accent),.66), 0 0 86px rgba(var(--cabinet-light),.28), 0 0 128px rgba(var(--cabinet-accent),.12), inset 0 1px rgba(255,255,255,.24), inset 0 -26px 48px rgba(0,5,20,.38) !important;
+}
+html.oracle-tier-jackpot .slot-window,
+html.oracle-tier-revival .slot-window {
+  border-color: rgba(255, 235, 165, .92) !important;
+  background: radial-gradient(ellipse at 50% 42%, rgba(190, 251, 255, .3), transparent 62%), linear-gradient(135deg, #135d78, #091f42 48%, #3b2f5b) !important;
+  box-shadow: inset 0 0 48px rgba(0,5,24,.74), inset 0 1px rgba(255,255,255,.24), 0 0 0 5px rgba(2,25,43,.94), 0 0 0 7px rgba(255,220,107,.3), 0 0 46px rgba(140,238,248,.3) !important;
+}
+html.oracle-tier-jackpot .fortune-card.is-jackpot .result,
+html.oracle-tier-revival .fortune-card.is-jackpot .result { border-color: rgba(255, 226, 130, .4); background: linear-gradient(135deg, rgba(213,250,255,.13), rgba(255,221,115,.065)), rgba(3,21,43,.82) !important; }
+html.oracle-tier-jackpot .fortune-card.is-jackpot .result strong,
+html.oracle-tier-revival .fortune-card.is-jackpot .result strong { color: #fff0b3 !important; background: none !important; -webkit-text-fill-color: currentColor; text-shadow: 0 0 24px rgba(255,218,91,.34), 0 0 45px rgba(120,232,247,.22); }
+
+html.oracle-stage-descent .machine-plate { animation: royal-cabinet-inhale .72s cubic-bezier(.18,.78,.2,1) both; }
+html.oracle-stage-judgment .fortune-card { transform: scale(1.008); }
+html.oracle-stage-judgment .roulette-marquee i { animation-name: royal-running-light; animation-duration: .74s; }
+html.oracle-stage-verdict .fortune-card { transform: scale(.994); }
+html.oracle-stage-verdict .machine-plate { box-shadow: inset 0 1px rgba(236,254,255,.08), inset 0 -1px rgba(0,0,0,.38), 0 0 24px rgba(var(--cabinet-light),.1); }
+html.oracle-stage-revealed.oracle-tier-normal .fortune-card { transform: none; }
+html.oracle-stage-revealed.oracle-tier-jackpot .fortune-card::before,
+html.oracle-stage-revealed.oracle-tier-revival .fortune-card::before { animation: royal-result-aura 2.5s ease-in-out infinite alternate; }
+html.oracle-stage-fake .machine-plate,
+html.oracle-stage-locked .machine-plate { animation: royal-false-drop .7s ease-out both; }
+
+html.is-oracle-active #fortune {
+  --page-water: linear-gradient(180deg, rgba(var(--oracle-rgb), .075), rgba(var(--oracle-shadow-rgb), .24));
+}
+html.is-oracle-active #fortune .oracle-hero::before {
+  transform: scale(var(--oracle-pulse-scale));
+  transition: transform .72s cubic-bezier(.2,.72,.2,1), border-color .42s ease, box-shadow .42s ease;
+}
+html.oracle-stage-judgment #fortune .oracle-hero::before,
+html.oracle-stage-verdict #fortune .oracle-hero::before { border-color: rgba(var(--oracle-rgb), .24); box-shadow: inset 0 0 0 18px rgba(var(--oracle-rgb), .028), inset 0 0 0 54px rgba(var(--oracle-rgb), .022), 0 0 80px rgba(var(--oracle-rgb), .08); }
+html.is-oracle-active #fortune .oracle-hero h1 em { transition: color .4s ease, text-shadow .4s ease; }
+html.oracle-tier-hot #fortune .oracle-hero h1 em,
+html.oracle-tier-superhot #fortune .oracle-hero h1 em { color: rgb(var(--oracle-accent-rgb)); text-shadow: 0 0 34px rgba(var(--oracle-accent-rgb), .16); }
+html.oracle-tier-jackpot #fortune .oracle-hero h1 em,
+html.oracle-tier-revival #fortune .oracle-hero h1 em { color: #fff0b0; text-shadow: 0 0 36px rgba(var(--oracle-accent-rgb), .24), 0 0 64px rgba(var(--oracle-rgb), .14); }
+html.oracle-tier-fake-loss #fortune .oracle-hero h1 em { color: #c08d88; text-shadow: none; }
+html.oracle-tier-hot #fortune .oracle-notes,
+html.oracle-tier-superhot #fortune .oracle-notes { border-color: rgba(var(--oracle-accent-rgb), .22); }
+html.oracle-tier-jackpot #fortune .oracle-notes,
+html.oracle-tier-revival #fortune .oracle-notes { border-color: rgba(var(--oracle-accent-rgb), .32); box-shadow: inset 0 1px rgba(238,255,255,.06), 0 24px 70px rgba(var(--oracle-rgb), .08); }
+html.oracle-tier-fake-loss #fortune .oracle-notes { border-color: rgba(var(--oracle-accent-rgb), .2); filter: saturate(.72) brightness(.88); }
+
+@keyframes royal-tier-lamp { to { opacity: .45; transform: scale(.72); } }
+@keyframes royal-running-light { 0%,100% { opacity: .18; } 48%,62% { opacity: 1; box-shadow: 0 0 12px rgba(var(--cabinet-accent), .92); } }
+@keyframes royal-cabinet-inhale { 0% { transform: translateY(3px) scale(.992); } 60% { transform: translateY(-2px) scale(1.006); } 100% { transform: none; } }
+@keyframes royal-result-aura { to { opacity: 1; transform: scale(1.025); } }
+@keyframes royal-false-drop { 0% { opacity: 1; transform: none; } 38% { opacity: .82; transform: translateY(2px) scale(.995); } 100% { opacity: 1; transform: translateY(5px) scale(.992); } }
+
+@media (max-width: 820px) {
+  #fortune .oracle-hero::after { right: 24px; }
+  #fortune .oracle-layout { grid-template-columns: 1fr; padding-top: 54px; }
+  .fortune-card { max-width: 620px; margin-inline: auto; }
+  .oracle-notes { max-width: 620px; margin: 42px auto 0; }
+}
+
+@media (max-width: 560px) {
+  #fortune .oracle-hero::after { display: none; }
+  #fortune .oracle-layout { padding-top: 36px; }
+  .fortune-card { padding: 10px 11px 14px; border-radius: 18px; }
+  .machine-plate { min-height: 70px; gap: 7px 8px; padding: 9px 9px 8px; }
+  .oracle-machine-identity > span { font-size: 11px; letter-spacing: .07em; }
+  .oracle-machine-identity > small { font-size: 8px; }
+  .oracle-tier-badge { min-width: 68px; min-height: 25px; padding-inline: 7px; font-size: 6px; letter-spacing: .08em; }
+  .machine-plate > span { font-size: 6px; }
+  .roulette-marquee { margin-bottom: 10px; padding-inline: 8px; }
+  .roulette-marquee i { width: 5px; height: 5px; }
+  .slot-window { border-radius: 14px; }
+  .result { min-height: 164px; padding: 17px 16px 19px; }
+  .result strong { font-size: clamp(28px, 10vw, 38px); }
+  .fortune-card > #spin { min-height: 66px; }
+  .oracle-notes { border-radius: 14px; padding-inline: 16px; }
+  html.oracle-stage-judgment .fortune-card,
+  html.oracle-stage-verdict .fortune-card { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.oracle-stage-descent .machine-plate,
+  html.oracle-stage-revealed.oracle-tier-jackpot .fortune-card::before,
+  html.oracle-stage-revealed.oracle-tier-revival .fortune-card::before,
+  html.oracle-stage-fake .machine-plate,
+  html.oracle-stage-locked .machine-plate,
+  html.oracle-stage-judgment .roulette-marquee i,
+  html.oracle-tier-superhot .oracle-tier-badge > i,
+  html.oracle-tier-jackpot .oracle-tier-badge > i,
+  html.oracle-tier-revival .oracle-tier-badge > i { animation: none !important; transform: none !important; }
+  .fortune-card > #spin { transition: none; }
+}

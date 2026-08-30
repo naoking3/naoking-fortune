@@ -183,6 +183,19 @@
   oracleScope.setAttribute('aria-hidden', 'true');
   oracleScope.innerHTML = '<i></i><i></i><i></i><span></span>';
   card.append(oracleScope);
+  const machinePlate = card.querySelector('.machine-plate');
+  const machineIdentity = document.createElement('strong');
+  machineIdentity.className = 'oracle-machine-identity';
+  machineIdentity.setAttribute('aria-hidden', 'true');
+  machineIdentity.innerHTML = '<span>ABYSSAL ROYAL SLOT</span><small>王国の神託装置</small>';
+  const oracleTierBadge = document.createElement('b');
+  oracleTierBadge.className = 'oracle-tier-badge';
+  oracleTierBadge.setAttribute('aria-hidden', 'true');
+  const oracleTierLamp = document.createElement('i');
+  const oracleTierLabel = document.createElement('span');
+  oracleTierLabel.textContent = 'STANDBY';
+  oracleTierBadge.append(oracleTierLamp, oracleTierLabel);
+  machinePlate?.append(machineIdentity, oracleTierBadge);
   const oracleEnvironment = document.createElement('div');
   oracleEnvironment.className = 'oracle-environment';
   oracleEnvironment.setAttribute('aria-hidden', 'true');
@@ -191,6 +204,24 @@
 
   const environmentTargets = [pageRoot, pageBody].filter(Boolean);
   const activeEnvironmentClasses = new Set();
+  const oracleTierLabels = Object.freeze({
+    normal: 'NORMAL',
+    hot: 'HOT',
+    superhot: 'VERY HOT',
+    jackpot: 'JACKPOT',
+    'fake-loss': 'FAKE LOSE',
+    revival: 'REVIVAL'
+  });
+  function oracleTierCopy(phase, tier) {
+    if (phase === 'descent') return 'SCANNING';
+    if (phase === 'judgment') {
+      if (tier === 'fake-loss' || tier === 'revival') return 'UNSTABLE';
+      if (tier === 'jackpot' || tier === 'superhot') return 'VERY HOT';
+    }
+    if (phase === 'verdict' && tier === 'revival') return 'UNSTABLE';
+    if (phase === 'locked') return 'SYSTEM LOCK';
+    return oracleTierLabels[tier] || 'STANDBY';
+  }
   function clearOracleEnvironment() {
     environmentTargets.forEach(target => {
       activeEnvironmentClasses.forEach(className => target.classList.remove(className));
@@ -200,6 +231,7 @@
       }
     });
     activeEnvironmentClasses.clear();
+    oracleTierLabel.textContent = 'STANDBY';
     oracleEnvironment.removeAttribute?.('data-phase');
     oracleEnvironment.removeAttribute?.('data-tier');
   }
@@ -227,6 +259,7 @@
     clearOracleEnvironment();
     if (!phase) return;
     const tier = oracleTier(result, tierOverride);
+    oracleTierLabel.textContent = oracleTierCopy(phase, tier);
     const classes = ['is-oracle-active', `oracle-stage-${phase}`, `oracle-tier-${tier}`];
     if (result?.kind) classes.push(`oracle-outcome-${result.kind}`);
     if (result?.effect) classes.push(`oracle-effect-${result.effect}`);
