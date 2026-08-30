@@ -184,7 +184,7 @@ const beatEvents = settledDrawEvents.filter(event => event.type === 'naoking:ora
 const phaseEvents = settledDrawEvents.filter(event => event.type === 'naoking:oraclephase');
 const settledRoute = afterSettle.route;
 if (afterSettle.resolvedDraws - beforeSettledDraw.resolvedDraws !== 1) failures.push('one settled click did not resolve exactly one draw');
-if (drawEvents.length > 0 && drawEvents.length !== 1) failures.push(`one click emitted ${drawEvents.length} draw events`);
+if (drawEvents.length !== 1) failures.push(`one click emitted ${drawEvents.length} draw events`);
 if (resultEvents.length !== 1) failures.push(`one click emitted ${resultEvents.length} result events`);
 if (stopEvents.length !== 5) failures.push(`one click emitted ${stopEvents.length} reel-stop events instead of 5`);
 

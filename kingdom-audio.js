@@ -671,10 +671,12 @@
     if (!canPlay()) return;
     const detail = event?.detail || {};
     const total = Math.max(1, Number(detail.total ?? detail.count) || 5);
-    const suppliedIndex = detail.index ?? detail.orderIndex ?? detail.stopIndex;
+    const suppliedIndex = detail.index ?? detail.stopIndex;
     const index = Math.max(0, Number.isFinite(Number(suppliedIndex)) ? Number(suppliedIndex) : state.stopCount);
-    const final = Boolean(detail.final ?? detail.isLast ?? detail.last ?? (index >= total - 1));
-    state.stopCount = Math.min(total, index + 1);
+    const suppliedOrder = detail.order ?? detail.orderIndex;
+    const order = Math.max(0, Number.isFinite(Number(suppliedOrder)) ? Number(suppliedOrder) : state.stopCount);
+    const final = Boolean(detail.final ?? detail.isLast ?? detail.last ?? (order >= total - 1));
+    state.stopCount = Math.min(total, order + 1);
     reelStop(index, total, final);
   }
 

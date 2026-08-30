@@ -477,9 +477,9 @@
     });
   }
 
-  function dispatchOracleStop(index, total) {
+  function dispatchOracleStop(index, order, total) {
     emitOracle('naoking:oraclestop', {
-      index, total, final:index === total - 1, route:activePresentation?.id || ''
+      index, order, total, final:order === total - 1, route:activePresentation?.id || ''
     });
   }
 
@@ -820,7 +820,7 @@
         const item = tiles[tileIndex]; const image = item?.querySelector?.('img');
         if (image) image.src = result.image;
         item?.classList.add('is-stopped'); item?.style?.setProperty('--stop-order', orderIndex);
-        dispatchOracleStop(orderIndex, presentation.stopOrder.length);
+        dispatchOracleStop(tileIndex, orderIndex, presentation.stopOrder.length);
         if (orderIndex === presentation.stopOrder.length - 1) { setPhase('verdict'); later(onComplete, presentation.premium ? 620 : 430); }
       }, orderIndex * stopGap);
     });

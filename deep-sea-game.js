@@ -662,7 +662,8 @@
     function telegraphCurrent(direction, delay = 0.85) {
       emitGameAudio('current-warning', {
         intensity: 0.54 + phaseIndex() * 0.08,
-        pattern: 'current-gate'
+        pattern: 'current-gate',
+        direction: direction > 0 ? 'right' : 'left'
       });
       warnings.push({
         kind: 'current', direction, life: delay, maxLife: delay,
