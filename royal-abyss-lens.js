@@ -90,7 +90,7 @@
       float currentB = noise(lensPoint * 6.2 + vec2(-time * 0.11, time * 0.068));
       float ambientBreath = 0.5 + 0.5 * sin(time * 0.72 + currentA * 2.6);
       float ambientWake = sin(lensPoint.y * 13.0 + lensPoint.x * 4.0 - time * 1.15);
-      ambientWake *= smoothstep(1.0, 0.18, radial);
+      ambientWake *= 1.0 - smoothstep(0.18, 1.0, radial);
       vec2 current = vec2(currentA - 0.5, currentB - 0.5);
       current += vec2(ambientWake * 0.12, cos(lensPoint.x * 9.0 + time * 0.68) * 0.045);
 
@@ -117,7 +117,7 @@
       float crownGold = pow(max(0.0, dot(normal, normalize(vec2(-0.5, 0.86)))), 14.0) * rim;
       float waterLight = caustic(lensPoint * 1.42, time) * innerMask;
       float travellingLight = pow(max(0.0, 1.0 - abs(ambientWake)), 8.0) * innerMask;
-      float impactRing = smoothstep(0.055, 0.0, abs(radial - (0.24 + uImpact * 0.58))) * uImpact;
+      float impactRing = (1.0 - smoothstep(0.0, 0.055, abs(radial - (0.24 + uImpact * 0.58)))) * uImpact;
 
       refracted += vec3(0.48, 0.95, 0.96) * light * 0.34;
       refracted += vec3(0.32, 0.92, 0.91) * waterLight * (0.08 + uImpact * 0.12);
@@ -185,6 +185,7 @@
     running: false,
     visible: true,
     destroyed: false,
+    disabled: false,
     pointerX: 0.5,
     pointerY: 0.5,
     targetPointerX: 0.5,
@@ -236,6 +237,12 @@
         console.warn('[ROYAL ABYSS LENS] Texture upload skipped.', error);
       }
     };
+    image.onerror = () => {
+      if (token !== textureToken) return;
+      const reason = `Unable to load ${source}`;
+      if (!kingdomReady) fallback(reason);
+      else console.warn('[ROYAL ABYSS LENS] Keeping the previous texture.', reason);
+    };
     image.src = source;
   };
 
@@ -284,7 +291,7 @@
   };
 
   function start() {
-    if (state.running || state.destroyed || document.hidden || !state.visible || !kingdomReady) return;
+    if (state.running || state.destroyed || state.disabled || document.hidden || !state.visible || !kingdomReady) return;
     state.running = true;
     state.lastFrame = 0;
     state.frame = window.requestAnimationFrame(render);
@@ -322,7 +329,7 @@
     gl.uniform1i(uniforms.uKingdom, 0);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-    if (reducedMotion.matches && state.targetImpact === 0 && Math.abs(state.dive - state.targetDive) < 0.003) {
+    if (reducedMotion.matches && state.targetImpact === 0 && Math.abs(state.impact) < 0.003 && Math.abs(state.dive - state.targetDive) < 0.003) {
       stop();
       return;
     }
@@ -346,18 +353,27 @@
     if (!pointerFrame) pointerFrame = window.requestAnimationFrame(updatePointer);
   }, { passive: true });
 
-  hero.addEventListener('pointerleave', () => {
+  const recenterPointer = () => {
+    window.cancelAnimationFrame(pointerFrame);
+    pointerFrame = 0;
+    pointerEvent = null;
     state.targetPointerX = 0.5;
     state.targetPointerY = 0.5;
-  });
+    start();
+  };
+
+  hero.addEventListener('pointerleave', recenterPointer);
 
   hero.addEventListener('pointerdown', event => {
+    if (reducedMotion.matches) return;
     const bounds = hero.getBoundingClientRect();
     state.targetPointerX = Math.min(1, Math.max(0, (event.clientX - bounds.left) / Math.max(1, bounds.width)));
     state.targetPointerY = Math.min(1, Math.max(0, (event.clientY - bounds.top) / Math.max(1, bounds.height)));
     impact(1, 1250);
     window.dispatchEvent(new CustomEvent('naoking:waterpulse', { detail: { intensity: 0.68, duration: 900 } }));
   }, { passive: true });
+  hero.addEventListener('pointerup', recenterPointer, { passive: true });
+  hero.addEventListener('pointercancel', recenterPointer, { passive: true });
 
   let scrollFrame = 0;
   const onScroll = () => {
@@ -383,8 +399,15 @@
   };
 
   const onReducedMotion = () => {
-    if (!reducedMotion.matches) start();
-    else impact(0.18, 220);
+    if (!reducedMotion.matches) {
+      start();
+      return;
+    }
+    window.clearTimeout(state.impactTimer);
+    state.targetImpact = 0;
+    state.impact = 0;
+    recenterPointer();
+    start();
   };
 
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -395,8 +418,9 @@
   compactViewport.addEventListener?.('change', resize);
   reducedMotion.addEventListener?.('change', onReducedMotion);
 
+  let observer = null;
   if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(entries => {
+    observer = new IntersectionObserver(entries => {
       state.visible = entries.some(entry => entry.isIntersecting);
       if (state.visible) start();
       else stop();
@@ -407,10 +431,12 @@
   const destroy = () => {
     if (state.destroyed) return;
     state.destroyed = true;
+    state.disabled = true;
     stop();
     window.clearTimeout(state.impactTimer);
     window.cancelAnimationFrame(pointerFrame);
     window.cancelAnimationFrame(scrollFrame);
+    observer?.disconnect();
     gl.deleteTexture(kingdomTexture);
     gl.deleteBuffer(buffer);
     gl.deleteProgram(program);
@@ -420,6 +446,8 @@
 
   canvas.addEventListener('webglcontextlost', event => {
     event.preventDefault();
+    state.disabled = true;
+    kingdomReady = false;
     stop();
     fallback('WebGL context lost');
   });

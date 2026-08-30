@@ -368,7 +368,7 @@ body.is-opening-active .hero-king { transform: translate3d(34px, 14px, 0) scale(
 .hero-copy { z-index: 5; margin-right: -6.5vw; transform: translate3d(var(--hero-copy-x, 0px), var(--hero-copy-y, 0px), 0); transition: transform 1.2s var(--ease-water), opacity .95s ease, filter .95s ease; }
 .hero h1 strong { font-size: clamp(66px, 8.65vw, 132px); }
 .hero .lead { max-width: 610px; }
-.hero-king > img { position: relative; z-index: 3; filter: drop-shadow(0 28px 44px rgba(2, 40, 61, .24)); }
+.hero-king > img { position: relative; z-index: 3; filter: drop-shadow(0 28px 44px rgba(2, 40, 61, .24)); animation: none; }
 .hero-king figcaption { z-index: 4; }
 .royal-abyss-lens {
   position: absolute;

@@ -34,8 +34,6 @@
         const bounds = hero.getBoundingClientRect();
         const x = ((latestPointer.clientX - bounds.left) / Math.max(1, bounds.width) - .5) * 2;
         const y = ((latestPointer.clientY - bounds.top) / Math.max(1, bounds.height) - .5) * 2;
-        hero.style.setProperty('--hero-shift-x', `${(-x * 10).toFixed(2)}px`);
-        hero.style.setProperty('--hero-shift-y', `${(-y * 8).toFixed(2)}px`);
         hero.style.setProperty('--hero-copy-x', `${(x * 2.2).toFixed(2)}px`);
         hero.style.setProperty('--hero-copy-y', `${(y * 1.8).toFixed(2)}px`);
         hero.style.setProperty('--signature-shift-x', `${(x * 5).toFixed(2)}px`);
@@ -46,8 +44,6 @@
     hero.addEventListener('pointerleave', () => {
       window.cancelAnimationFrame(heroPointerFrame);
       heroPointerFrame = 0;
-      hero.style.setProperty('--hero-shift-x', '0px');
-      hero.style.setProperty('--hero-shift-y', '0px');
       hero.style.setProperty('--hero-copy-x', '0px');
       hero.style.setProperty('--hero-copy-y', '0px');
       hero.style.setProperty('--signature-shift-x', '0px');
