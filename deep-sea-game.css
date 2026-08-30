@@ -142,6 +142,15 @@
 .deep-sea-game.is-oxygen-critical .game-oxygen-fill { background: linear-gradient(90deg, #ed5969, #ffb28e); }
 .deep-sea-game.is-oxygen-critical #game-canvas { border-color: rgba(255, 118, 126, .68); }
 
+.deep-sea-game.is-risk-reward #game-canvas {
+  border-color: rgba(144, 244, 255, .92);
+  box-shadow:
+    inset 0 0 34px rgba(97, 232, 248, .12),
+    0 0 0 1px rgba(164, 247, 255, .22),
+    0 0 30px rgba(75, 218, 239, .2);
+  animation: risk-reward-impact .58s cubic-bezier(.2, .78, .25, 1) both;
+}
+
 /* Runtime state feedback stays short so a failed run can restart immediately. */
 .deep-sea-game.is-fever #game-canvas {
   border-color: rgba(255, 222, 118, .82);
@@ -183,6 +192,12 @@
   42% { transform: translate3d(3px, -1px, 0) scale(1.002); }
   64% { transform: translate3d(-1px, 0, 0) scale(1); }
   100% { transform: translate3d(0, 0, 0) scale(1); filter: brightness(1); }
+}
+
+@keyframes risk-reward-impact {
+  0% { filter: brightness(1.28) saturate(1.15); }
+  38% { filter: brightness(1.08) saturate(1.08); }
+  100% { filter: brightness(1); }
 }
 
 @keyframes retry-ready {

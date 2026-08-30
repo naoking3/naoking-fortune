@@ -64,11 +64,11 @@
     const OXYGEN_START = 78;
     const PLAYER_Y = WORLD.height - 92;
     const PHASES = [
-      { drain: 5.4, gap: 198, speed: 220, warning: 0.95, shift: 230, current: 92, reward: 18 },
-      { drain: 6.8, gap: 188, speed: 260, warning: 0.84, shift: 255, current: 103, reward: 21 },
-      { drain: 8.2, gap: 176, speed: 300, warning: 0.74, shift: 280, current: 114, reward: 24 },
-      { drain: 9.8, gap: 164, speed: 340, warning: 0.66, shift: 305, current: 126, reward: 27 },
-      { drain: 11.6, gap: 152, speed: 380, warning: 0.58, shift: 330, current: 140, reward: 30 }
+      { drain: 8.4, gap: 198, speed: 220, warning: 0.95, shift: 230, current: 92, reward: 42 },
+      { drain: 11.2, gap: 188, speed: 260, warning: 0.84, shift: 255, current: 103, reward: 52 },
+      { drain: 14.8, gap: 176, speed: 300, warning: 0.74, shift: 280, current: 114, reward: 64 },
+      { drain: 18.5, gap: 164, speed: 340, warning: 0.66, shift: 305, current: 126, reward: 78 },
+      { drain: 21.5, gap: 152, speed: 380, warning: 0.58, shift: 330, current: 140, reward: 92 }
     ];
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const keyState = { left: false, right: false };
@@ -110,6 +110,8 @@
       oxygen: OXYGEN_START,
       oxygenWarningStage: 0,
       oxygenFlashFor: 0,
+      riskRewardFor: 0,
+      riskAttemptFor: 0,
       feverFor: 0,
       currentFor: 0,
       currentStrength: 0,
@@ -160,6 +162,14 @@
         'いま避けるところ、そこやで。',
         '反射神経、地上に置いてきた？',
         '次はせめて一桁後半まで頼む。'
+      ],
+      opening: [
+        '5秒前から終わる王、記録係が追いつかない。',
+        '予兆より先に、心が沈んだな。',
+        '最初の青い隙間、王には狭すぎた？',
+        '開幕で海へ返却されました。',
+        'チュートリアルは読まない。海流も読まない。',
+        'まだ酸素メーターの説明中だったぞ。'
       ],
       middle: [
         'ちょっと上手くなった瞬間に油断したな。',
@@ -212,6 +222,16 @@
         '流れに乗るのと流されるのは別です。',
         '海流のせいにしていいのは一回だけ。'
       ],
+      greed: [
+        '餌に目がくらんで、岩まで食べたな。',
+        'O2は取れた？ 命は落とした。',
+        '王国餌一匹に、王国ごと賭けたな。',
+        '欲張った瞬間だけ、泳ぎが庶民だった。',
+        '回復の数字を見て、障害物を忘れた王。',
+        'その餌は高かったな。代金は残機ひとつ。',
+        'RISKは読めた。REWARDまで届かなかった。',
+        '餌を追った。海もお前を追っていた。'
+      ],
       combo: [
         'そのコンボを抱えて沈むの、芸術点は高い。',
         '魚は取れる。障害物は避けられない。個性的やな。',
@@ -223,6 +243,14 @@
         '記録更新。なおキングの期待値も1ミリ上がった。',
         '前の自分には勝った。次は深海に勝て。',
         '新記録やん。そこは普通にえらい。'
+      ],
+      pbNear: [
+        '自己ベストの背びれが、目の前で逃げた。',
+        'あと一呼吸で更新。呼吸が足りなかった。',
+        '記録更新の直前だけ、海はよく見ている。',
+        'BESTの数字、今お前を見て笑っている。',
+        '前回の自分に、ほんの少しだけ負けた。',
+        '次は届く。今のは届かなかったけど。'
       ],
       oxygen: [
         '避けるだけで酸素が増えると思った？',
@@ -253,6 +281,12 @@
     function setText(element, value) { if (element) element.textContent = value; }
     function announce(message) { setText(stateOutput, message); }
     function randomFrom(values) { return values[Math.floor(Math.random() * values.length)]; }
+    function exclusiveTaunt(values) {
+      const available = values.filter((message) => message !== game.lastTaunt);
+      const message = randomFrom(available.length ? available : values);
+      game.lastTaunt = message;
+      return message;
+    }
     function clamp(value, minimum, maximum) { return Math.max(minimum, Math.min(maximum, value)); }
     function difficulty() { return clamp(game.elapsed / GAME_DURATION, 0, 1); }
     function phaseIndex() {
@@ -278,6 +312,7 @@
       gameRoot.classList.toggle('has-current', game.currentFor > 0);
       gameRoot.classList.toggle('is-oxygen-low', oxygenLevel <= 40);
       gameRoot.classList.toggle('is-oxygen-critical', oxygenLevel <= 20);
+      gameRoot.classList.toggle('is-risk-reward', game.riskRewardFor > 0);
     }
 
     function clearRunState() {
@@ -291,8 +326,9 @@
       clearRunState();
       Object.assign(game, {
         mode: 'playing', score: 0, combo: 0, runBestCombo: 0, comboWindow: 0, multiplier: 1,
-        elapsed: 0, pickupTimer: 0.35, patternTimer: 2.45, crownTimer: 7.5 + Math.random() * 3,
+        elapsed: 0, pickupTimer: 0.35, patternTimer: 1.95, crownTimer: 7.5 + Math.random() * 3,
         oxygen: OXYGEN_START, oxygenWarningStage: 0, oxygenFlashFor: 0,
+        riskRewardFor: 0, riskAttemptFor: 0,
         feverFor: 0, currentFor: 0, currentStrength: 0, flashFor: 0, shakeFor: 0,
         hitStopFor: 0, deathTimer: 0, deathCause: 'unknown', lastSafeX: WORLD.width / 2,
         recentPatterns: [], announcementTimer: 3.8, lastFrame: performance.now(),
@@ -334,6 +370,7 @@
 
     function causeGroup(cause) {
       if (cause.includes('oxygen')) return 'oxygen';
+      if (cause.includes('greed')) return 'greed';
       if (cause.includes('rock')) return 'rock';
       if (cause.includes('net')) return 'net';
       if (cause.includes('mine')) return 'mine';
@@ -344,11 +381,14 @@
     function chooseTaunt({ time, cause, isBest, cleared }) {
       const candidates = [];
       if (!cleared && causeGroup(cause) === 'oxygen') {
-        const oxygenOptions = TAUNTS.oxygen.filter((message) => message !== game.lastTaunt);
-        const oxygenTaunt = randomFrom(oxygenOptions.length ? oxygenOptions : TAUNTS.oxygen);
-        game.lastTaunt = oxygenTaunt;
-        return oxygenTaunt;
+        return exclusiveTaunt(TAUNTS.oxygen);
       }
+      if (!cleared && causeGroup(cause) === 'greed') return exclusiveTaunt(TAUNTS.greed);
+      const distanceToBest = game.bestTime - time;
+      if (!cleared && !isBest && time >= 5 && distanceToBest > 0 && distanceToBest <= 0.75) {
+        return exclusiveTaunt(TAUNTS.pbNear);
+      }
+      if (!cleared && time < 5.5) return exclusiveTaunt(TAUNTS.opening);
       if (cleared) candidates.push(...TAUNTS.clear);
       else if (time < 3) candidates.push(...TAUNTS.instant);
       else if (time < 7) candidates.push(...TAUNTS.early);
@@ -376,6 +416,8 @@
       scheduledEvents.length = 0;
       game.currentFor = 0;
       game.currentStrength = 0;
+      game.riskRewardFor = 0;
+      game.riskAttemptFor = 0;
 
       const survivalTime = cleared ? GAME_DURATION : Math.min(GAME_DURATION, game.elapsed);
       const isBest = survivalTime > game.bestTime + 0.04;
@@ -442,7 +484,9 @@
         return;
       }
       game.mode = 'dying';
-      game.deathCause = entity.type === 'oxygen' ? 'oxygen' : (game.currentFor > 0 ? 'current' : (entity.type || 'unknown'));
+      game.deathCause = entity.type === 'oxygen'
+        ? 'oxygen'
+        : (game.riskAttemptFor > 0 ? 'greed' : (game.currentFor > 0 ? 'current' : (entity.type || 'unknown')));
       game.deathTimer = reducedMotion ? 0.12 : 0.38;
       game.hitStopFor = reducedMotion ? 0 : 0.075;
       game.shakeFor = reducedMotion ? 0 : 0.32;
@@ -645,8 +689,8 @@
     }
 
     function intersects(entity) {
-      const playerHitWidth = player.width * (entity.precisePickup ? 0.30 : 0.61);
-      const playerHitHeight = player.height * (entity.precisePickup ? 0.46 : 0.56);
+      const playerHitWidth = player.width * (entity.precisePickup ? 0.12 : 0.61);
+      const playerHitHeight = player.height * (entity.precisePickup ? 0.38 : 0.56);
       return Math.abs(entity.x - player.x) < (entity.width + playerHitWidth) / 2
         && Math.abs(entity.y - player.y) < (entity.height + playerHitHeight) / 2;
     }
@@ -677,7 +721,11 @@
         game.oxygenFlashFor = entity.riskReward ? 0.46 : 0.24;
       }
       addParticles(entity.x, entity.y, entity.type === 'pearl' ? '#dffcff' : '#ffd66b', entity.type === 'pearl' ? 18 : 9);
-      if (entity.riskReward) announce(`KINGDOM FEED +${oxygenGain}% O2 / ${game.combo} COMBO`);
+      if (entity.riskReward) {
+        game.riskRewardFor = 0.58;
+        game.riskAttemptFor = 0.55;
+        announce(`RISK CLEARED → O2 +${oxygenGain}% / ${game.combo} COMBO`);
+      }
     }
 
     function updateParticles(delta) {
@@ -711,6 +759,8 @@
       game.deathTimer -= delta;
       game.flashFor = Math.max(0, game.flashFor - delta);
       game.oxygenFlashFor = Math.max(0, game.oxygenFlashFor - delta);
+      game.riskRewardFor = Math.max(0, game.riskRewardFor - delta);
+      game.riskAttemptFor = Math.max(0, game.riskAttemptFor - delta);
       game.shakeFor = Math.max(0, game.shakeFor - delta);
       updateParticles(slowDelta);
       updateAmbient(slowDelta);
@@ -730,6 +780,8 @@
       game.currentFor = Math.max(0, game.currentFor - delta);
       game.flashFor = Math.max(0, game.flashFor - delta);
       game.oxygenFlashFor = Math.max(0, game.oxygenFlashFor - delta);
+      game.riskRewardFor = Math.max(0, game.riskRewardFor - delta);
+      game.riskAttemptFor = Math.max(0, game.riskAttemptFor - delta);
       game.shakeFor = Math.max(0, game.shakeFor - delta);
       player.shieldFor = Math.max(0, player.shieldFor - delta);
       game.oxygen = Math.max(0, game.oxygen - phaseConfig().drain * delta);
@@ -781,6 +833,12 @@
         entity.y += entity.speed * delta * (entity.hazard || entity.riskReward ? obstacleScale : 1);
         entity.x += Math.sin(game.elapsed * 2.1 + entity.phase) * entity.sway * delta;
         entity.rotation += delta * (entity.hazard ? 0.9 : 0.25);
+        if (
+          entity.riskReward
+          && entity.y > PLAYER_Y - 150
+          && entity.y < PLAYER_Y + 36
+          && Math.abs(entity.x - player.x) < 30
+        ) game.riskAttemptFor = 0.7;
         if (intersects(entity)) {
           entities.splice(index, 1);
           if (entity.hazard) beginDeath(entity); else collect(entity);
@@ -1145,7 +1203,8 @@
         Object.assign(game, {
           mode: 'idle', score: 0, combo: 0, runBestCombo: 0, comboWindow: 0, multiplier: 1,
           elapsed: 0, pickupTimer: 0, patternTimer: 0, crownTimer: 0,
-          oxygen: OXYGEN_START, oxygenWarningStage: 0, oxygenFlashFor: 0, feverFor: 0,
+          oxygen: OXYGEN_START, oxygenWarningStage: 0, oxygenFlashFor: 0,
+          riskRewardFor: 0, riskAttemptFor: 0, feverFor: 0,
           currentFor: 0, currentStrength: 0, flashFor: 0, shakeFor: 0, hitStopFor: 0,
           deathTimer: 0, deathCause: 'unknown', lastSafeX: WORLD.width / 2,
           recentPatterns: [], announcementTimer: 0, resultTaunt: '', resultTitle: '未判定'
