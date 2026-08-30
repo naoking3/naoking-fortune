@@ -195,9 +195,19 @@
     { id:'royal-commercial', family:'broadcast', kinds:['normal'], weight:.3, tier:'signal', world:'commercial', motion:'skip', duration:7900, cue:'A WORD FROM THE KING', detail:'突然、王国海藻のCMが始まる。買わなくていい。', scene:'commercial', sequence:'broadcast', twistMotion:'brake' },
     { id:'do-not-press-seal', family:'interactive', kinds:['normal'], weight:.22, tier:'hot', world:'royal-seal', motion:'edge-first', duration:8400, cue:'DO NOT PRESS', detail:'押すなと言われた王印が、こちらを見ている。', scene:'royal-seal', sequence:'interactive', twistMotion:'respin', interactive:true },
 
-    { id:'deep-sea-duel', family:'full-event', category:'full-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.48, tier:'hot', world:'duel', motion:'witnesses', duration:8600, cue:'DEEP-SEA DUEL', detail:'二つの影が王国中央で激突。勝敗は最後まで確定しない。', scene:'duel', sequence:'battle', twistMotion:'brake' },
-    { id:'crown-chase', family:'full-event', category:'full-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.46, tier:'hot', world:'crown-chase', motion:'push', duration:8500, cue:'CROWN CHASE', detail:'逃げる王冠を全証人で追跡。捕まるかはまだ分からない。', scene:'crown-chase', sequence:'pursuit', twistMotion:'respin' },
-    { id:'royal-trial', family:'full-event', category:'full-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.44, tier:'hot', world:'royal-trial', motion:'witnesses', duration:8800, cue:'ROYAL TRIAL', detail:'王国法廷が開廷。評決は最後の一枚まで伏せられる。', scene:'royal-trial', sequence:'trial', twistMotion:'stopping' },
+    { id:'deep-sea-duel', family:'full-event', category:'full-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.48, tier:'hot', world:'duel', motion:'witnesses', duration:8600, cue:'DEEP-SEA DUEL', detail:'二つの影が王国中央で激突。勝敗は最後まで確定しない。', scene:'duel', sequence:'battle', twistMotion:'brake', audioScene:'battle' },
+    { id:'crown-chase', family:'full-event', category:'full-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.46, tier:'hot', world:'crown-chase', motion:'push', duration:8500, cue:'CROWN CHASE', detail:'逃げる王冠を全証人で追跡。捕まるかはまだ分からない。', scene:'crown-chase', sequence:'pursuit', twistMotion:'respin', audioScene:'chase' },
+    { id:'royal-trial', family:'full-event', category:'full-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.44, tier:'hot', world:'royal-trial', motion:'witnesses', duration:8800, cue:'ROYAL TRIAL', detail:'王国法廷が開廷。評決は最後の一枚まで伏せられる。', scene:'royal-trial', sequence:'trial', twistMotion:'stopping', audioScene:'court' },
+    { id:'crown-goal-challenge', family:'full-event', category:'full-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.24, tier:'hot', world:'crown-goal', motion:'push', duration:10100, cue:'CROWN GOAL CHALLENGE', detail:'王冠を一投。ポストの先に何が待つかは、静止画判定まで分からない。', scene:'crown-goal', sequence:'sports', twistMotion:'brake', audioScene:'sports' },
+    { id:'abyss-news-live', family:'full-event', category:'full-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.20, tier:'hot', world:'news-live', motion:'synchronous', duration:9700, cue:'ABYSS NEWS LIVE', detail:'王冠行方不明の現場とスタジオを緊急接続。速報の結末は未確認。', scene:'news-live', sequence:'news-event', twistMotion:'respin', audioScene:'news' },
+    { id:'royal-commercial-takeover', family:'full-event', category:'full-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.18, tier:'signal', world:'commercial-takeover', motion:'skip', duration:9900, cue:'ROYAL COMMERCIAL', detail:'音の出ない王笛のCMが、神託を勝手に占拠した。', scene:'commercial-takeover', sequence:'commercial-event', twistMotion:'brake', audioScene:'commercial' },
+    { id:'oracle-repair-disaster', family:'full-event', category:'full-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.22, tier:'hot', world:'repair-disaster', motion:'breakdown', duration:10200, cue:'ORACLE REPAIR DISASTER', detail:'装置を全部分解したあと、王の手元に一本だけネジが余る。', scene:'repair-disaster', sequence:'repair-event', twistMotion:'reverse', audioScene:'repair' },
+    { id:'judgment-abandoned', family:'full-event', category:'full-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.19, tier:'hot', world:'abandon', motion:'lazy', duration:10400, cue:'JUDGMENT ABANDONED', detail:'なおキングは定時を理由に神託を放棄。装置も海も沈み始める。', scene:'abandon', sequence:'abandon-event', twistMotion:'stopping', audioScene:'abandon' },
+    { id:'cctv-result-chase', family:'full-event', category:'full-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.23, tier:'hot', world:'cctv-chase', motion:'push', duration:10300, cue:'RESULT ENVELOPE ESCAPED', detail:'判決入り封筒が王国全域へ逃走。監視カメラが追跡を開始した。', scene:'cctv-chase', sequence:'surveillance', twistMotion:'respin', audioScene:'chase' },
+    { id:'royal-lunch-show', family:'full-event', category:'full-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.17, tier:'signal', world:'lunch-show', motion:'lazy', duration:9800, cue:'THE KING IS EATING', detail:'Rouletteを片付け、王の昼食番組が突然始まった。', scene:'lunch-show', sequence:'banquet', twistMotion:'brake', audioScene:'lunch' },
+    { id:'council-deadlock', family:'full-event', category:'full-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.18, tier:'hot', world:'council-deadlock', motion:'witnesses', duration:10100, cue:'ROYAL COUNCIL DEADLOCK', detail:'全証人の意見が食い違い、王だけが議題を聞いていない。', scene:'council-deadlock', sequence:'council-event', twistMotion:'stopping', audioScene:'court' },
+    { id:'upside-down-kingdom', family:'chaos', category:'chaos-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.22, tier:'hot', world:'upside-down', motion:'reverse', duration:9600, cue:'GRAVITY AUDIT', detail:'王国の重力監査。Pageが反転し、UIが天井へ落ちていく。', scene:'upside-down', sequence:'gravity-event', twistMotion:'reverse', audioScene:'gravity' },
+    { id:'giant-naoking-inspection', family:'chaos', category:'chaos-event', kinds:['normal','win','loss'], revivalCompatible:true, weight:.22, tier:'hot', world:'giant-naoking', motion:'outside-in', duration:9400, cue:'GIANT KING INSPECTION', detail:'巨大なおキングが背景から接近。判定装置を顔だけで検査する。', scene:'giant-naoking', sequence:'giant-event', twistMotion:'brake', audioScene:'giant' },
 
     { id:'royal-intrusion', family:'intrusion', kinds:['win'], weight:1.15, tier:'superhot', world:'royal', motion:'push', duration:5200, cue:'THE KING INTERVENES', detail:'なおキングが五枚目を自分で押し込む。', intrusion:'king' },
     { id:'palace-floodlights', family:'environment', kinds:['win'], weight:1.05, tier:'superhot', world:'floodlights', motion:'outside-in', duration:5000, cue:'PALACE FLOODLIGHTS', detail:'宮殿の光がサイト全体から一点へ集まる。' },
@@ -231,12 +241,16 @@
     { id:'royal-audience', family:'premium', kinds:['win'], effects:['rainbow','crown','abyss'], weight:.16, tier:'extreme', world:'audience', motion:'witnesses', duration:11000, cue:'ROYAL CORONATION', detail:'筐体が王座へ組み替わり、五証人が一枚ずつ礼をする。', premium:true, intrusion:'king', freeze:true, scene:'coronation', sequence:'coronation', twistMotion:'stopping' },
     { id:'golden-tide', family:'premium', kinds:['win'], effects:['rainbow','crown'], weight:.14, tier:'extreme', world:'golden-tide', motion:'wave', duration:6800, cue:'GOLDEN TIDE', detail:'金の海流がページの端から端まで満ちる。', premium:true },
     { id:'secret-4810', family:'secret', kinds:['win'], weight:.09, tier:'extreme', world:'secret-4810', motion:'skip', duration:11600, cue:'DEPTH 4810 // VAULT', detail:'四個の封印が順に外れ、金庫から寝た王が結果を押し出す。', premium:true, blackout:true, scene:'vault-4810', sequence:'vault', twistMotion:'respin' },
-    { id:'palace-open', family:'premium', kinds:['win'], effects:['rainbow','comet'], weight:.13, tier:'extreme', world:'palace-open', motion:'outside-in', duration:7000, cue:'THE PALACE OPENS', detail:'背景の海が割れ、その奥に王宮の光が現れる。', premium:true, freeze:true }
+    { id:'palace-open', family:'premium', kinds:['win'], effects:['rainbow','comet'], weight:.13, tier:'extreme', world:'palace-open', motion:'outside-in', duration:7000, cue:'THE PALACE OPENS', detail:'背景の海が割れ、その奥に王宮の光が現れる。', premium:true, freeze:true },
+    { id:'pixel-palace-bonus', family:'premium', category:'premium', kinds:['win'], effects:['rainbow','crown','comet','abyss'], weight:.08, tier:'extreme', world:'pixel-palace', motion:'skip', duration:11200, cue:'ROYAL 8-BIT PALACE', detail:'神託が低解像度の王宮ゲームへ変換。王冠ゲートを開いて帰還する。', premium:true, freeze:true, scene:'pixel-palace', sequence:'pixel-palace', twistMotion:'respin', audioScene:'pixel' }
   ].map(route => Object.freeze(route)));
 
   const routeById = new Map(presentationRoutes.map(route => [route.id, route]));
   const presentationHistory = [];
   const presentationCategoryHistory = [];
+  const sealEndingSet = sets => Object.freeze(Object.fromEntries(Object.entries(sets).map(([outcome, entries]) => [
+    outcome, Object.freeze(entries.map(entry => Object.freeze({ ...entry })))
+  ])));
   const eventEndings = Object.freeze({
     'deep-sea-duel':Object.freeze({
       normal:Object.freeze([
@@ -267,6 +281,69 @@
       win:Object.freeze([Object.freeze({ eyebrow:'NOT GUILTY', title:'王国より褒賞', detail:'無罪判決と同時に、勝利の王印が押されました。' }), Object.freeze({ eyebrow:'ROYAL DECREE', title:'特別勝訴', detail:'最後の証言で評決が反転し、祝砲が鳴ります。' })]),
       loss:Object.freeze([Object.freeze({ eyebrow:'GUILTY', title:'判決、ハズレ', detail:'冷たい木槌の一打で、全証言が閉じました。' }), Object.freeze({ eyebrow:'CASE DISMISSED', title:'申立て却下', detail:'王国法典の端に、小さく敗訴と記されています。' })]),
       revival:Object.freeze([Object.freeze({ eyebrow:'OBJECTION', title:'最終証言で再審', detail:'確定寸前の敗訴が破棄され、JACKPOT判決へ変わります。' }), Object.freeze({ eyebrow:'OVERRULED', title:'王が判決を撤回', detail:'閉廷後になおキングが戻り、勝訴の印を押しました。' })])
+    }),
+    'crown-goal-challenge':sealEndingSet({
+      normal:[{ variant:'post', eyebrow:'ON THE POST', title:'王冠、ポストで停止', detail:'入っても外れてもいないので、通常判定へ戻ります。' },{ variant:'walkout', eyebrow:'NO THROW', title:'王が投げずに帰る', detail:'構えだけは完璧でした。競技委員が通常判定を採用します。' }],
+      win:[{ variant:'goal', eyebrow:'ROYAL GOAL', title:'王冠、ゴール中央へ', detail:'海底スタンドが揺れ、勝利信号が一斉に点灯します。' },{ variant:'keeper-own-goal', eyebrow:'OWN GOAL', title:'守護魚が自分で押し込む', detail:'なおキングは何もしていませんが、得点として認められました。' }],
+      loss:[{ variant:'miss', eyebrow:'WIDE', title:'王冠、画面外へ', detail:'長い助走の末、ゴールだけをきれいに避けました。' },{ variant:'keeper', eyebrow:'SAVED', title:'小魚Keeperが完全捕球', detail:'王は抗議していますが、映像判定も明確なハズレです。' }],
+      revival:[{ variant:'bounce-goal', eyebrow:'POST → GOAL', title:'跳ね返った王冠が逆転入場', detail:'外れたと思った一拍後、逆側のポストからJACKPOTへ。' },{ variant:'late-goal', eyebrow:'AFTER THE WHISTLE', title:'遅れて来た泡が押し込む', detail:'競技終了の静寂を破り、王冠が最後の一線を越えました。' }]
+    }),
+    'abyss-news-live':sealEndingSet({
+      normal:[{ variant:'weather', eyebrow:'WEATHER DESK', title:'結局、深度の天気予報', detail:'王冠速報は保留。穏やかな通常潮が続く見込みです。' },{ variant:'no-update', eyebrow:'NO UPDATE', title:'新情報はありません', detail:'現場記者も困り、静かな神託へ戻しました。' }],
+      win:[{ variant:'breaking-win', eyebrow:'BREAKING JACKPOT', title:'王冠、Studioへ帰還', detail:'中継映像を突き破り、勝利速報がPage全体を占拠します。' },{ variant:'ticker-win', eyebrow:'EXTRA EDITION', title:'Tickerが勝利文へ変形', detail:'流れていた文字が整列し、王国史上最速の号外になりました。' }],
+      loss:[{ variant:'signal-lost', eyebrow:'SIGNAL LOST', title:'中継、ハズレ地点で途絶', detail:'テスト画面に残ったのは、しょんぼりした王だけでした。' },{ variant:'fake-crown', eyebrow:'CORRECTION', title:'発見物は海藻でした', detail:'速報を訂正します。王冠ではなく長めの海藻です。' }],
+      revival:[{ variant:'correction-win', eyebrow:'URGENT CORRECTION', title:'ハズレ速報を全面訂正', detail:'別Cameraの王冠映像が届き、JACKPOTへ差し替わります。' },{ variant:'studio-crash', eyebrow:'LIVE INTRUSION', title:'王がStudioへ突入', detail:'放送終了の直前、勝利札を持った王が画面を破りました。' }]
+    }),
+    'royal-commercial-takeover':sealEndingSet({
+      normal:[{ variant:'silent-flute', eyebrow:'PRODUCT TEST', title:'王笛は本当に無音', detail:'盛大に構えましたが何も鳴らず、通常判定だけ残りました。' },{ variant:'sold-out', eyebrow:'SOLD OUT?', title:'まだ売っていません', detail:'問い合わせ先も存在しないので神託へ戻ります。' }],
+      win:[{ variant:'jingle-win', eyebrow:'BUY ONE / WIN ONE', title:'極小Jingleから大当たり', detail:'一音だけの広告が、なぜか王宮級の勝利へ膨らみました。' },{ variant:'disclaimer-win', eyebrow:'LIMITED OFFER', title:'注意書きがJACKPOTへ拡大', detail:'画面下の小さな一行が、王国全体を覆う勝利文になります。' }],
+      loss:[{ variant:'refund', eyebrow:'NO REFUNDS', title:'運勢の返品は不可', detail:'箱を開けたらハズレ札だけ。保証書は海水で読めません。' },{ variant:'weak-beep', eyebrow:'DEMO FAILED', title:'弱いBeepでCM終了', detail:'王が気まずそうに退場し、そのままハズレです。' }],
+      revival:[{ variant:'director-cut', eyebrow:'DIRECTOR\'S CUT', title:'「CUT」のあと壁が崩れる', detail:'撮影Setの裏から本物のJACKPOT宮殿が現れました。' },{ variant:'dream-offer', eyebrow:'ONE MORE OFFER', title:'放送終了後に王が戻る', detail:'売れ残った王冠を押し込み、勝利扱いに変更しました。' }]
+    }),
+    'oracle-repair-disaster':sealEndingSet({
+      normal:[{ variant:'one-screw', eyebrow:'ONE SCREW LEFT', title:'一本余ったが動いている', detail:'触らない方が良さそうなので通常判定で封印します。' },{ variant:'tape', eyebrow:'TEMPORARY FIX', title:'海藻Tapeで応急処置', detail:'見た目は悪いですが、神託は平常運転へ戻りました。' }],
+      win:[{ variant:'fix', eyebrow:'SYSTEM RESTORED', title:'余ったネジが王室Key', detail:'最後の穴へ入れた瞬間、勝利回路が完全起動しました。' },{ variant:'hit-win', eyebrow:'IMPACT SUCCESS', title:'叩いたらJACKPOT', detail:'修理手順書にはありませんが、王の一撃で直りました。' }],
+      loss:[{ variant:'collapse', eyebrow:'TOTAL FAILURE', title:'Panelが全部落ちる', detail:'余ったネジを隠した直後、装置が静かに崩壊しました。' },{ variant:'reverse-wire', eyebrow:'WRONG CABLE', title:'上下を逆に配線', detail:'画面は戻りましたが、判定だけがハズレ方向です。' }],
+      revival:[{ variant:'reverse-repair', eyebrow:'UNDO REPAIR', title:'修理を逆再生', detail:'壊す前まで巻き戻すと、内部からJACKPOTが出てきました。' },{ variant:'tiny-fish', eyebrow:'SECOND OPINION', title:'小魚整備士が一秒で直す', detail:'王の長い修理を横目に、勝利回路だけを接続しました。' }]
+    }),
+    'judgment-abandoned':sealEndingSet({
+      normal:[{ variant:'cleaner', eyebrow:'SHIFT ENDED', title:'清掃魚が通常判定を代行', detail:'王は帰りました。床に残った札を正式結果とします。' },{ variant:'elevator', eyebrow:'OUT OF OFFICE', title:'Elevatorは戻ってこない', detail:'置き忘れた王冠だけが通常航路を指しました。' }],
+      win:[{ variant:'forgotten-crown', eyebrow:'LEFT BEHIND', title:'忘れ物の王冠が勝利判定', detail:'無人の装置へ着地し、王不在のJACKPOTが成立しました。' },{ variant:'overtime', eyebrow:'UNPAID OVERTIME', title:'王、渋々戻ってくる', detail:'帰宅直前に勝利信号を見つけ、偉そうに押印しました。' }],
+      loss:[{ variant:'closed', eyebrow:'COURT CLOSED', title:'本日の判定は終了', detail:'照明も水流も落ち、ハズレ札だけが受付に残ります。' },{ variant:'outsourced', eyebrow:'RETURN TO SENDER', title:'外注先から差し戻し', detail:'書類不備の赤印と一緒に、敗北判定が返送されました。' }],
+      revival:[{ variant:'crown-drop', eyebrow:'AFTER HOURS', title:'無人の天井から王冠落下', detail:'完全無音のあと、JACKPOTだけが営業を再開します。' },{ variant:'wrong-floor', eyebrow:'ELEVATOR RETURNS', title:'王が違う階から乱入', detail:'閉廷後のPageをこじ開け、勝利札を置いてまた帰りました。' }]
+    }),
+    'cctv-result-chase':sealEndingSet({
+      normal:[{ variant:'decoy-envelope', eyebrow:'CAM 04', title:'捕まえた封筒は空', detail:'本物は不明のまま、通常判定へ接続します。' },{ variant:'time-out', eyebrow:'TRACKING ENDED', title:'監視時間切れ', detail:'足跡だけが穏やかな結果へ並び替わりました。' }],
+      win:[{ variant:'caught', eyebrow:'TARGET SECURED', title:'判決封筒を捕獲', detail:'四つのCameraが同時に勝利Sealを確認しました。' },{ variant:'ahead', eyebrow:'SUBJECT AHEAD', title:'Resultが先回りして待っていた', detail:'追跡隊より先にJACKPOT席へ到着しています。' }],
+      loss:[{ variant:'escaped', eyebrow:'TARGET LOST', title:'封筒、Footerの外へ逃走', detail:'王は追跡を諦め、ハズレの控えだけを提出しました。' },{ variant:'wrong-subject', eyebrow:'WRONG SUBJECT', title:'干からびた王を誤認逮捕', detail:'本物の判決は逃げ切り、しょんぼりしたハズレが残ります。' }],
+      revival:[{ variant:'rewind-camera', eyebrow:'REWIND CAM 02', title:'映像を逆再生して再捕獲', detail:'逃走経路を巻き戻し、JACKPOT封筒だけ取り戻しました。' },{ variant:'drop', eyebrow:'EVIDENCE DROP', title:'画面上から勝利封筒', detail:'見失った直後、別Cameraから王冠付きで落ちてきます。' }]
+    }),
+    'royal-lunch-show':sealEndingSet({
+      normal:[{ variant:'nap', eyebrow:'AFTER LUNCH', title:'王、食後すぐ寝る', detail:'寝息が通常判定の泡だけを運びました。' },{ variant:'shared', eyebrow:'TABLE SERVICE', title:'残りは証人へ配給', detail:'会食は穏やかに終了し、通常航路へ戻ります。' }],
+      win:[{ variant:'satisfied', eyebrow:'ROYAL SATISFACTION', title:'満足した王がJACKPOT', detail:'最後の一口を飲み込み、王冠Sealを豪快に押しました。' },{ variant:'plate-win', eyebrow:'SECRET COURSE', title:'皿の下に勝利札', detail:'片付けた瞬間、隠しMenuのJACKPOTが現れます。' }],
+      loss:[{ variant:'fish-escape', eyebrow:'DINNER ESCAPED', title:'主菜が泳いで逃げる', detail:'王も皿も追いかけ、ハズレ判定だけ置き去りです。' },{ variant:'overeaten', eyebrow:'TOO FULL', title:'食べ過ぎで判定不能', detail:'なおキングは動けず、敗北札にだけ手が届きました。' }],
+      revival:[{ variant:'dessert', eyebrow:'DESSERT ARRIVES', title:'終わった卓へ王冠Dessert', detail:'閉店寸前の一皿がJACKPOTへ変形しました。' },{ variant:'dream-win', eyebrow:'ROYAL DREAM', title:'寝た王の夢から勝利', detail:'現実のハズレ卓を、寝言だけでひっくり返します。' }]
+    }),
+    'council-deadlock':sealEndingSet({
+      normal:[{ variant:'postponed', eyebrow:'MEETING POSTPONED', title:'結論は次の潮へ', detail:'議事録だけ残し、通常判定へ戻ります。' },{ variant:'abstain', eyebrow:'ALL ABSTAIN', title:'全証人が棄権', detail:'王が一番無難な神託を採用しました。' }],
+      win:[{ variant:'unanimous', eyebrow:'UNANIMOUS', title:'全会一致の勝利', detail:'聞いていなかった王も最後だけ賛成しました。' },{ variant:'minority-win', eyebrow:'ONE SMALL VOICE', title:'小魚の一票で逆転', detail:'最小の証言が全議席を動かし、JACKPOT可決です。' }],
+      loss:[{ variant:'veto', eyebrow:'ROYAL VETO', title:'王が理由なく拒否', detail:'説明はありません。議事録には大きくハズレとだけ。' },{ variant:'sleep-vote', eyebrow:'CHAIR ASLEEP', title:'寝言を敗北票として集計', detail:'会議はそのまま散会し、冷たい判定が残りました。' }],
+      revival:[{ variant:'recount', eyebrow:'RECOUNT', title:'最後の一票を数え直す', detail:'裏返った王冠票が見つかり、JACKPOTへ再可決。' },{ variant:'minutes-rewrite', eyebrow:'AMENDED MINUTES', title:'議事録が勝手に書き換わる', detail:'敗北の文字が一字ずつ逃げ、勝利案が成立しました。' }]
+    }),
+    'upside-down-kingdom':sealEndingSet({
+      normal:[{ variant:'center', eyebrow:'GRAVITY STABLE', title:'王冠だけ中央に残る', detail:'落ちたUIを戻し、通常判定を再開します。' },{ variant:'wall-king', eyebrow:'90 DEGREE KING', title:'王が壁に張り付く', detail:'本人は平気そうなので、結果は通常扱いです。' }],
+      win:[{ variant:'crown-assembly', eyebrow:'ZERO-G JACKPOT', title:'落下物が勝利文を組む', detail:'反転した王国で、王冠だけが上向きに爆発します。' },{ variant:'floor-win', eyebrow:'NEW FLOOR', title:'天井側にJACKPOT着地', detail:'常識は逆ですが、勝利Sealだけは正位置です。' }],
+      loss:[{ variant:'fall-out', eyebrow:'GRAVITY ERROR', title:'判定がPage端から落下', detail:'王も追いかけましたが、ハズレ札だけ残りました。' },{ variant:'crushed', eyebrow:'UI COLLISION', title:'王冠が装置に刺さる', detail:'抜こうとしてさらに壊し、敗北判定で停止します。' }],
+      revival:[{ variant:'reverse-gravity', eyebrow:'GRAVITY REVERSED', title:'落下を完全逆再生', detail:'散った部品が戻り、中心にJACKPOTを組み上げます。' },{ variant:'king-shove', eyebrow:'ROYAL PUSH', title:'巨大な王がPageを押し戻す', detail:'上下も敗北も正位置へ戻り、勝利信号が再点火。' }]
+    }),
+    'giant-naoking-inspection':sealEndingSet({
+      normal:[{ variant:'pass', eyebrow:'INSPECTION PASS', title:'何もせず帰る', detail:'瞳の反射に通常判定だけが一瞬見えました。' },{ variant:'stamp', eyebrow:'ACCEPTABLE', title:'理由なしの合格Seal', detail:'巨大な王の鼻先で、通常航路へ押し戻されます。' }],
+      win:[{ variant:'sneeze-win', eyebrow:'ROYAL SNEEZE', title:'くしゃみで王冠Storm', detail:'UIは吹き飛びましたが、JACKPOTだけ中央へ残りました。' },{ variant:'eye-win', eyebrow:'EYE REFLECTION', title:'瞳の奥に王宮', detail:'巨大な反射面が開き、専用勝利Sceneへ接続します。' }],
+      loss:[{ variant:'fail', eyebrow:'INSPECTION FAIL', title:'不合格、理由なし', detail:'巨大な王は首を振り、しょんぼり顔のハズレを置きました。' },{ variant:'covered', eyebrow:'TOO CLOSE', title:'顔で画面が全部隠れる', detail:'離れたあとには敗北札しか残っていません。' }],
+      revival:[{ variant:'second-look', eyebrow:'SECOND LOOK', title:'帰り際に振り向く', detail:'王の瞳から勝利光が飛び、JACKPOTへ上書きします。' },{ variant:'tiny-crown', eyebrow:'MICRO CROWN', title:'巨大王に極小王冠', detail:'間の抜けた戴冠の瞬間、敗北Sceneが金色に破裂しました。' }]
+    }),
+    'pixel-palace-bonus':sealEndingSet({
+      win:[{ variant:'gate', eyebrow:'STAGE CLEAR', title:'王冠Gate、OPEN', detail:'低解像度の王宮を突破し、JACKPOT世界へ帰還します。' },{ variant:'secret-room', eyebrow:'SECRET ROOM', title:'壁の裏に白金王座', detail:'一Pixelの亀裂から、専用Premium宮殿が展開されます。' },{ variant:'boss-sleep', eyebrow:'BOSS ASLEEP', title:'最終王が寝ていた', detail:'戦わず王冠を回収。豪華なのに締まらない完全勝利です。' },{ variant:'extra-life', eyebrow:'1UP → JACKPOT', title:'残機が王冠へ変換', detail:'Retro Fanfareのあと、Page全体がRoyal Sceneへ変わります。' }]
     })
   });
 
@@ -320,11 +397,22 @@
     battle:Object.freeze({ signal:.10, twist:.51, judgment:.71, stop:.86 }),
     pursuit:Object.freeze({ signal:.11, twist:.52, judgment:.71, stop:.86 }),
     trial:Object.freeze({ signal:.10, twist:.53, judgment:.72, stop:.87 }),
+    sports:Object.freeze({ signal:.08, twist:.51, judgment:.72, stop:.87 }),
+    'news-event':Object.freeze({ signal:.09, twist:.51, judgment:.71, stop:.86 }),
+    'commercial-event':Object.freeze({ signal:.10, twist:.52, judgment:.72, stop:.87 }),
+    'repair-event':Object.freeze({ signal:.08, twist:.51, judgment:.71, stop:.87 }),
+    'abandon-event':Object.freeze({ signal:.08, twist:.52, judgment:.73, stop:.88 }),
+    surveillance:Object.freeze({ signal:.08, twist:.50, judgment:.71, stop:.87 }),
+    banquet:Object.freeze({ signal:.10, twist:.53, judgment:.73, stop:.88 }),
+    'council-event':Object.freeze({ signal:.09, twist:.52, judgment:.72, stop:.87 }),
+    'gravity-event':Object.freeze({ signal:.09, twist:.51, judgment:.71, stop:.87 }),
+    'giant-event':Object.freeze({ signal:.09, twist:.52, judgment:.72, stop:.87 }),
     'fake-object':Object.freeze({ signal:.12, twist:.55, judgment:.72, stop:.86 }),
     'book-revival':Object.freeze({ signal:.10, twist:.50, judgment:.68, stop:.85 }),
     'silent-revival':Object.freeze({ signal:.10, twist:.52, judgment:.70, stop:.85 }),
     coronation:Object.freeze({ signal:.09, twist:.50, judgment:.68, stop:.86 }),
-    vault:Object.freeze({ signal:.08, twist:.48, judgment:.66, stop:.84 })
+    vault:Object.freeze({ signal:.08, twist:.48, judgment:.66, stop:.84 }),
+    'pixel-palace':Object.freeze({ signal:.07, twist:.48, judgment:.68, stop:.86 })
   });
 
   function sequenceFor(presentation) {
@@ -488,10 +576,13 @@
   const chaosTitle = document.createElement('strong');
   const chaosDetail = document.createElement('span');
   const chaosGlyph = document.createElement('b'); chaosGlyph.setAttribute('aria-hidden', 'true');
+  const chaosProps = document.createElement('div');
+  chaosProps.className = 'oracle-event-props'; chaosProps.setAttribute('aria-hidden', 'true');
+  chaosProps.innerHTML = '<i></i><i></i><i></i><i></i><b></b><span></span>';
   const chaosAction = document.createElement('button');
   chaosAction.className = 'oracle-chaos-action'; chaosAction.type = 'button'; chaosAction.hidden = true;
   chaosCopy.append(chaosEyebrow, chaosTitle, chaosDetail, chaosAction);
-  chaosPanel.append(chaosImage, chaosCopy, chaosGlyph); chaosStage.append(chaosPanel);
+  chaosPanel.append(chaosImage, chaosCopy, chaosGlyph); chaosStage.append(chaosPanel, chaosProps);
   (pageBody || card).append(chaosStage);
 
   let busy = false;
@@ -737,8 +828,19 @@
     duel:{ image:'assets/characters/naoking-hero.webp', glyph:'VS', signal:['DEEP-SEA DUEL','王国中央で決闘開始','二つの影が接近。勝敗信号はまだ封印されています。'], twist:['FINAL EXCHANGE','最後の一撃が交差','どちらが立っているか、泡が晴れるまで分かりません。'] },
     'crown-chase':{ image:'assets/characters/naoking-panic.webp', glyph:'♛↗', signal:['CROWN CHASE','王冠が逃走','なおキングと五証人が画面外まで追跡します。'], twist:['LAST CORNER','王冠信号、急旋回','捕まえたのか、見失ったのか――判定へ。'] },
     'royal-trial':{ image:'assets/characters/naoking-hero.webp', glyph:'判', signal:['ROYAL TRIAL','深海王国法廷、開廷','当たりにもハズレにも見える証言を順に読み上げます。'], twist:['FINAL VERDICT','王の木槌が上がる','評決は落下音のあとにだけ公開されます。'] },
+    'crown-goal':{ image:'assets/characters/naoking-panic.webp', glyph:'GOAL', signal:['ROYAL SPORTS LIVE','王冠ゴールチャレンジ','助走開始。王冠の軌道はまだ誰にも読めません。'], twist:['PHOTO FINISH','ポスト直前で完全静止','入る、外れる、跳ね返る――次の一拍が決着です。'] },
+    'news-live':{ image:'assets/characters/naoking-panic.webp', glyph:'LIVE', signal:['ABYSS NEWS NETWORK','王冠行方不明 LIVE','Studioと四つの監視Cameraを緊急接続します。'], twist:['BREAKING UPDATE','現場映像に何かが映る','王冠か海藻か、速報字幕が確定を待っています。'] },
+    'commercial-takeover':{ image:'assets/characters/naoking-laugh.webp', glyph:'CM', signal:['ROYAL SHOPPING','音の出ない王笛','豪華な構え。機能は音が出ないことです。'], twist:['ONE TINY BEEP','広告はまだ続きます','返品、成功、放送事故。どの締め方かは未定です。'] },
+    'repair-disaster':{ image:'assets/characters/naoking-panic.webp', glyph:'🔧', signal:['ROYAL MAINTENANCE','神託装置を全分解','王は手順書を上下逆に持っています。'], twist:['ONE SCREW LEFT','一本だけ余りました','成功か完全崩壊か、電源を入れるまで分かりません。'] },
+    abandon:{ image:'assets/characters/naoking-sleepy.webp', glyph:'退', signal:['SHIFT COMPLETE','王、定時退勤','判定途中ですが、なおキングはもう帰ります。'], twist:['NO STAFF / NO CURRENT','海も装置も営業終了','このまま終わるのか、何かが戻るのか――無音で待ちます。'] },
+    'cctv-chase':{ image:'assets/characters/naoking-panic.webp', glyph:'CAM', signal:['SECURITY CAMERA 01','判決封筒が逃走','HeroからFooterまで、王国全Cameraで追跡します。'], twist:['CAMERA 04 / LOST CORNER','封筒が死角へ入った','捕獲、逃走、誤認逮捕。映像を巻き戻します。'] },
+    'lunch-show':{ image:'assets/characters/naoking-sleepy.webp', glyph:'皿', signal:['ROYAL TABLE LIVE','王の昼食が始まった','Rouletteは片付けました。今日の主菜は逃げそうです。'], twist:['LAST COURSE','皿の下に何かある','勝利札、ハズレ札、ただの汚れ。片付けて確認します。'] },
+    'council-deadlock':{ image:'assets/characters/naoking-hero.webp', glyph:'議', signal:['ROYAL COUNCIL','全員、意見が違う','王は議題を聞かずに木槌だけ構えています。'], twist:['FINAL VOTE','最後の一票を開封','賛成、反対、寝言。どれとして数えるか協議中です。'] },
+    'upside-down':{ image:'assets/characters/naoking-panic.webp', glyph:'↻', signal:['GRAVITY AUDIT','王国、上下反転','Pageの部品が天井方向へ落ち始めました。'], twist:['COLLISION REPORT','王冠とUIが衝突','壊れたのか組み上がったのか、重力を戻して確認します。'] },
+    'giant-naoking':{ image:'assets/characters/naoking-hero.webp', glyph:'王', signal:['ROYAL SCALE ANOMALY','巨大なおキング接近','背景から中景、前景へ。検査理由は不明です。'], twist:['TOO CLOSE','顔で画面が埋まりました','合格、不合格、くしゃみ。離れるまで結末は見えません。'] },
     coronation:{ image:'assets/characters/naoking-jackpot.webp', glyph:'♛', signal:['ROYAL CORONATION','五証人、起立','神託装置を王座へ組み替えます。'], twist:['THE KING ARRIVES','戴冠式を開始','王は少し遅刻しました。'] },
-    'vault-4810':{ image:'assets/characters/naoking-sleepy.webp', glyph:'4810', signal:['FOUR ROYAL SEALS','王室金庫を解錠','第一、第二、第三……第四封印。'], twist:['VAULT OPEN','中で王が寝ていた','起こしたので、結果を押し出します。'] }
+    'vault-4810':{ image:'assets/characters/naoking-sleepy.webp', glyph:'4810', signal:['FOUR ROYAL SEALS','王室金庫を解錠','第一、第二、第三……第四封印。'], twist:['VAULT OPEN','中で王が寝ていた','起こしたので、結果を押し出します。'] },
+    'pixel-palace':{ image:'assets/characters/naoking-jackpot.webp', glyph:'8BIT', signal:['ROYAL GAME MODE','王宮を8-bitへ変換','王冠Gateまで残り一画面。結果はまだ封印中です。'], twist:['FINAL STAGE','Boss Roomを開く','戦闘、居眠り、隠し通路。どのClearかは次のFrameで。'] }
   });
 
   function hideChaosScene() {
@@ -758,7 +860,10 @@
     chaosAction.hidden = !(presentation.interactive && phase === 'signal' && !chaosInteracted && !reducedMotion.matches);
     chaosAction.textContent = scene.action || '王印を押す';
     chaosStage.style.setProperty('--chaos-duration', `${timelineDelay(ms)}ms`);
-    chaosStage.className = `oracle-chaos-stage is-visible scene-${presentation.scene} phase-${phase}`;
+    const endingClass = phase === 'twist' && presentation.ending
+      ? ` outcome-${presentation.ending.outcome} ending-${presentation.ending.variant || 'default'}`
+      : '';
+    chaosStage.className = `oracle-chaos-stage is-visible scene-${presentation.scene} phase-${phase}${endingClass}`;
     chaosStage.setAttribute('aria-hidden', chaosAction.hidden ? 'true' : 'false');
     const revision = ++chaosSceneRevision;
     later(() => {
@@ -804,6 +909,7 @@
   }
 
   function routeBeatCue(presentation, phase) {
+    if (presentation.audioScene) return `${presentation.audioScene}-${phase}`;
     if (phase === 'signal') {
       if (presentation.blackout) return 'blackout';
       if (presentation.intrusion) return 'intrusion';
@@ -816,7 +922,11 @@
       'giant-fish':'reverse', commercial:'intrusion', 'royal-seal':'impact', repair:'impact',
       surface:'reverse', escape:'intrusion', cardboard:'intrusion', 'cracked-tank':'blackout',
       'verdict-book':'silence', 'golden-bubble':'revival', duel:'impact', 'crown-chase':'intrusion',
-      'royal-trial':'impact', coronation:'crown', 'vault-4810':'crown'
+      'royal-trial':'impact', 'crown-goal':'sports-twist', 'news-live':'news-twist',
+      'commercial-takeover':'commercial-twist', 'repair-disaster':'repair-twist', abandon:'abandon-twist',
+      'cctv-chase':'chase-twist', 'lunch-show':'lunch-twist', 'council-deadlock':'court-twist',
+      'upside-down':'gravity-twist', 'giant-naoking':'giant-twist', coronation:'crown',
+      'vault-4810':'crown', 'pixel-palace':'pixel-twist'
     };
     return sceneCues[presentation.scene] || (presentation.reversal ? 'reverse' : 'reel-brake');
   }
@@ -876,7 +986,9 @@
     if (presentation.premium) card.classList.add('is-premium');
     if (result.kind === 'win') {
       card.classList.add('is-jackpot'); slot.classList.add('is-jackpot');
-      if (result.effect === 'crown' || presentation.world === 'golden-tide') crowns.classList.add('is-raining');
+      crowns.classList.add('is-raining');
+      propIn('royal-burst', '♛', presentation.premium ? 2600 : 2050);
+      if (presentation.premium || ['rainbow','revival','abyss'].includes(result.effect)) setIntruder({ intrusion:'king' }, true);
       if (result.effect === 'comet') propIn('comet', '✦', 1550);
       if (result.effect === 'abyss') propIn('searchlight', '◢', 1850);
       flash(result.effect, presentation.id === 'abyssal-blackout-revival' ? 'REVIVAL // JACKPOT' : finalEffectText[result.effect], presentation.id === 'abyssal-blackout-revival' ? 2800 : 1900);
@@ -1124,9 +1236,13 @@
   function runCutinDiagnostics() {
     const routes = presentationRoutes.map(route => {
       const timings = sequenceTimings(route);
+      const endings = eventEndings[route.id] || {};
       return Object.freeze({
         id:route.id,
-        scene:Boolean(route.scene),
+        scene:Boolean(route.scene), family:route.family, category:presentationCategory(route),
+        sceneId:route.scene || '', audioScene:route.audioScene || '',
+        endingOutcomes:Object.freeze(Object.keys(endings)),
+        endingVariantCount:Object.values(endings).reduce((total, entries) => total + entries.length, 0),
         signalDwell:timings.signalDwell,
         twistDwell:timings.twistDwell,
         signalToTwist:timings.twistAt ? timings.twistAt - timings.signalAt : 0,

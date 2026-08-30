@@ -131,25 +131,25 @@ if (resultCount !== 20) failures.push(`only ${resultCount} of 20 result definiti
 if (diagnostic.rates.loss < 0.07 || diagnostic.rates.loss > 0.11) failures.push(`loss rate ${diagnostic.rates.loss}`);
 if (diagnostic.rates.normal < 0.61 || diagnostic.rates.normal > 0.72) failures.push(`normal rate ${diagnostic.rates.normal}`);
 if (diagnostic.rates.win < 0.18 || diagnostic.rates.win > 0.29) failures.push(`win rate ${diagnostic.rates.win}`);
-if (presentationDiagnostic.routeDefinitions !== 51) failures.push(`presentation route count was ${presentationDiagnostic.routeDefinitions}; expected 51`);
+if (presentationDiagnostic.routeDefinitions !== 62) failures.push(`presentation route count was ${presentationDiagnostic.routeDefinitions}; expected 62`);
 if (presentationDiagnostic.missingRoutes.length !== 0) failures.push(`uncovered presentation routes: ${presentationDiagnostic.missingRoutes.join(', ')}`);
 if (presentationDiagnostic.immediateRouteRepeat !== 0) failures.push(`presentation immediately repeated ${presentationDiagnostic.immediateRouteRepeat} times`);
 if (presentationDiagnostic.incompatibleRoutes !== 0) failures.push(`${presentationDiagnostic.incompatibleRoutes} incompatible presentation routes`);
 if (presentationDiagnostic.resultPresentationContradictions !== 0) failures.push(`${presentationDiagnostic.resultPresentationContradictions} result/presentation contradictions`);
 if (presentationDiagnostic.endingContradictions !== 0) failures.push(`${presentationDiagnostic.endingContradictions} event ending contradictions`);
 if (presentationDiagnostic.nonFrozenPresentations !== 0) failures.push(`${presentationDiagnostic.nonFrozenPresentations} presentation objects were mutable`);
-if (presentationDiagnostic.normalRouteCount !== 21) failures.push(`only ${presentationDiagnostic.normalRouteCount} of 21 normal routes appeared`);
+if (presentationDiagnostic.normalRouteCount !== 31) failures.push(`only ${presentationDiagnostic.normalRouteCount} of 31 normal routes appeared`);
 if (presentationDiagnostic.largestRouteShare > 0.15) failures.push(`largest presentation share was ${presentationDiagnostic.largestRouteShare}`);
 if (presentationDiagnostic.minEstimatedRotations < 10) failures.push(`minimum estimated rotations was ${presentationDiagnostic.minEstimatedRotations}`);
 if (presentationDiagnostic.textCutinShare > 0.16) failures.push(`text cut-in share was ${presentationDiagnostic.textCutinShare}`);
-if (presentationDiagnostic.fullEventShare < 0.06 || presentationDiagnostic.fullEventShare > 0.16) failures.push(`full event share was ${presentationDiagnostic.fullEventShare}`);
+if (presentationDiagnostic.fullEventShare < 0.15 || presentationDiagnostic.fullEventShare > 0.28) failures.push(`full event share was ${presentationDiagnostic.fullEventShare}`);
 if (presentationDiagnostic.immediateCategoryRepeat / presentationDiagnostic.iterations > 0.08) failures.push(`category immediately repeated ${presentationDiagnostic.immediateCategoryRepeat} times`);
-for (const category of ['environment','reel-event','intrusion','character-cutin','full-event','text-cutin','rule-change']) {
+for (const category of ['environment','reel-event','intrusion','character-cutin','full-event','chaos-event','premium','text-cutin','rule-change']) {
   if (!presentationDiagnostic.categories[category]) failures.push(`presentation category ${category} was never selected`);
 }
 if (sessionDiagnostic.endingContradictions !== 0 || sessionDiagnostic.incompatibleRoutes !== 0) failures.push('200-spin session found a route/result contradiction');
-if (cutinDiagnostic.sceneCount !== 20) failures.push(`scene route count was ${cutinDiagnostic.sceneCount}; expected 20`);
-if (cutinDiagnostic.routeCount !== 51) failures.push(`cut-in diagnostics covered ${cutinDiagnostic.routeCount} routes`);
+if (cutinDiagnostic.sceneCount !== 31) failures.push(`scene route count was ${cutinDiagnostic.sceneCount}; expected 31`);
+if (cutinDiagnostic.routeCount !== 62) failures.push(`cut-in diagnostics covered ${cutinDiagnostic.routeCount} routes`);
 if (cutinDiagnostic.shortestSignalDwell < 3700) failures.push(`shortest signal cut-in was only ${cutinDiagnostic.shortestSignalDwell}ms`);
 if (cutinDiagnostic.shortestTwistDwell < 3500) failures.push(`shortest twist cut-in was only ${cutinDiagnostic.shortestTwistDwell}ms`);
 if (cutinDiagnostic.shortestSceneSignalDwell < 4000) failures.push(`shortest character cut-in was only ${cutinDiagnostic.shortestSceneSignalDwell}ms`);
@@ -158,6 +158,21 @@ if (cutinDiagnostic.shortestSignalToTwist < 4380) failures.push(`a signal cut-in
 if (cutinDiagnostic.restartRoute.id !== 'abyssal-blackout-revival') failures.push('missing abyssal blackout revival route');
 if (cutinDiagnostic.restartRoute.signalDwell < 5000) failures.push(`abyssal revival setup only lasted ${cutinDiagnostic.restartRoute.signalDwell}ms`);
 if (cutinDiagnostic.netLossImage !== 'assets/characters/naoking-panic.webp') failures.push(`net loss image was ${cutinDiagnostic.netLossImage}`);
+
+const fullEventRoutes = cutinDiagnostic.routes.filter(route => route.family === 'full-event');
+if (fullEventRoutes.length !== 11) failures.push(`full event route count was ${fullEventRoutes.length}; expected 11`);
+for (const route of fullEventRoutes) {
+  const missingOutcomes = ['normal','win','loss','revival'].filter(outcome => !route.endingOutcomes.includes(outcome));
+  if (missingOutcomes.length) failures.push(`${route.id} missing endings: ${missingOutcomes.join(', ')}`);
+  if (route.endingVariantCount < 8) failures.push(`${route.id} had only ${route.endingVariantCount} ending variants`);
+  if (!route.audioScene) failures.push(`${route.id} had no dedicated audio scene`);
+}
+const requiredChaosScenes = ['crown-goal','news-live','commercial-takeover','repair-disaster','abandon','cctv-chase','lunch-show','council-deadlock','upside-down','giant-naoking','pixel-palace'];
+for (const sceneId of requiredChaosScenes) {
+  if (!cutinDiagnostic.routes.some(route => route.sceneId === sceneId)) failures.push(`missing chaos expansion scene: ${sceneId}`);
+}
+const pixelPremium = cutinDiagnostic.routes.find(route => route.id === 'pixel-palace-bonus');
+if (!pixelPremium || pixelPremium.category !== 'premium' || pixelPremium.endingVariantCount < 4 || pixelPremium.audioScene !== 'pixel') failures.push('pixel palace premium contract was incomplete');
 
 const beforeClick = debug.getState();
 clickListeners[0]?.();
