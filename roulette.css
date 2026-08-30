@@ -390,6 +390,8 @@
 .slot-window[data-reel-motion="launch"] .shark-tile { animation: oracle-witness-roll .16s linear infinite; animation-delay: var(--witness-delay); }
 .slot-window[data-reel-motion="cruise"] .shark-tile { animation: oracle-witness-roll .22s linear infinite; animation-delay: var(--witness-delay); }
 .slot-window[data-reel-motion="anticipation"] .shark-tile { animation: oracle-witness-roll .34s cubic-bezier(.42,0,.58,1) infinite; animation-delay: var(--witness-delay); }
+.slot-window[data-reel-motion="suspense"] .shark-tile { animation: oracle-witness-roll 1.18s cubic-bezier(.22,.78,.24,1) infinite; animation-delay: var(--witness-delay); filter:brightness(.88) saturate(.78); }
+.slot-window[data-reel-motion="blackout"] .shark-tile { animation-play-state:paused!important; opacity:.04!important; filter:brightness(0) saturate(0)!important; }
 .slot-window[data-reel-motion="reverse"] .shark-tile { animation: oracle-witness-roll .29s linear infinite reverse; animation-delay: var(--witness-delay); }
 .slot-window[data-reel-motion="brake"] .shark-tile { animation: oracle-witness-roll .57s cubic-bezier(.32,.05,.62,.94) infinite; animation-delay: var(--witness-delay); }
 .slot-window[data-reel-motion="respin"] .shark-tile { animation: oracle-witness-respin .46s cubic-bezier(.22,.78,.18,1) infinite; animation-delay:var(--witness-delay); }
@@ -761,6 +763,8 @@ html.is-oracle-active .oracle-bubble { animation-play-state: running; }
 html.oracle-stage-descent .oracle-current { animation-duration:1.55s; }
 html.oracle-stage-cruise .oracle-current { animation-duration:.72s; }
 html.oracle-stage-signal .oracle-current { animation-duration:1.05s; }
+html.oracle-stage-signal body[data-page="fortune"] .photo-background { filter:saturate(1.18) brightness(.98) hue-rotate(-7deg); }
+html.oracle-stage-signal .fortune-card{box-shadow:0 46px 110px rgba(0,8,24,.72),0 0 66px rgba(109,228,242,.1),inset 0 1px rgba(255,255,255,.11)!important;}
 html.oracle-stage-judgment .oracle-current { animation-duration:1.7s; }
 html.oracle-stage-verdict .oracle-current { animation-play-state:paused; }
 html.oracle-stage-fake .oracle-current { opacity:.04; animation-play-state:paused; }
@@ -807,8 +811,9 @@ html.oracle-tier-extreme .header-depth b,html.oracle-tier-extreme .depth-rail b,
 }
 .oracle-takeover > span{font:700 clamp(16px,3vw,36px) var(--mono);letter-spacing:.14em;text-shadow:0 0 24px rgba(118,228,240,.38)}
 .oracle-takeover > small{color:rgba(205,235,239,.68);font:500 11px var(--display);letter-spacing:.08em}
-.oracle-takeover.is-visible{animation:oracle-takeover-cut 1.15s cubic-bezier(.18,.72,.2,1) both}
+.oracle-takeover.is-visible{animation:oracle-takeover-cut var(--takeover-duration,1.15s) cubic-bezier(.18,.72,.2,1) both}
 .oracle-takeover.route-power-failure,.oracle-takeover.route-secret-4810,.oracle-takeover.route-light-reboot{background:linear-gradient(90deg,transparent,rgba(0,3,10,.96) 12% 88%,transparent);color:#fff0d0}
+.oracle-takeover.route-abyssal-blackout-revival{border-color:rgba(184,230,240,.2);background:linear-gradient(90deg,transparent,rgba(0,2,8,.98) 10% 90%,transparent);color:#e2faff;box-shadow:0 0 60px rgba(0,0,0,.52)}
 .oracle-takeover.route-royal-audience,.oracle-takeover.route-golden-tide,.oracle-takeover.route-palace-open{border-color:rgba(255,225,126,.46);color:#fff4bb;background:linear-gradient(90deg,transparent,rgba(12,45,59,.92) 12%,rgba(67,53,37,.9) 50%,rgba(12,45,59,.92) 88%,transparent)}
 
 /*
@@ -917,6 +922,16 @@ html.oracle-world-reverse .oracle-current,html.oracle-world-undertow .oracle-cur
 html.oracle-world-ascension .oracle-current{transform:rotate(82deg);animation-name:oracle-current-rise}
 html.oracle-world-constellation .oracle-environment::before{background:radial-gradient(circle at 18% 24%,#fff 0 1px,transparent 2px),radial-gradient(circle at 73% 18%,#fff7b5 0 1px,transparent 2px),radial-gradient(circle at 56% 72%,#a9f7ff 0 1px,transparent 2px);background-size:130px 110px,170px 150px,210px 190px;opacity:.44}
 html.oracle-world-blackout .oracle-environment::after,html.oracle-world-reboot .oracle-environment::after,html.oracle-world-secret-4810 .oracle-environment::after{background:#000b;animation:oracle-power-failure 1.1s steps(2,end) both}
+html.oracle-world-abyssal-restart.oracle-stage-fake body[data-page="fortune"] .photo-background{filter:brightness(.025) saturate(0)!important;opacity:.16}
+html.oracle-world-abyssal-restart.oracle-stage-fake .site-header,html.oracle-world-abyssal-restart.oracle-stage-fake .depth-rail,html.oracle-world-abyssal-restart.oracle-stage-fake .fortune-card:not(.is-abyssal-blackout){filter:brightness(.035) saturate(0);}
+html.oracle-world-abyssal-restart.oracle-stage-fake .fortune-card{filter:brightness(.035) saturate(0);box-shadow:none!important;}
+html.oracle-world-abyssal-restart.oracle-stage-fake .oracle-environment{opacity:1!important;animation:none!important}
+html.oracle-world-abyssal-restart.oracle-stage-fake .oracle-environment::before,html.oracle-world-abyssal-restart.oracle-stage-fake .oracle-environment>*{opacity:0!important;animation-play-state:paused!important}
+html.oracle-world-abyssal-restart.oracle-stage-fake .oracle-environment::after{opacity:1!important;background:rgba(0,2,8,.96)!important;animation:none!important}
+html.oracle-world-abyssal-restart.oracle-stage-revival body[data-page="fortune"] .photo-background{animation:oracle-abyssal-reboot 2.8s cubic-bezier(.12,.76,.18,1) both;filter:saturate(1.38) brightness(1.12) hue-rotate(-12deg)!important;opacity:1}
+html.oracle-world-abyssal-restart.oracle-stage-revival .site-header,html.oracle-world-abyssal-restart.oracle-stage-revival .depth-rail,html.oracle-world-abyssal-restart.oracle-stage-revival .fortune-card{animation:oracle-abyssal-reboot 1.55s cubic-bezier(.12,.76,.18,1) both;filter:none}
+html.oracle-world-abyssal-restart.oracle-stage-revival .oracle-environment::after{background:radial-gradient(circle at 50% 50%,rgba(231,255,255,.92),rgba(95,232,243,.26) 20%,transparent 58%);animation:oracle-abyssal-flash 1.7s ease-out both}
+html.oracle-world-abyssal-restart.oracle-stage-revival .oracle-bubble{animation-duration:.82s;animation-direction:reverse;opacity:.74}
 html.oracle-world-crown-sink .oracle-current{animation-name:oracle-current-sink;animation-duration:1.8s!important}
 html.oracle-world-fish .oracle-environment::before{background:repeating-linear-gradient(18deg,transparent 0 42px,rgba(155,237,245,.05) 43px 45px,transparent 46px 90px);animation:oracle-fish-current 1.1s linear both}
 html.oracle-world-cold .oracle-environment::after{background:linear-gradient(rgba(3,17,30,.32),rgba(3,17,30,.5));}
@@ -995,18 +1010,20 @@ html.is-oracle-suspended .oracle-environment,html.is-oracle-suspended .oracle-en
 @keyframes oracle-current-sink{to{transform:translateY(46%) rotate(-5deg);opacity:.04}}
 @keyframes oracle-pressure-breathe{to{opacity:.28}}
 @keyframes oracle-bubble-rise{0%{opacity:0;transform:translate(0,0) scale(.5)}18%{opacity:.4}56%{transform:translate(16px,-52vh) scale(.92)}100%{opacity:0;transform:translate(-10px,-112vh) scale(1.22)}}
-@keyframes oracle-takeover-cut{0%{opacity:0;clip-path:inset(48% 0)}18%,76%{opacity:1;clip-path:inset(0)}100%{opacity:0;clip-path:inset(0 0 0 100%)}}
+@keyframes oracle-takeover-cut{0%{opacity:0;clip-path:inset(48% 0)}10%,92%{opacity:1;clip-path:inset(0)}100%{opacity:0;clip-path:inset(0 0 0 100%)}}
 @keyframes oracle-bioglow{to{opacity:.7;transform:translateX(3%)}}
 @keyframes oracle-blue-hour{to{opacity:.7;transform:translateX(8%) skewX(-8deg)}}
 @keyframes oracle-floodlights{0%{opacity:0;transform:rotate(-12deg)}38%,72%{opacity:.8}100%{opacity:.24;transform:rotate(9deg)}}
 @keyframes oracle-power-failure{0%,42%,58%,100%{opacity:.15}14%,48%,72%{opacity:.88}}
+@keyframes oracle-abyssal-reboot{0%{filter:brightness(.035) saturate(0);opacity:.16}12%{filter:brightness(1.9) saturate(1.4);opacity:1}28%{filter:brightness(.78) saturate(1.08)}100%{filter:none;opacity:1}}
+@keyframes oracle-abyssal-flash{0%{opacity:0;transform:scale(.35)}12%{opacity:1;transform:scale(1.08)}100%{opacity:0;transform:scale(1.46)}}
 @keyframes oracle-fish-current{to{transform:translateX(-18%)}}
 @keyframes oracle-golden-tide{to{opacity:.78;transform:translateY(5%)}}
 @keyframes oracle-palace-open{0%{clip-path:inset(0 0)}100%{clip-path:inset(0 46%)}}
 @keyframes oracle-defibrillator{50%{filter:brightness(2.2)}}
 @keyframes oracle-depth-anomaly{50%{opacity:.18}}
 @keyframes oracle-tier-lamp{to{opacity:.32}}
-@keyframes oracle-chaos-stage-in{0%{opacity:0}12%,82%{opacity:1}100%{opacity:0}}
+@keyframes oracle-chaos-stage-in{0%{opacity:0}10%,92%{opacity:1}100%{opacity:0}}
 @keyframes oracle-chaos-rule{0%{opacity:0;transform:scaleX(.12)}35%,76%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(.82)}}
 @keyframes oracle-seal-rebuke{50%{transform:translateX(7px);filter:brightness(1.35)}}
 @keyframes oracle-news-ticker{to{transform:translateX(-18%)}}

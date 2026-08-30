@@ -244,6 +244,12 @@ for (let index = 0; index < 5; index += 1) {
 }
 assert.equal(window.NaokingAudio.snapshot().stopCount, 5, 'five stop events must produce a complete five-witness stop count');
 
+window.dispatchEvent(new FakeCustomEvent('naoking:oraclebeat', { detail: { cue: 'abyssal-blackout', intensity: 0.18 } }));
+assert.equal(window.NaokingAudio.snapshot().silenceActive, true, 'abyssal blackout must silence the entire oracle scene');
+window.dispatchEvent(new FakeCustomEvent('naoking:oraclebeat', { detail: { cue: 'abyssal-distant-signal', intensity: 0.22 } }));
+window.dispatchEvent(new FakeCustomEvent('naoking:oraclebeat', { detail: { cue: 'abyssal-reboot', intensity: 1 } }));
+assert.equal(window.NaokingAudio.snapshot().silenceActive, false, 'abyssal reboot must release the blackout silence');
+
 window.dispatchEvent(new FakeCustomEvent('naoking:gameaudio', { detail: { cue: 'start', intensity: 0.6 } }));
 for (let index = 0; index < 10; index += 1) {
   window.dispatchEvent(new FakeCustomEvent('naoking:gameaudio', { detail: { cue: 'retry', intensity: 0.6 } }));

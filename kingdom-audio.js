@@ -779,6 +779,21 @@
         impact(0.32 * intensity, 'event');
         scheduleTimer(() => silence(Number(options.duration) || 720), 110, 'oracle');
         break;
+      case 'abyssal-blackout':
+        stopOracleScene({ includeResult: true });
+        impact(0.22 * intensity, 'event');
+        silence(4300, { fade:0.055, depth:0 });
+        break;
+      case 'abyssal-distant-signal':
+        tone({ layer:'signal', frequency:78, endFrequency:122, duration:1.35, type:'sine', gain:0.038 * intensity, attack:.45, release:.72 });
+        bubble({ layer:'signal', delay:.68, pan:-.16, size:.22 });
+        break;
+      case 'abyssal-reboot':
+        clearSilence(true);
+        waterWhoosh('surface', 0.74 * intensity, 'event');
+        royalBell(0.88 * intensity, .18, 'result');
+        lowPulse(0.68 * intensity, .06, 'tension');
+        break;
       case 'reverse':
         noise({ layer: 'event', duration: 0.58, gain: 0.13 * intensity, frequency: 190, endFrequency: 1900, q: 0.65 });
         tone({ layer: 'event', frequency: 74, endFrequency: 260, duration: 0.5, type: 'triangle', gain: 0.1 * intensity });

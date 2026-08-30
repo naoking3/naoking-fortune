@@ -130,7 +130,7 @@ if (resultCount !== 20) failures.push(`only ${resultCount} of 20 result definiti
 if (diagnostic.rates.loss < 0.07 || diagnostic.rates.loss > 0.11) failures.push(`loss rate ${diagnostic.rates.loss}`);
 if (diagnostic.rates.normal < 0.61 || diagnostic.rates.normal > 0.72) failures.push(`normal rate ${diagnostic.rates.normal}`);
 if (diagnostic.rates.win < 0.18 || diagnostic.rates.win > 0.29) failures.push(`win rate ${diagnostic.rates.win}`);
-if (presentationDiagnostic.routeDefinitions !== 47) failures.push(`presentation route count was ${presentationDiagnostic.routeDefinitions}; expected 47`);
+if (presentationDiagnostic.routeDefinitions !== 48) failures.push(`presentation route count was ${presentationDiagnostic.routeDefinitions}; expected 48`);
 if (presentationDiagnostic.missingRoutes.length !== 0) failures.push(`uncovered presentation routes: ${presentationDiagnostic.missingRoutes.join(', ')}`);
 if (presentationDiagnostic.immediateRouteRepeat !== 0) failures.push(`presentation immediately repeated ${presentationDiagnostic.immediateRouteRepeat} times`);
 if (presentationDiagnostic.incompatibleRoutes !== 0) failures.push(`${presentationDiagnostic.incompatibleRoutes} incompatible presentation routes`);
@@ -140,9 +140,14 @@ if (presentationDiagnostic.normalRouteCount !== 18) failures.push(`only ${presen
 if (presentationDiagnostic.largestRouteShare > 0.15) failures.push(`largest presentation share was ${presentationDiagnostic.largestRouteShare}`);
 if (presentationDiagnostic.minEstimatedRotations < 10) failures.push(`minimum estimated rotations was ${presentationDiagnostic.minEstimatedRotations}`);
 if (cutinDiagnostic.sceneCount !== 17) failures.push(`scene route count was ${cutinDiagnostic.sceneCount}; expected 17`);
-if (cutinDiagnostic.shortestSignalDwell < 2700) failures.push(`shortest signal cut-in was only ${cutinDiagnostic.shortestSignalDwell}ms`);
-if (cutinDiagnostic.shortestTwistDwell < 2500) failures.push(`shortest twist cut-in was only ${cutinDiagnostic.shortestTwistDwell}ms`);
-if (cutinDiagnostic.shortestSignalToTwist < 3000) failures.push(`a signal cut-in was replaced after only ${cutinDiagnostic.shortestSignalToTwist}ms`);
+if (cutinDiagnostic.routeCount !== 48) failures.push(`cut-in diagnostics covered ${cutinDiagnostic.routeCount} routes`);
+if (cutinDiagnostic.shortestSignalDwell < 5600) failures.push(`shortest signal cut-in was only ${cutinDiagnostic.shortestSignalDwell}ms`);
+if (cutinDiagnostic.shortestTwistDwell < 5200) failures.push(`shortest twist cut-in was only ${cutinDiagnostic.shortestTwistDwell}ms`);
+if (cutinDiagnostic.shortestSceneSignalDwell < 6000) failures.push(`shortest character cut-in was only ${cutinDiagnostic.shortestSceneSignalDwell}ms`);
+if (cutinDiagnostic.shortestSceneTwistDwell < 5500) failures.push(`shortest character twist cut-in was only ${cutinDiagnostic.shortestSceneTwistDwell}ms`);
+if (cutinDiagnostic.shortestSignalToTwist < 6500) failures.push(`a signal cut-in was replaced after only ${cutinDiagnostic.shortestSignalToTwist}ms`);
+if (cutinDiagnostic.restartRoute.id !== 'abyssal-blackout-revival') failures.push('missing abyssal blackout revival route');
+if (cutinDiagnostic.restartRoute.signalDwell < 7000) failures.push(`abyssal revival setup only lasted ${cutinDiagnostic.restartRoute.signalDwell}ms`);
 if (cutinDiagnostic.netLossImage !== 'assets/characters/naoking-panic.webp') failures.push(`net loss image was ${cutinDiagnostic.netLossImage}`);
 
 const beforeClick = debug.getState();

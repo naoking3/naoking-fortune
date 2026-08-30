@@ -222,6 +222,7 @@
     { id:'light-reboot', family:'revival', kinds:['win'], effects:['revival'], weight:1.05, tier:'revival', world:'reboot', motion:'outside-in', duration:6600, cue:'KINGDOM REBOOT', detail:'非常灯から順に王国の光が蘇る。', fake:true, blackout:true },
     { id:'verdict-book-reversal', family:'revival', kinds:['win'], effects:['revival'], weight:.62, tier:'revival', world:'verdict-book', motion:'reverse', duration:9000, cue:'THE CLOSED VERDICT', detail:'敗北判定書が閉じ、王冠のしおりから逆向きに開く。', scene:'verdict-book', sequence:'book-revival', twistMotion:'reverse', fake:true, freeze:true },
     { id:'single-golden-bubble', family:'revival', kinds:['win'], effects:['revival'], weight:.58, tier:'revival', world:'golden-bubble', motion:'center-last', duration:9500, cue:'ONE BUBBLE REMAINS', detail:'完全停止した海で、金の一泡だけが戻ってくる。', scene:'golden-bubble', sequence:'silent-revival', twistMotion:'revival', fake:true, blackout:true, freeze:true },
+    { id:'abyssal-blackout-revival', family:'revival', kinds:['win'], effects:['revival'], weight:.46, tier:'extreme', world:'abyssal-restart', motion:'power-cut', duration:10500, cue:'ABYSSAL POWER FAILURE', detail:'海も光も止まり、遠くの信号だけが残る。', premium:true, fake:true, blackout:true, freeze:true },
 
     { id:'royal-audience', family:'premium', kinds:['win'], effects:['rainbow','crown','abyss'], weight:.16, tier:'extreme', world:'audience', motion:'witnesses', duration:11000, cue:'ROYAL CORONATION', detail:'筐体が王座へ組み替わり、五証人が一枚ずつ礼をする。', premium:true, intrusion:'king', freeze:true, scene:'coronation', sequence:'coronation', twistMotion:'stopping' },
     { id:'golden-tide', family:'premium', kinds:['win'], effects:['rainbow','crown'], weight:.14, tier:'extreme', world:'golden-tide', motion:'wave', duration:6800, cue:'GOLDEN TIDE', detail:'金の海流がページの端から端まで満ちる。', premium:true },
@@ -271,9 +272,25 @@
   function cutinDuration(presentation, phase = 'signal') {
     const premium = Boolean(presentation.premium || presentation.tier === 'extreme');
     const heated = premium || ['hot', 'superhot', 'revival', 'fake-loss'].includes(presentation.tier);
-    if (premium) return phase === 'signal' ? 3500 : 3300;
-    if (heated) return phase === 'signal' ? 3150 : 2900;
-    return phase === 'signal' ? 2700 : 2500;
+    if (premium) return phase === 'signal' ? 7000 : 6500;
+    if (heated) return phase === 'signal' ? 6500 : 6000;
+    if (presentation.scene) return phase === 'signal' ? 6000 : 5500;
+    return phase === 'signal' ? 5600 : 5200;
+  }
+
+  function sequenceTimings(presentation) {
+    const sequence = sequenceFor(presentation);
+    const total = presentation.duration;
+    const signalAt = Math.round(total * sequence.signal);
+    const signalDwell = cutinDuration(presentation, 'signal');
+    const twistDwell = cutinDuration(presentation, 'twist');
+    const twistAt = sequence.twist
+      ? Math.max(Math.round(total * sequence.twist), signalAt + signalDwell + 520)
+      : 0;
+    const lastCutinEnd = twistAt ? twistAt + twistDwell : signalAt + signalDwell;
+    const judgmentAt = Math.max(Math.round(total * sequence.judgment), lastCutinEnd + 700);
+    const stopAt = Math.max(Math.round(total * sequence.stop), judgmentAt + 1000);
+    return Object.freeze({ signalAt, twistAt, judgmentAt, stopAt, signalDwell, twistDwell });
   }
 
   function routeCompatible(route, result) {
@@ -436,6 +453,7 @@
 
   function tierFor(result, presentation, override = '') {
     if (override) return override;
+    if (presentation?.id === 'abyssal-blackout-revival' && result?.effect === 'revival') return 'jackpot';
     if (presentation?.tier) return presentation.tier;
     if (!result || result.kind === 'normal') return 'normal';
     if (result.effect === 'revival') return 'revival';
@@ -612,6 +630,7 @@
     const small = oracleTakeover.querySelector?.('small');
     if (span) span.textContent = presentation.cue;
     if (small) small.textContent = presentation.modifier?.cue || presentation.detail;
+    oracleTakeover.style.setProperty('--takeover-duration', `${timelineDelay(ms)}ms`);
     oracleTakeover.className = `oracle-takeover is-visible is-${phase} route-${presentation.id}`;
     later(() => { oracleTakeover.className = 'oracle-takeover'; }, ms);
   }
@@ -663,6 +682,7 @@
     chaosEyebrow.textContent = copy[0]; chaosTitle.textContent = copy[1]; chaosDetail.textContent = copy[2];
     chaosAction.hidden = !(presentation.interactive && phase === 'signal' && !chaosInteracted && !reducedMotion.matches);
     chaosAction.textContent = scene.action || '王印を押す';
+    chaosStage.style.setProperty('--chaos-duration', `${timelineDelay(ms)}ms`);
     chaosStage.className = `oracle-chaos-stage is-visible scene-${presentation.scene} phase-${phase}`;
     chaosStage.setAttribute('aria-hidden', chaosAction.hidden ? 'true' : 'false');
     const revision = ++chaosSceneRevision;
@@ -729,10 +749,14 @@
     if (phase === 'signal') {
       setRouteReadout(presentation, phase);
       const cutinMs = cutinDuration(presentation, 'signal');
+      setReelMotion('suspense');
       if (presentation.scene) showChaosScene(presentation, 'signal', cutinMs);
-      else showTakeover(presentation, 'signal', presentation.premium ? cutinMs : presentation.tier === 'normal' ? 1350 : 2100);
+      else showTakeover(presentation, 'signal', cutinMs);
       dispatchOracleBeat(routeBeatCue(presentation, phase), { intensity:presentation.premium ? .92 : presentation.tier === 'superhot' ? .78 : .52 });
       if (presentation.intrusion) { setIntruder(presentation, true); later(() => setIntruder(presentation, false), Math.min(cutinMs, 2600)); }
+      later(() => {
+        if (activePresentation?.id === presentation.id && busy) setReelMotion('anticipation');
+      }, Math.max(500, cutinMs - 500));
       if (presentation.world === 'constellation') crowns.classList.add('is-constellation');
       if (presentation.world === 'crown-sink') crowns.classList.add('is-sinking');
       if (presentation.world === 'golden-tide' || presentation.world === 'audience') crowns.classList.add('is-raining');
@@ -746,8 +770,9 @@
       later(() => card.classList.remove('is-chaos-twist'), 920);
       refreshSpinCandidates(activeVisualResult);
       const cutinMs = cutinDuration(presentation, 'twist');
+      setReelMotion('suspense');
       if (presentation.scene) showChaosScene(presentation, 'twist', cutinMs);
-      else showTakeover({ ...presentation, cue:'CURRENT SHIFT', detail:'航路が途中で書き換わった。', modifier:{ cue:'', detail:'' } }, 'twist', presentation.premium ? cutinMs : 1900);
+      else showTakeover({ ...presentation, cue:'CURRENT SHIFT', detail:'航路が途中で書き換わった。', modifier:{ cue:'', detail:'' } }, 'twist', cutinMs);
       dispatchOracleBeat(routeBeatCue(presentation, phase), {
         intensity:presentation.premium ? 1 : presentation.tier === 'hot' || presentation.tier === 'superhot' ? .78 : .58,
         silenceMs:['verdict-book'].includes(presentation.scene) ? 720 : undefined
@@ -756,6 +781,9 @@
       if (presentation.scene === 'repair') card.classList.add('is-reel-reverse');
       if (presentation.scene === 'escape') { setIntruder({ intrusion:'fish' }, true); later(() => setIntruder(presentation, false), 1250); }
       if (presentation.scene === 'coronation' || presentation.scene === 'vault-4810') crowns.classList.add('is-raining');
+      later(() => {
+        if (activePresentation?.id === presentation.id && busy) setReelMotion(presentation.twistMotion || 'anticipation');
+      }, Math.max(500, cutinMs - 500));
     }
     if (phase === 'judgment') {
       refreshSpinCandidates(activeVisualResult);
@@ -775,7 +803,7 @@
       if (result.effect === 'crown' || presentation.world === 'golden-tide') crowns.classList.add('is-raining');
       if (result.effect === 'comet') propIn('comet', '✦', 1550);
       if (result.effect === 'abyss') propIn('searchlight', '◢', 1850);
-      flash(result.effect, finalEffectText[result.effect], 1900);
+      flash(result.effect, presentation.id === 'abyssal-blackout-revival' ? 'REVIVAL // JACKPOT' : finalEffectText[result.effect], presentation.id === 'abyssal-blackout-revival' ? 2800 : 1900);
     } else if (result.kind === 'loss') {
       if (result.effect === 'net') propIn('net', '╳', 1700);
       if (result.effect === 'alarm') propIn('alarm', '!', 1600);
@@ -806,6 +834,28 @@
   }
 
   function runFalseEnding(result, presentation) {
+    if (presentation.id === 'abyssal-blackout-revival') {
+      const blackoutHold = 5200;
+      const rebootHold = 3100;
+      setPhase('fake', 'fake-loss'); setReelMotion('blackout'); card.classList.add('is-failed', 'is-fake', 'is-abyssal-blackout');
+      reel.innerHTML = fiveTiles('assets/characters/naoking-7.webp', true); title.textContent = '通信断';
+      message.textContent = '……信号も水流も、完全に停止しました。'; resultRegion?.classList.add('is-false-ending');
+      status.textContent = 'POWER FAILURE // ORACLE OFFLINE'; flash('void', 'POWER FAILURE', 4200);
+      showTakeover({ ...presentation, cue:'POWER FAILURE', detail:'深海王国の全系統が停止しました。', modifier:{ cue:'', detail:'' } }, 'fake', 4200);
+      dispatchOracleBeat('abyssal-blackout', { intensity:.18 });
+      later(() => {
+        flash('signal', '·', 900);
+        dispatchOracleBeat('abyssal-distant-signal', { intensity:.22 });
+      }, 3900);
+      later(() => {
+        card.classList.remove('is-failed', 'is-fake', 'is-abyssal-blackout'); setPhase('revival', 'jackpot');
+        showTakeover({ ...presentation, cue:'SIGNAL DETECTED', detail:'深海の彼方から、王国の再起動信号。', modifier:{ cue:'', detail:'' } }, 'revival', 1700);
+        flash('revival', 'REVIVAL // JACKPOT', 2500); setReelMotion('revival'); slot.classList.add('is-spinning');
+        dispatchOracleBeat('abyssal-reboot', { intensity:1 });
+        later(() => showFinal(result, presentation), rebootHold);
+      }, blackoutHold);
+      return;
+    }
     const fakeHold = presentation.scene ? 1500 : 1800;
     const revivalHold = presentation.scene ? 2000 : 1600;
     setPhase('fake', 'fake-loss'); setReelMotion('settled'); card.classList.add('is-failed', 'is-fake');
@@ -873,20 +923,15 @@
     setButtonCopy('五つの証言を採取中…', 'ONE DRAW // DO NOT TAP'); status.textContent = `ROUTE LOCKED // ${presentation.cue}`;
     resultRegion?.setAttribute('aria-busy', 'true'); message.textContent = '最終結果は封印済み。王国が、そこへ至る航路を選んでいる。';
 
-    const total = presentation.duration;
-    const sequence = sequenceFor(presentation);
-    const signalAt = Math.round(total * sequence.signal);
-    const twistAt = sequence.twist ? Math.round(total * sequence.twist) : 0;
-    const judgmentAt = Math.round(total * sequence.judgment);
-    const stopAt = Math.round(total * sequence.stop);
+    const { signalAt, twistAt, judgmentAt, stopAt } = sequenceTimings(presentation);
     later(() => { setPhase('cruise'); setReelMotion('cruise'); status.textContent = 'FULL CURRENT // WITNESSES ROTATING'; }, 320);
     later(() => {
-      setPhase('signal', presentation.fake && result.kind === 'normal' ? 'hot' : ''); setReelMotion(presentation.reversal ? 'reverse' : 'anticipation');
+      setPhase('signal', presentation.fake && result.kind === 'normal' ? 'hot' : ''); setReelMotion(presentation.reversal ? 'reverse' : 'suspense');
       status.textContent = `${presentation.tier.toUpperCase()} // OMEN DETECTED`; applyRouteMoment(presentation, 'signal');
     }, signalAt);
     if (twistAt) {
       later(() => {
-        setPhase('anomaly'); setReelMotion(presentation.twistMotion || 'anticipation');
+        setPhase('anomaly'); setReelMotion('suspense');
         status.textContent = `${presentation.scene ? 'SCENE CHANGE' : 'CURRENT SHIFT'} // ROUTE STILL SEALED`; applyRouteMoment(presentation, 'twist');
       }, twistAt);
     }
@@ -994,26 +1039,33 @@
   }
 
   function runCutinDiagnostics() {
-    const scenes = presentationRoutes.filter(route => route.scene).map(route => {
-      const sequence = sequenceFor(route);
-      const signalAt = Math.round(route.duration * sequence.signal);
-      const twistAt = Math.round(route.duration * sequence.twist);
+    const routes = presentationRoutes.map(route => {
+      const timings = sequenceTimings(route);
       return Object.freeze({
         id:route.id,
-        signalDwell:cutinDuration(route, 'signal'),
-        twistDwell:cutinDuration(route, 'twist'),
-        signalToTwist:twistAt - signalAt,
-        signalAt,
-        twistAt
+        scene:Boolean(route.scene),
+        signalDwell:timings.signalDwell,
+        twistDwell:timings.twistDwell,
+        signalToTwist:timings.twistAt ? timings.twistAt - timings.signalAt : 0,
+        signalAt:timings.signalAt,
+        twistAt:timings.twistAt,
+        judgmentAt:timings.judgmentAt,
+        stopAt:timings.stopAt
       });
     });
+    const scenes = routes.filter(route => route.scene);
+    const restartRoute = routes.find(route => route.id === 'abyssal-blackout-revival');
     return Object.freeze({
       sceneCount:scenes.length,
-      shortestSignalDwell:Math.min(...scenes.map(scene => scene.signalDwell)),
-      shortestTwistDwell:Math.min(...scenes.map(scene => scene.twistDwell)),
-      shortestSignalToTwist:Math.min(...scenes.map(scene => scene.signalToTwist)),
+      routeCount:routes.length,
+      shortestSignalDwell:Math.min(...routes.map(route => route.signalDwell)),
+      shortestTwistDwell:Math.min(...routes.map(route => route.twistDwell)),
+      shortestSceneSignalDwell:Math.min(...scenes.map(scene => scene.signalDwell)),
+      shortestSceneTwistDwell:Math.min(...scenes.map(scene => scene.twistDwell)),
+      shortestSignalToTwist:Math.min(...routes.filter(route => route.twistAt).map(route => route.signalToTwist)),
       netLossImage:resultByKey.get('net')?.image || '',
-      scenes:Object.freeze(scenes)
+      restartRoute:Object.freeze(restartRoute || {}),
+      routes:Object.freeze(routes)
     });
   }
 
