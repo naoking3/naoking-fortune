@@ -325,10 +325,11 @@
 }
 
 .slot-reel {
+  --reel-count: 5;
   position: absolute !important;
   inset: 18px 16px !important;
   display: grid !important;
-  grid-template-columns: .72fr .9fr 1.32fr .9fr .72fr;
+  grid-template-columns: repeat(var(--reel-count), minmax(0, 1fr));
   align-items: stretch;
   gap: clamp(5px, 1vw, 11px);
   transform: none !important;
@@ -352,11 +353,15 @@
   will-change: transform, opacity, filter;
 }
 
-.shark-tile:nth-child(1) { --witness-delay: -45ms; }
-.shark-tile:nth-child(2) { --witness-delay: -125ms; }
-.shark-tile:nth-child(3) { --witness-delay: -205ms; border-color: rgba(var(--machine-accent), .34); }
-.shark-tile:nth-child(4) { --witness-delay: -85ms; }
-.shark-tile:nth-child(5) { --witness-delay: -165ms; }
+.shark-tile[data-reel-index="0"] { --witness-delay: -45ms; }
+.shark-tile[data-reel-index="1"] { --witness-delay: -125ms; }
+.shark-tile[data-reel-index="2"] { --witness-delay: -205ms; }
+.shark-tile[data-reel-index="3"] { --witness-delay: -85ms; }
+.shark-tile[data-reel-index="4"] { --witness-delay: -165ms; }
+.shark-tile[data-reel-index="5"] { --witness-delay: -245ms; }
+.shark-tile[data-reel-index="6"] { --witness-delay: -105ms; }
+.shark-tile[data-reel-index="7"] { --witness-delay: -285ms; }
+.shark-tile.is-prime { border-color: rgba(var(--machine-accent), .34); }
 
 .shark-tile > span {
   position: absolute;
@@ -380,10 +385,10 @@
   user-select: none;
 }
 
-.shark-tile:nth-child(3) .shark-face { width: 122% !important; opacity: 1; filter: drop-shadow(0 20px 24px rgba(0, 0, 0, .5)); }
+.shark-tile.is-prime .shark-face { width: 122% !important; opacity: 1; filter: drop-shadow(0 20px 24px rgba(0, 0, 0, .5)); }
 .shark-tile.is-stopped { animation: oracle-witness-lock .34s cubic-bezier(.16,.78,.18,1) both !important; }
 .shark-tile.is-stopped .shark-face { opacity: .3; filter: drop-shadow(0 14px 18px rgba(0, 0, 0, .44)) saturate(.72); }
-.shark-tile:nth-child(3).is-stopped .shark-face { opacity: 1; filter: drop-shadow(0 20px 24px rgba(0,0,0,.5)) drop-shadow(0 0 18px rgba(var(--machine-light),.14)); }
+.shark-tile.is-prime.is-stopped .shark-face { opacity: 1; filter: drop-shadow(0 20px 24px rgba(0,0,0,.5)) drop-shadow(0 0 18px rgba(var(--machine-light),.14)); }
 
 /* Speed is not one long loop: launch -> full current -> omen -> brake ->
    individually locked witnesses. 16+ perceived passes even on normal routes. */
@@ -1248,11 +1253,11 @@ html.is-oracle-suspended .site-header,html.is-oracle-suspended body[data-page="f
   .oracle-phase-rail>i { height:22px; }
   .oracle-phase-rail>i::after { top:25px; font-size:4px; }
   .slot-window { height:250px; margin-top:14px; }
-  .slot-reel { inset:13px 9px!important; grid-template-columns:.72fr .86fr 1.22fr .86fr .72fr; gap:3px; }
+  .slot-reel { inset:13px 9px!important; grid-template-columns:repeat(var(--reel-count),minmax(0,1fr)); gap:3px; }
   .shark-tile { clip-path:polygon(7px 0,calc(100% - 7px) 0,100% 7px,100% calc(100% - 7px),calc(100% - 7px) 100%,7px 100%,0 calc(100% - 7px),0 7px); }
   .shark-tile>span { top:5px; left:5px; font-size:4px; }
   .shark-face { display:block!important; width:205%!important; height:78%!important; }
-  .shark-tile:nth-child(3) .shark-face { width:150%!important; }
+  .shark-tile.is-prime .shark-face { width:150%!important; }
   .roulette-status { min-height:31px; padding-inline:9px; font-size:6px; letter-spacing:.055em; }
   .result { min-height:164px; margin-top:10px; padding:17px 16px 18px; }
   .result strong { font-size:clamp(27px,9vw,38px); }
@@ -1304,8 +1309,700 @@ html.is-oracle-suspended .site-header,html.is-oracle-suspended body[data-page="f
   .pointer,.roulette-flare,.oracle-crown-field>i,.oracle-intruder,.roulette-fx,.roulette-scene-prop,.oracle-tier-badge>i { animation:none!important; }
   .slot-window[data-reel-motion] .shark-tile { animation:none!important; opacity:1!important; filter:none!important; transform:none!important; }
   .slot-window[data-reel-motion] .shark-tile:not(.is-stopped) .shark-face { opacity:.5; }
-  .slot-window[data-reel-motion] .shark-tile:nth-child(3) .shark-face { opacity:1; }
+  .slot-window[data-reel-motion] .shark-tile.is-prime .shark-face { opacity:1; }
   .result.is-revealing { animation:none!important; }
   html.is-oracle-active body[data-page="fortune"] .photo-background,html.is-oracle-active .site-header { transition:none!important;filter:none!important; }
   html.is-oracle-active .fortune-card,html.is-oracle-active .site-header,html.is-oracle-active .depth-rail,html.is-oracle-active body[data-page="fortune"] .photo-background{transform:none!important;opacity:1!important;clip-path:none!important}
+}
+
+/* ========================================================================== */
+/* ULTIMATE ENTERTAINMENT EXPANSION                                            */
+/* ========================================================================== */
+
+/* The witness cage is now a topology, not a five-column illustration. */
+.slot-reel[data-reel-count="4"] { --reel-count:4; gap:clamp(8px,1.15vw,14px); }
+.slot-reel[data-reel-count="5"] { --reel-count:5; gap:clamp(5px,1vw,11px); }
+.slot-reel[data-reel-count="6"] { --reel-count:6; gap:clamp(4px,.72vw,8px); }
+.slot-reel[data-reel-count="7"] { --reel-count:7; gap:clamp(3px,.52vw,6px); inset-inline:12px!important; }
+.slot-reel[data-reel-count="8"] { --reel-count:8; gap:clamp(2px,.38vw,4px); inset-inline:10px!important; }
+.slot-reel[data-reel-count="4"] .shark-face { width:138%!important; }
+.slot-reel[data-reel-count="5"] .shark-face { width:176%!important; }
+.slot-reel[data-reel-count="6"] .shark-face { width:192%!important; }
+.slot-reel[data-reel-count="7"] .shark-face { width:214%!important; }
+.slot-reel[data-reel-count="8"] .shark-face { width:238%!important; }
+.slot-reel[data-reel-count] .shark-tile.is-prime .shark-face { width:132%!important; }
+.slot-reel[data-reel-count="4"] .shark-tile.is-prime .shark-face { width:118%!important; }
+.slot-reel[data-reel-count="6"] .shark-tile.is-prime .shark-face { width:140%!important; }
+.slot-reel[data-reel-count="7"] .shark-tile.is-prime .shark-face { width:152%!important; }
+.slot-reel[data-reel-count="8"] .shark-tile.is-prime .shark-face { width:164%!important; }
+.slot-reel[data-reel-count="7"] .shark-tile,
+.slot-reel[data-reel-count="8"] .shark-tile { clip-path:polygon(7px 0,calc(100% - 7px) 0,100% 7px,100% calc(100% - 7px),calc(100% - 7px) 100%,7px 100%,0 calc(100% - 7px),0 7px); }
+.slot-reel[data-reel-count="7"] .shark-tile>span,
+.slot-reel[data-reel-count="8"] .shark-tile>span { top:5px;left:5px;font-size:5px;letter-spacing:0; }
+.slot-reel[data-reel-count] .shark-tile.is-prime { z-index:2;box-shadow:inset 0 0 28px rgba(var(--machine-accent),.11),0 0 18px rgba(var(--machine-accent),.08); }
+
+/* Reel grammar: each token changes spatial logic, not only duration. */
+.slot-window[data-reel-motion="waterfall"] .shark-tile { animation:oracle-reel-waterfall .24s linear infinite;animation-delay:var(--witness-delay); }
+.slot-window[data-reel-motion="flow"] .shark-tile { animation:oracle-reel-flow .34s linear infinite;animation-delay:var(--witness-delay); }
+.slot-window[data-reel-motion="orbit"] { perspective:780px; }
+.slot-window[data-reel-motion="orbit"] .shark-tile { animation:oracle-reel-orbit .72s cubic-bezier(.45,.05,.55,.95) infinite;animation-delay:var(--witness-delay);transform-style:preserve-3d; }
+.slot-window[data-reel-motion="viscous"] .shark-tile { animation:oracle-reel-viscous 1.15s cubic-bezier(.7,0,.16,1) infinite;animation-delay:var(--witness-delay);transform-origin:50% 15%; }
+.slot-window[data-reel-motion="sticky"] .shark-tile { animation:oracle-reel-sticky .92s steps(7,end) infinite;animation-delay:var(--witness-delay); }
+.slot-window[data-reel-motion="majestic"] { perspective:1000px; }
+.slot-window[data-reel-motion="majestic"] .shark-tile { animation:oracle-reel-majestic 1.42s cubic-bezier(.2,.7,.18,1) infinite;animation-delay:var(--witness-delay);transform-origin:50% 100%; }
+.slot-window[data-reel-motion="depth-dive"] { perspective:520px; }
+.slot-window[data-reel-motion="depth-dive"] .shark-tile { animation:oracle-reel-depth-dive .92s cubic-bezier(.52,.02,.65,.88) infinite;animation-delay:var(--witness-delay); }
+.slot-window[data-reel-motion="depth-pulse"] .shark-tile { animation:oracle-reel-depth-pulse .78s ease-in-out infinite alternate;animation-delay:var(--witness-delay); }
+.slot-window[data-reel-motion="scatter"] .shark-tile { animation:oracle-reel-scatter .72s cubic-bezier(.5,.02,.46,.98) infinite;animation-delay:var(--witness-delay); }
+.slot-window[data-reel-motion="scatter"] .shark-tile[data-reel-index="0"],
+.slot-window[data-reel-motion="glitch"] .shark-tile[data-reel-index="0"] { --scatter-x:-26%;--scatter-r:-4deg; }
+.slot-window[data-reel-motion="scatter"] .shark-tile[data-reel-index="1"],
+.slot-window[data-reel-motion="glitch"] .shark-tile[data-reel-index="1"] { --scatter-x:18%;--scatter-r:3deg; }
+.slot-window[data-reel-motion="scatter"] .shark-tile[data-reel-index="2"],
+.slot-window[data-reel-motion="glitch"] .shark-tile[data-reel-index="2"] { --scatter-x:-12%;--scatter-r:5deg; }
+.slot-window[data-reel-motion="scatter"] .shark-tile[data-reel-index="3"],
+.slot-window[data-reel-motion="glitch"] .shark-tile[data-reel-index="3"] { --scatter-x:30%;--scatter-r:-5deg; }
+.slot-window[data-reel-motion="scatter"] .shark-tile[data-reel-index="4"],
+.slot-window[data-reel-motion="glitch"] .shark-tile[data-reel-index="4"] { --scatter-x:-20%;--scatter-r:2deg; }
+.slot-window[data-reel-motion="scatter"] .shark-tile[data-reel-index="5"],
+.slot-window[data-reel-motion="glitch"] .shark-tile[data-reel-index="5"] { --scatter-x:13%;--scatter-r:-3deg; }
+.slot-window[data-reel-motion="scatter"] .shark-tile[data-reel-index="6"],
+.slot-window[data-reel-motion="glitch"] .shark-tile[data-reel-index="6"] { --scatter-x:-31%;--scatter-r:6deg; }
+.slot-window[data-reel-motion="scatter"] .shark-tile[data-reel-index="7"],
+.slot-window[data-reel-motion="glitch"] .shark-tile[data-reel-index="7"] { --scatter-x:24%;--scatter-r:-6deg; }
+.slot-window[data-reel-motion="one-accelerates"] .shark-tile { animation:oracle-reel-viscous .96s cubic-bezier(.7,0,.16,1) infinite;animation-delay:var(--witness-delay); }
+.slot-window[data-reel-motion="one-accelerates"] .shark-tile:is(.is-prime,.is-accelerated) { animation:oracle-reel-waterfall .105s linear infinite;box-shadow:inset 0 0 26px rgba(var(--machine-accent),.19),0 0 15px rgba(var(--machine-accent),.13); }
+.slot-window[data-reel-motion="stutter"] .shark-tile { animation:oracle-reel-stutter .66s steps(9,end) infinite;animation-delay:var(--witness-delay); }
+.slot-window[data-reel-motion="selective-respin"] .shark-tile:not(.is-stopped),
+.slot-window[data-reel-motion="selective-respin"] .shark-tile.is-selected { animation:oracle-witness-respin .32s cubic-bezier(.22,.78,.18,1) infinite;animation-delay:var(--witness-delay); }
+.slot-window[data-reel-motion="selective-respin"] .shark-tile.is-stopped:not(.is-selected) { animation:none!important;opacity:.32; }
+.slot-window[data-reel-motion="evacuate"] .shark-tile[data-reel-index="0"],
+.slot-window[data-reel-motion="evacuate"] .shark-tile.is-evacuating { z-index:4;animation:oracle-reel-evacuate 1.05s cubic-bezier(.62,.01,.85,.48) infinite; }
+.slot-window[data-reel-motion="evacuate"] .shark-tile:not([data-reel-index="0"]):not(.is-evacuating) { animation:oracle-reel-gap-close .84s cubic-bezier(.2,.72,.2,1) infinite;animation-delay:var(--witness-delay); }
+.slot-window[data-reel-motion="accordion"] .shark-tile { animation:oracle-reel-accordion 1.16s cubic-bezier(.55,.01,.22,1) infinite;animation-delay:var(--witness-delay); }
+.slot-window[data-reel-motion="race"] .shark-tile { animation:oracle-reel-race .49s cubic-bezier(.35,.04,.62,.96) infinite;animation-delay:var(--witness-delay); }
+.slot-window[data-reel-motion="race"] .shark-tile.is-prime { animation-duration:.34s; }
+.slot-window[data-reel-motion="school-run"] .shark-tile { animation:oracle-reel-school-run .63s cubic-bezier(.36,.02,.64,.98) infinite;animation-delay:var(--witness-delay);transform-origin:50% 100%; }
+.slot-window[data-reel-motion="portal-spin"] { perspective:620px; }
+.slot-window[data-reel-motion="portal-spin"] .shark-tile { animation:oracle-reel-portal 1.02s cubic-bezier(.5,.02,.5,.98) infinite;animation-delay:var(--witness-delay);backface-visibility:hidden; }
+.slot-window[data-reel-motion="power-restart"] .shark-tile { animation:oracle-reel-power-restart 1.28s steps(10,end) infinite;animation-delay:var(--witness-delay); }
+.slot-window[data-reel-motion="glitch"] .shark-tile { animation:oracle-reel-glitch .48s steps(8,end) infinite;animation-delay:var(--witness-delay); }
+.slot-window[data-reel-motion="rewind"] .shark-tile { animation:oracle-reel-rewind .62s cubic-bezier(.65,.02,.28,.98) infinite;animation-delay:var(--witness-delay); }
+
+/* Five schools share assets, but never share an entrance grammar. */
+.oracle-fish-school { position:fixed;z-index:79;inset:0;display:block;overflow:hidden;visibility:hidden;opacity:0;pointer-events:none;contain:strict;perspective:900px; }
+.oracle-fish-school.is-visible { visibility:visible;opacity:1; }
+.oracle-fish-school:not(.is-visible) .oracle-fish { animation:none!important; }
+html.is-oracle-suspended .oracle-fish-school .oracle-fish { animation-play-state:paused!important; }
+.oracle-fish-school .oracle-fish { --fish-x:8%;--fish-y:50%;--fish-size:44px;--fish-delay:0s;--fish-duration:4.6s;--fish-turn:0deg;--fish-depth:1;--fish-body:111,228,235;position:absolute;left:var(--fish-x);top:var(--fish-y);display:block;width:var(--fish-size);height:auto;max-width:none;aspect-ratio:1.65;font-size:var(--fish-size);opacity:.86;transform-origin:center;will-change:translate,rotate,scale,opacity;filter:drop-shadow(0 8px 12px rgba(0,6,20,.44)); }
+.oracle-fish-school .oracle-fish>i { position:absolute;z-index:2;inset:18% 0 18% 23%;display:block;border:1px solid rgba(226,255,255,.5);border-radius:58% 48% 48% 58%;background:radial-gradient(circle at 76% 37%,#f6ffff 0 3%,#12384b 4% 7%,transparent 8%),linear-gradient(145deg,rgba(239,255,255,.76),rgba(var(--fish-body),.9) 38%,rgba(13,82,102,.9));box-shadow:inset 0 -4px 7px rgba(0,20,42,.25); }
+.oracle-fish-school .oracle-fish>i::before { content:"";position:absolute;left:34%;bottom:-28%;width:36%;height:42%;background:rgba(var(--fish-body),.58);clip-path:polygon(0 0,100% 18%,42% 100%); }
+.oracle-fish-school .oracle-fish>b { position:absolute;z-index:1;left:0;top:19%;display:block;width:34%;height:62%;background:linear-gradient(90deg,rgba(var(--fish-body),.18),rgba(var(--fish-body),.82));clip-path:polygon(0 50%,100% 0,78% 50%,100% 100%); }
+.oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish { --fish-body:111,229,239;aspect-ratio:2.2; }
+.oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish>i { inset-block:27%;border-radius:62% 45% 45% 62%; }
+.oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish>b { top:27%;height:46%; }
+.oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish { --fish-body:231,211,124;aspect-ratio:1.42; }
+.oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish::after { content:"♛";position:absolute;z-index:4;left:45%;top:-43%;color:#ffe89a;font:900 .62em var(--display);text-shadow:0 2px 7px rgba(0,6,20,.6); }
+.oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish>i { inset:11% 0 11% 25%;border-radius:54%; }
+.oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish>b { top:14%;height:72%; }
+.oracle-fish-school:is(.school-golden,[data-school="golden"]) .oracle-fish { --fish-body:255,216,92;aspect-ratio:2.05; }
+.oracle-fish-school:is(.school-golden,[data-school="golden"]) .oracle-fish>i { inset-block:22%;box-shadow:inset 0 -5px 8px rgba(90,47,2,.2),0 0 13px rgba(255,218,96,.42); }
+.oracle-fish-school:is(.school-golden,[data-school="golden"]) .oracle-fish>i::before { left:20%;bottom:-38%;width:58%;height:54%;clip-path:polygon(0 0,100% 0,44% 100%); }
+.oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish { --fish-body:69,141,167;aspect-ratio:1.16; }
+.oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish::before { content:"";position:absolute;z-index:4;left:56%;top:-26%;width:38%;height:42%;border-top:2px solid rgba(152,245,240,.76);border-right:2px solid rgba(152,245,240,.76);border-radius:0 100% 0 0;box-shadow:8px -2px 5px -4px #b8fff2; }
+.oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish>i { inset:4% 0 4% 18%;border-radius:58%;background:radial-gradient(circle at 75% 35%,#d9ffff 0 4%,#001b2d 5% 10%,transparent 11%),radial-gradient(circle at 42% 54%,rgba(103,245,220,.2),transparent 42%),#092c45; }
+.oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish>b { top:13%;height:74%; }
+.oracle-fish-school:is(.school-naoking,[data-school="naoking"]) .oracle-fish { --fish-body:111,224,222;aspect-ratio:1.28; }
+.oracle-fish-school:is(.school-naoking,[data-school="naoking"]) .oracle-fish::after { content:"♛";position:absolute;z-index:4;left:43%;top:-35%;color:#ffe58d;font:900 .58em var(--display); }
+.oracle-fish-school:is(.school-naoking,[data-school="naoking"]) .oracle-fish>i { inset:5% 0 5% 20%;border-radius:48% 55% 50% 48%;background:radial-gradient(circle at 68% 35%,#f8ffff 0 4%,#153346 5% 9%,transparent 10%),radial-gradient(circle at 46% 66%,rgba(2,34,47,.82) 0 7%,transparent 8%),linear-gradient(145deg,#eafff7,rgba(var(--fish-body),.92) 42%,#176078); }
+.oracle-fish-school .oracle-fish:nth-child(2n) { --fish-y:24%;--fish-size:34px;--fish-delay:-.7s; }
+.oracle-fish-school .oracle-fish:nth-child(3n) { --fish-y:72%;--fish-size:27px;--fish-delay:-1.45s; }
+.oracle-fish-school .oracle-fish:nth-child(4n) { --fish-y:39%;--fish-size:52px;--fish-delay:-2.1s; }
+.oracle-fish-school .oracle-fish:nth-child(5n) { --fish-y:84%;--fish-size:22px;--fish-delay:-2.8s; }
+.oracle-fish-school .oracle-fish:nth-child(7n) { --fish-y:11%;--fish-size:30px;--fish-delay:-3.35s; }
+
+.oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish { animation:oracle-school-cross var(--fish-duration) linear infinite;animation-delay:calc(0s - var(--fish-delay)); }
+.oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish:nth-child(3n) { animation-name:oracle-school-cross-low; }
+.oracle-fish-school:is(.school-royal,[data-school="royal"]) { transform-style:preserve-3d; }
+.oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish { left:50%;top:50%;width:calc(var(--fish-size) + 7px);animation:oracle-school-orbit var(--fish-duration) cubic-bezier(.45,.04,.55,.96) infinite;animation-delay:calc(0s - var(--fish-delay)); }
+.oracle-fish-school:is(.school-golden,[data-school="golden"]) .oracle-fish { animation:oracle-school-absorb var(--fish-duration) cubic-bezier(.58,.02,.8,.54) infinite;animation-delay:calc(0s - var(--fish-delay)); }
+.oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish { left:50%;top:50%;width:calc(var(--fish-size) + 24px);animation:oracle-school-depth var(--fish-duration) cubic-bezier(.26,.03,.72,.96) infinite;animation-delay:calc(0s - var(--fish-delay));filter:blur(var(--fish-blur,1px)) drop-shadow(0 14px 24px rgba(0,3,14,.62)); }
+.oracle-fish-school:is(.school-naoking,[data-school="naoking"]) .oracle-fish { left:50%;top:50%;animation:oracle-school-spiral var(--fish-duration) cubic-bezier(.47,.02,.53,.98) infinite;animation-delay:calc(0s - var(--fish-delay)); }
+.oracle-fish-school:is(.motion-cross,[data-motion="cross"]) .oracle-fish { animation-name:oracle-school-cross; }
+.oracle-fish-school:is(.motion-orbit,[data-motion="orbit"]) .oracle-fish { left:50%;top:50%;animation-name:oracle-school-orbit; }
+.oracle-fish-school:is(.motion-absorb,[data-motion="absorb"]) .oracle-fish { animation-name:oracle-school-absorb; }
+.oracle-fish-school:is(.motion-depth,[data-motion="depth"]) .oracle-fish { left:50%;top:50%;animation-name:oracle-school-depth; }
+.oracle-fish-school:is(.motion-spiral,[data-motion="spiral"]) .oracle-fish { left:50%;top:50%;animation-name:oracle-school-spiral; }
+
+html.oracle-world-fish-school-small .oracle-environment::before { background:repeating-linear-gradient(12deg,transparent 0 42px,rgba(132,239,245,.09) 43px 45px,transparent 46px 86px);animation:oracle-expansion-current-cross 1.2s linear infinite; }
+html.oracle-world-fish-school-royal .oracle-environment::before { background:repeating-radial-gradient(ellipse at 50% 48%,transparent 0 8vw,rgba(255,226,133,.08) 8.1vw 8.35vw);animation:oracle-expansion-world-orbit 3.4s linear infinite; }
+html.oracle-world-fish-school-golden .oracle-environment::before { background:conic-gradient(from 0deg at 50% 52%,transparent 0 8%,rgba(255,222,111,.16) 9% 10%,transparent 11% 22%);animation:oracle-expansion-world-absorb 2.4s ease-in infinite; }
+html.oracle-world-fish-school-abyss body[data-page="fortune"] .photo-background { animation:oracle-expansion-world-depth 3.1s cubic-bezier(.28,.03,.7,.96) infinite alternate;filter:brightness(.42) saturate(.58)!important; }
+html.oracle-world-fish-school-naoking .fortune-card { animation:oracle-expansion-world-overload .62s steps(6,end) infinite; }
+
+@keyframes oracle-reel-waterfall { 0%{translate:0 -42%;filter:blur(1px)}100%{translate:0 42%;filter:blur(1px)} }
+@keyframes oracle-reel-flow { 0%{translate:-7% -36%;rotate:-1deg}50%{translate:5% 0;rotate:1deg}100%{translate:-7% 36%;rotate:-1deg} }
+@keyframes oracle-reel-orbit { 0%{transform:rotateX(-68deg) translateY(-28%) translateZ(-70px)}50%{transform:rotateX(0) translateY(0) translateZ(34px)}100%{transform:rotateX(68deg) translateY(28%) translateZ(-70px)} }
+@keyframes oracle-reel-viscous { 0%,18%{translate:0 -28%;scale:1 .72}42%,68%{translate:0 7%;scale:1 1.24}82%,100%{translate:0 30%;scale:1 .82} }
+@keyframes oracle-reel-sticky { 0%,22%{translate:0 -25%}23%,48%{translate:0 -7%}49%,76%{translate:0 12%}77%,100%{translate:0 28%} }
+@keyframes oracle-reel-majestic { 0%{transform:rotateX(-12deg) translateY(-20%) scale(.94);opacity:.48}48%{transform:rotateX(0) translateY(0) scale(1.035);opacity:1}100%{transform:rotateX(12deg) translateY(20%) scale(.94);opacity:.48} }
+@keyframes oracle-reel-depth-dive { 0%{transform:translateZ(150px) translateY(-20%) scale(1.3);opacity:1}100%{transform:translateZ(-220px) translateY(34%) scale(.42);opacity:.18} }
+@keyframes oracle-reel-depth-pulse { 0%{transform:translateZ(-80px) scale(.76);filter:brightness(.62)}100%{transform:translateZ(48px) scale(1.08);filter:brightness(1.18)} }
+@keyframes oracle-reel-scatter { 0%{translate:0 -38%;rotate:0deg}46%{translate:var(--scatter-x) 3%;rotate:var(--scatter-r)}100%{translate:0 38%;rotate:0deg} }
+@keyframes oracle-reel-stutter { 0%,12%{translate:0 -26%}13%,31%{translate:0 11%}32%,54%{translate:0 -4%}55%,70%{translate:0 28%}71%,100%{translate:0 6%} }
+@keyframes oracle-reel-evacuate { 0%,22%{translate:0 -25%;rotate:0}58%{translate:-115% 4%;rotate:-12deg;opacity:1}100%{translate:-240% -32%;rotate:-28deg;opacity:0} }
+@keyframes oracle-reel-gap-close { 0%,48%{translate:0 -22%}72%,100%{translate:-8% 24%} }
+@keyframes oracle-reel-accordion { 0%,100%{scale:.56 1;translate:-16% -22%}45%{scale:1.34 .82;translate:12% 3%}68%{scale:.78 1.12;translate:-5% 24%} }
+@keyframes oracle-reel-race { 0%{translate:0 38%;scale:.94}45%{translate:0 -11%;scale:1.04}100%{translate:0 -38%;scale:.94} }
+@keyframes oracle-reel-school-run { 0%,100%{translate:-7% 24%;rotate:-2deg;scale:1 .9}50%{translate:7% -24%;rotate:2deg;scale:1 1.08} }
+@keyframes oracle-reel-portal { 0%{transform:rotateY(0) translateY(-20%) scale(.86)}50%{transform:rotateY(180deg) translateY(8%) scale(1.08)}100%{transform:rotateY(360deg) translateY(28%) scale(.86)} }
+@keyframes oracle-reel-power-restart { 0%,12%{opacity:.03;transform:scaleY(.05)}13%,26%{opacity:.8;transform:scaleY(1)}27%,45%{opacity:.12;transform:scaleY(.18)}46%,100%{opacity:1;transform:scaleY(1) translateY(24%)} }
+@keyframes oracle-reel-glitch { 0%{translate:0 -28%}18%{translate:var(--scatter-x) 6%;clip-path:inset(0 0 62%)}36%{translate:calc(0% - var(--scatter-x)) -2%;clip-path:inset(31% 0 24%)}55%{translate:9% 23%;clip-path:inset(66% 0 0)}100%{translate:0 -28%;clip-path:inset(0)} }
+@keyframes oracle-reel-rewind { 0%{translate:0 32%;scale:1 .88}44%{translate:0 -8%;scale:1 1.15}100%{translate:0 -34%;scale:1 .9} }
+@keyframes oracle-school-cross { 0%{translate:-18vw 0;rotate:var(--fish-turn);opacity:0}10%{opacity:.88}55%{translate:46vw -4vh;opacity:.9}100%{translate:110vw 3vh;opacity:0} }
+@keyframes oracle-school-cross-low { 0%{translate:-22vw 0;opacity:0}12%{opacity:.72}52%{translate:48vw 7vh}100%{translate:112vw -3vh;opacity:0} }
+@keyframes oracle-school-orbit { 0%{translate:-50% -50%;transform:rotate(0) translateX(clamp(110px,31vw,440px)) rotate(0);scale:.62;opacity:0}12%{opacity:.9}50%{transform:rotate(180deg) translateX(clamp(110px,31vw,440px)) rotate(-180deg);scale:1.08}100%{translate:-50% -50%;transform:rotate(360deg) translateX(clamp(110px,31vw,440px)) rotate(-360deg);scale:.62;opacity:0} }
+@keyframes oracle-school-absorb { 0%{translate:calc(-26vw - var(--fish-x)) calc(-20vh - var(--fish-y));scale:1.25;opacity:0}15%{opacity:.92}74%{translate:calc(50vw - var(--fish-x)) calc(52vh - var(--fish-y));scale:.48;opacity:.92}100%{translate:calc(50vw - var(--fish-x)) calc(52vh - var(--fish-y));scale:.04;opacity:0} }
+@keyframes oracle-school-depth { 0%{translate:-50% -50%;scale:.03;opacity:0}20%{opacity:.16}67%{scale:1.08;opacity:.72}100%{translate:calc(-50% + var(--fish-x)) calc(-50% + var(--fish-y));scale:5.2;opacity:0} }
+@keyframes oracle-school-spiral { 0%{translate:-50% -50%;transform:rotate(0) translateX(46vw) rotate(0);scale:.25;opacity:0}12%{opacity:.92}72%{transform:rotate(660deg) translateX(10vw) rotate(-660deg);scale:1.08}100%{translate:-50% -50%;transform:rotate(900deg) translateX(2vw) rotate(-900deg);scale:.05;opacity:0} }
+@keyframes oracle-expansion-current-cross { to{background-position:86px 0} }
+@keyframes oracle-expansion-world-orbit { to{transform:rotate(360deg) scale(1.12)} }
+@keyframes oracle-expansion-world-absorb { 0%{transform:scale(1.5) rotate(-16deg);opacity:0}70%{opacity:1}100%{transform:scale(.18) rotate(18deg);opacity:0} }
+@keyframes oracle-expansion-world-depth { from{transform:scale(1.02);filter:brightness(.42) saturate(.58)}to{transform:scale(1.14);filter:brightness(.28) saturate(.42)} }
+@keyframes oracle-expansion-world-overload { 0%,100%{translate:0 0}20%{translate:-3px 1px}40%{translate:4px -2px}60%{translate:-2px -1px}80%{translate:3px 2px} }
+
+/* Expansion scenes keep the copy readable while the surrounding silhouette changes. */
+.oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) { --scene-accent:153,236,242;--scene-gold:255,225,132; }
+.oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) .oracle-chaos-copy { border-inline-start:1px solid rgba(var(--scene-accent),.2);background:linear-gradient(90deg,rgba(0,12,27,.82),rgba(0,12,27,.52) 82%,transparent);text-shadow:0 2px 12px rgba(0,4,16,.72); }
+.oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) .oracle-event-props { z-index:1; }
+.oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) .oracle-event-props>i,
+.oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) .oracle-event-props>b,
+.oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) .oracle-event-props>span { opacity:1; }
+
+/* 01 — seven witness registry: a wide evidentiary cage with a blinking extra cell. */
+.oracle-chaos-stage.scene-seventh-witness::before { background:repeating-linear-gradient(90deg,rgba(133,235,243,.055) 0 calc(14.285% - 1px),rgba(196,250,251,.22) calc(14.285% - 1px) 14.285%),linear-gradient(180deg,rgba(1,17,34,.5),rgba(1,10,25,.95));backdrop-filter:blur(3px); }
+.oracle-chaos-stage.scene-seventh-witness .oracle-chaos-panel { grid-template-columns:minmax(150px,220px) minmax(300px,1fr) minmax(110px,160px);width:min(96vw,1180px);min-height:310px;border:2px solid rgba(161,239,244,.34);background:linear-gradient(90deg,rgba(4,38,53,.97),rgba(2,18,35,.98));clip-path:polygon(0 8%,4% 8%,4% 0,96% 0,96% 8%,100% 8%,100% 92%,96% 92%,96% 100%,4% 100%,4% 92%,0 92%); }
+.oracle-chaos-stage.scene-seventh-witness .oracle-chaos-panel::before { content:"WITNESS 01  ·  02  ·  03  ·  04  ·  05  ·  06  ·  07 UNREGISTERED";position:absolute;top:12px;inset-inline:5%;color:rgba(201,248,250,.48);font:700 8px var(--mono);letter-spacing:.17em;white-space:nowrap;text-align:center; }
+.oracle-chaos-stage.scene-seventh-witness .oracle-chaos-panel::after { content:"";position:absolute;inset:42px 2% 16px;z-index:-1;background:repeating-linear-gradient(90deg,transparent 0 calc(14.285% - 1px),rgba(159,239,243,.16) calc(14.285% - 1px) 14.285%); }
+.scene-seventh-witness .oracle-chaos-image { animation:oracle-scene-witness-scan 1.2s steps(7,end) both; }
+.scene-seventh-witness.phase-twist .oracle-chaos-panel { animation:oracle-scene-seventh-expand 1.28s cubic-bezier(.15,.82,.18,1) both; }
+.scene-seventh-witness .oracle-event-props>i { top:19%;width:9.5vw;height:58%;border:1px solid rgba(171,242,246,.2);background:repeating-linear-gradient(180deg,rgba(175,245,248,.08) 0 1px,transparent 1px 7px); }
+.scene-seventh-witness .oracle-event-props>i:nth-child(1){left:4%}.scene-seventh-witness .oracle-event-props>i:nth-child(2){left:17%}.scene-seventh-witness .oracle-event-props>i:nth-child(3){right:17%}.scene-seventh-witness .oracle-event-props>i:nth-child(4){right:4%;border-color:rgba(255,221,119,.5);animation:oracle-scene-witness-alert .38s steps(2,end) infinite}
+.scene-seventh-witness .oracle-event-props>b { right:4%;top:11%;color:#ffe28a;font:900 clamp(28px,5vw,68px)/1 var(--mono);animation:oracle-scene-witness-alert .38s steps(2,end) infinite; }
+.scene-seventh-witness .oracle-event-props>b::before { content:"07?"; }
+.scene-seventh-witness .oracle-event-props>span { left:0;right:0;top:24%;height:2px;background:rgba(202,252,255,.72);box-shadow:0 0 18px rgba(125,235,244,.55);animation:oracle-scene-registry-scan 1.35s linear infinite; }
+
+/* 02 — evacuation: the image physically leaves a vacancy and the cage closes behind it. */
+.oracle-chaos-stage.scene-witness-evacuation { place-items:end stretch;padding-inline:0; }
+.oracle-chaos-stage.scene-witness-evacuation::before { background:linear-gradient(180deg,rgba(2,15,31,.64),rgba(2,25,39,.96) 70%),repeating-linear-gradient(100deg,transparent 0 11vw,rgba(166,239,241,.07) 11.1vw 11.3vw); }
+.oracle-chaos-stage.scene-witness-evacuation .oracle-chaos-panel { grid-template-columns:minmax(120px,210px) minmax(270px,640px) 120px;width:100%;min-height:235px;border-inline:0;border-bottom:0;background:linear-gradient(90deg,transparent 0 6%,rgba(4,36,50,.96) 14% 86%,transparent 94%);box-shadow:0 -24px 70px rgba(0,7,19,.48); }
+.oracle-chaos-stage.scene-witness-evacuation .oracle-chaos-panel::before { content:"VACATED";position:absolute;left:4%;top:18%;bottom:18%;display:grid;width:13%;place-items:center;border:2px dashed rgba(255,205,110,.42);color:rgba(255,223,138,.52);font:800 10px var(--mono);letter-spacing:.16em; }
+.scene-witness-evacuation .oracle-chaos-image { animation:oracle-scene-evacuate-image 1.7s cubic-bezier(.62,.01,.85,.48) both; }
+.scene-witness-evacuation.phase-twist .oracle-chaos-image { animation-direction:reverse; }
+.scene-witness-evacuation .oracle-event-props>i { left:-8%;top:22%;width:26%;height:6px;background:linear-gradient(90deg,transparent,#eafefe,transparent);transform:skewX(-35deg);animation:oracle-scene-evacuation-stream 1s linear infinite; }
+.scene-witness-evacuation .oracle-event-props>i:nth-child(2){top:37%;animation-delay:-.24s}.scene-witness-evacuation .oracle-event-props>i:nth-child(3){top:64%;animation-delay:-.5s}.scene-witness-evacuation .oracle-event-props>i:nth-child(4){top:78%;animation-delay:-.73s}
+.scene-witness-evacuation .oracle-event-props>b { right:5%;top:16%;color:#ffe59b;font:900 clamp(38px,7vw,94px) var(--mono);animation:oracle-scene-exit-sign .7s steps(2,end) infinite; }
+.scene-witness-evacuation .oracle-event-props>b::before { content:"EXIT →"; }
+
+/* 03 — accordion: the machine folds through depth before exposing the sixth rib. */
+.oracle-chaos-stage.scene-accordion-reel { perspective:1200px; }
+.oracle-chaos-stage.scene-accordion-reel::before { background:repeating-linear-gradient(90deg,rgba(2,18,36,.92) 0 7vw,rgba(52,111,119,.4) 7vw 7.2vw,rgba(0,8,20,.95) 7.3vw 14vw);animation:oracle-scene-accordion-bg 1.4s ease-in-out infinite alternate; }
+.oracle-chaos-stage.scene-accordion-reel .oracle-chaos-panel { grid-template-columns:190px minmax(290px,1fr) 160px;width:min(94vw,1100px);min-height:285px;border-inline:9px double rgba(163,236,240,.3);background:repeating-linear-gradient(90deg,rgba(120,224,231,.06) 0 7%,rgba(0,7,20,.18) 7.1% 14%),linear-gradient(105deg,rgba(5,40,54,.98),rgba(2,18,36,.98));transform-style:preserve-3d;animation:oracle-scene-accordion-panel 1.7s cubic-bezier(.22,.75,.18,1) both; }
+.scene-accordion-reel.phase-twist .oracle-chaos-panel { animation-name:oracle-scene-accordion-rewind; }
+.scene-accordion-reel .oracle-chaos-panel>b { border-inline:1px solid rgba(255,225,135,.36);color:#ffe393;font-size:clamp(38px,7vw,86px);animation:oracle-scene-rib-count .9s steps(6,end) infinite; }
+.scene-accordion-reel .oracle-event-props>i { top:10%;bottom:10%;width:7vw;border-inline:1px solid rgba(177,244,246,.2);background:linear-gradient(90deg,transparent,rgba(150,235,241,.06),transparent);animation:oracle-scene-rib-fold 1.25s ease-in-out infinite alternate; }
+.scene-accordion-reel .oracle-event-props>i:nth-child(1){left:8%}.scene-accordion-reel .oracle-event-props>i:nth-child(2){left:30%;animation-delay:-.3s}.scene-accordion-reel .oracle-event-props>i:nth-child(3){right:30%;animation-delay:-.6s}.scene-accordion-reel .oracle-event-props>i:nth-child(4){right:8%;animation-delay:-.9s}
+
+/* 04 — race: a low horizon, seven lanes and a finish mast replace the oracle card. */
+.oracle-chaos-stage.scene-naoking-race { place-items:end stretch;padding:0 0 clamp(34px,7vh,74px); }
+.oracle-chaos-stage.scene-naoking-race::before { background:repeating-linear-gradient(100deg,transparent 0 6vw,rgba(197,249,250,.08) 6.1vw 6.3vw),linear-gradient(180deg,rgba(10,76,95,.54),rgba(1,14,30,.96) 68%);animation:oracle-scene-race-current .48s linear infinite; }
+.oracle-chaos-stage.scene-naoking-race .oracle-chaos-panel { grid-template-columns:minmax(180px,28%) minmax(300px,1fr) 170px;width:100%;min-height:245px;border:0;border-block:2px solid rgba(206,249,249,.36);background:linear-gradient(90deg,rgba(3,25,42,.94),rgba(7,55,65,.96) 58%,rgba(2,18,35,.98));clip-path:polygon(0 13%,73% 13%,76% 0,100% 0,100% 100%,0 100%); }
+.scene-naoking-race .oracle-chaos-image { animation:oracle-scene-racer 1.15s cubic-bezier(.25,.6,.22,1) infinite; }
+.scene-naoking-race.phase-twist .oracle-chaos-image { animation-duration:.42s; }
+.scene-naoking-race .oracle-event-props>i { left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(223,255,255,.52),transparent);animation:oracle-scene-lane-rush .52s linear infinite; }
+.scene-naoking-race .oracle-event-props>i:nth-child(1){top:26%}.scene-naoking-race .oracle-event-props>i:nth-child(2){top:43%;animation-delay:-.13s}.scene-naoking-race .oracle-event-props>i:nth-child(3){top:61%;animation-delay:-.26s}.scene-naoking-race .oracle-event-props>i:nth-child(4){top:79%;animation-delay:-.39s}
+.scene-naoking-race .oracle-event-props>b { right:10%;top:5%;width:8px;height:86%;background:repeating-linear-gradient(#f4fbec 0 10px,#10243a 10px 20px);box-shadow:0 0 0 2px rgba(234,255,255,.24); }
+.scene-naoking-race .oracle-event-props>span { right:3%;top:9%;width:12vw;height:13vh;background:repeating-conic-gradient(#edf8df 0 25%,#13243c 0 50%) 0/24px 24px;clip-path:polygon(0 0,100% 0,84% 100%,0 78%); }
+
+/* 05 — school dash: perspective corridor and a closing gate create a vertical sprint. */
+.oracle-chaos-stage.scene-royal-school-dash { place-items:end center;perspective:900px; }
+.oracle-chaos-stage.scene-royal-school-dash::before { background:linear-gradient(115deg,rgba(14,64,83,.85),rgba(1,14,31,.96) 50%,rgba(30,57,70,.88));clip-path:polygon(0 0,100% 0,83% 100%,17% 100%); }
+.oracle-chaos-stage.scene-royal-school-dash .oracle-chaos-panel { grid-template-columns:170px minmax(280px,580px) 130px;width:min(80vw,850px);min-height:330px;border:8px double rgba(186,238,235,.24);background:linear-gradient(90deg,rgba(15,48,57,.98),rgba(2,18,34,.98) 22% 78%,rgba(15,48,57,.98));transform:perspective(900px) rotateX(4deg);clip-path:polygon(8% 0,92% 0,100% 100%,0 100%); }
+.scene-royal-school-dash .oracle-chaos-image { animation:oracle-scene-school-sprint .58s cubic-bezier(.35,.02,.65,.98) infinite; }
+.scene-royal-school-dash .oracle-event-props>i { top:7%;bottom:0;width:3px;background:linear-gradient(rgba(240,255,255,.7),transparent);transform-origin:50% 100%; }
+.scene-royal-school-dash .oracle-event-props>i:nth-child(1){left:17%;rotate:-17deg}.scene-royal-school-dash .oracle-event-props>i:nth-child(2){left:37%;rotate:-6deg}.scene-royal-school-dash .oracle-event-props>i:nth-child(3){right:37%;rotate:6deg}.scene-royal-school-dash .oracle-event-props>i:nth-child(4){right:17%;rotate:17deg}
+.scene-royal-school-dash .oracle-event-props>b { left:12%;right:12%;top:11%;height:22%;border:7px double rgba(226,249,243,.46);background:repeating-linear-gradient(90deg,rgba(166,224,218,.12) 0 9%,rgba(0,12,28,.68) 9.5% 18%);animation:oracle-scene-school-gate 2s cubic-bezier(.65,.02,.8,.68) both; }
+.scene-royal-school-dash.phase-twist .oracle-event-props>b { animation-direction:reverse; }
+.scene-royal-school-dash .oracle-event-props>span { top:7%;left:50%;color:#ffe299;font:900 clamp(22px,4vw,52px) var(--mono);translate:-50% 0; }
+.scene-royal-school-dash .oracle-event-props>span::before { content:"00:10"; }
+
+/* 06 — realistic dive: a tall viewport, depth strata and an approaching shadow. */
+.oracle-chaos-stage.scene-realistic-deep-dive { place-items:center start;padding-left:clamp(18px,8vw,120px);perspective:1000px; }
+.oracle-chaos-stage.scene-realistic-deep-dive::before { background:radial-gradient(ellipse at 62% 82%,rgba(109,222,226,.12),transparent 22%),linear-gradient(180deg,rgba(48,131,151,.28),rgba(1,18,39,.97) 58%,#000916);animation:oracle-scene-dive-darken 3.4s ease-in-out infinite alternate; }
+.oracle-chaos-stage.scene-realistic-deep-dive .oracle-chaos-panel { grid-template-columns:minmax(150px,220px) minmax(250px,520px) 130px;width:min(68vw,800px);min-height:68vh;border:0;border-left:2px solid rgba(174,241,245,.32);background:linear-gradient(90deg,rgba(2,20,38,.9),rgba(2,13,28,.72),transparent);box-shadow:none;clip-path:polygon(0 0,92% 0,100% 9%,88% 100%,0 100%); }
+.scene-realistic-deep-dive .oracle-chaos-image { animation:oracle-scene-diver-depth 3.1s cubic-bezier(.32,.03,.7,.96) infinite alternate; }
+.scene-realistic-deep-dive.phase-twist .oracle-chaos-panel::after { content:"";position:absolute;z-index:-1;inset:8% -38% 8% 42%;border-radius:52%;background:radial-gradient(ellipse,rgba(0,2,9,.94),rgba(0,3,12,.82) 48%,transparent 72%);animation:oracle-scene-leviathan 2.1s ease-in-out both; }
+.scene-realistic-deep-dive .oracle-event-props>i { left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(165,237,241,.22),transparent); }
+.scene-realistic-deep-dive .oracle-event-props>i:nth-child(1){top:18%}.scene-realistic-deep-dive .oracle-event-props>i:nth-child(2){top:39%}.scene-realistic-deep-dive .oracle-event-props>i:nth-child(3){top:61%}.scene-realistic-deep-dive .oracle-event-props>i:nth-child(4){top:83%}
+.scene-realistic-deep-dive .oracle-event-props>b { right:6%;top:12%;bottom:10%;width:34px;border-inline:1px solid rgba(177,239,242,.3);background:repeating-linear-gradient(180deg,rgba(203,250,251,.42) 0 1px,transparent 1px 11%); }
+.scene-realistic-deep-dive .oracle-event-props>span { left:56%;top:68%;width:12px;aspect-ratio:1;border:1px solid rgba(213,252,253,.62);border-radius:50%;box-shadow:52px -90px 0 -3px rgba(202,249,251,.4),-34px 72px 0 4px rgba(171,237,241,.22);animation:oracle-scene-dive-bubbles 2.8s ease-in infinite; }
+
+/* 07 — portal: concentric rings rotate in opposite planes around a stable text dock. */
+.oracle-chaos-stage.scene-portal-panic { perspective:1000px; }
+.oracle-chaos-stage.scene-portal-panic::before { background:repeating-radial-gradient(ellipse at 50% 50%,rgba(85,221,236,.04) 0 6vw,rgba(171,244,247,.16) 6.1vw 6.25vw),linear-gradient(105deg,rgba(9,13,48,.96),rgba(0,42,61,.91),rgba(40,18,59,.95));animation:oracle-scene-portal-field 3s linear infinite; }
+.oracle-chaos-stage.scene-portal-panic .oracle-chaos-panel { grid-template-columns:220px minmax(280px,560px) 160px;width:min(88vw,940px);min-height:430px;border:2px solid rgba(157,237,244,.36);border-radius:46%;background:radial-gradient(circle at 20% 50%,rgba(87,226,238,.18),transparent 24%),linear-gradient(90deg,rgba(6,26,52,.94),rgba(3,14,34,.96));box-shadow:0 0 0 12px rgba(114,231,240,.04),0 0 0 32px rgba(138,86,219,.035),0 30px 100px rgba(0,2,18,.7); }
+.scene-portal-panic .oracle-chaos-image { animation:oracle-scene-portal-avatar 1.8s cubic-bezier(.5,.02,.5,.98) infinite; }
+.scene-portal-panic.phase-twist .oracle-chaos-image { animation-direction:reverse; }
+.scene-portal-panic .oracle-event-props>i { left:50%;top:50%;border:2px solid rgba(143,235,242,.3);border-radius:50%;translate:-50% -50%;animation:oracle-scene-portal-ring 2.3s linear infinite; }
+.scene-portal-panic .oracle-event-props>i:nth-child(1){width:38vw;aspect-ratio:1}.scene-portal-panic .oracle-event-props>i:nth-child(2){width:52vw;aspect-ratio:1;animation-direction:reverse;animation-duration:3.1s}.scene-portal-panic .oracle-event-props>i:nth-child(3){width:68vw;aspect-ratio:1;animation-duration:4s}.scene-portal-panic .oracle-event-props>i:nth-child(4){width:84vw;aspect-ratio:1;animation-direction:reverse;animation-duration:5s}
+.scene-portal-panic .oracle-event-props>b { left:50%;top:50%;width:18vw;aspect-ratio:1;border:1px solid rgba(255,225,131,.5);border-radius:50%;translate:-50% -50%;box-shadow:inset 0 0 44px rgba(106,230,241,.18),0 0 54px rgba(129,91,221,.19); }
+
+/* 08 — power cycle: a rigid service rack blacks out one bus at a time. */
+.oracle-chaos-stage.scene-machine-power-cycle::before { background:repeating-linear-gradient(0deg,rgba(131,228,235,.035) 0 1px,transparent 1px 6px),linear-gradient(90deg,#010612,#061d2d,#010612);animation:oracle-scene-power-room 2.25s steps(9,end) infinite; }
+.oracle-chaos-stage.scene-machine-power-cycle .oracle-chaos-panel { grid-template-columns:190px minmax(300px,1fr) 180px;width:min(90vw,960px);min-height:390px;border:10px double rgba(150,218,223,.22);background:repeating-linear-gradient(90deg,rgba(126,220,226,.04) 0 16%,rgba(0,6,17,.22) 16.3% 20%),linear-gradient(#092d39,#020d1c);box-shadow:inset 0 0 0 14px rgba(0,3,12,.38),0 35px 90px rgba(0,0,0,.7); }
+.scene-machine-power-cycle .oracle-chaos-panel::before { content:"POWER BUS 01     02     03     04     05";position:absolute;top:13px;inset-inline:5%;color:rgba(191,242,241,.42);font:700 8px var(--mono);letter-spacing:.13em;text-align:center; }
+.scene-machine-power-cycle .oracle-chaos-panel>b { display:grid;place-items:center;min-height:170px;border:3px solid rgba(196,235,224,.22);background:radial-gradient(circle,rgba(255,216,117,.13),transparent 52%),#03101f;color:#f4d878;font-size:clamp(34px,7vw,78px);animation:oracle-scene-power-gauge 1.5s steps(10,end) infinite; }
+.scene-machine-power-cycle .oracle-event-props>i { top:17%;width:12px;aspect-ratio:1;border-radius:50%;background:#b8ffdf;box-shadow:0 0 18px #80f5cd;animation:oracle-scene-power-lamp 1.4s steps(2,end) infinite; }
+.scene-machine-power-cycle .oracle-event-props>i:nth-child(1){left:22%}.scene-machine-power-cycle .oracle-event-props>i:nth-child(2){left:40%;animation-delay:.28s}.scene-machine-power-cycle .oracle-event-props>i:nth-child(3){left:58%;animation-delay:.56s}.scene-machine-power-cycle .oracle-event-props>i:nth-child(4){left:76%;animation-delay:.84s}
+.scene-machine-power-cycle .oracle-event-props>b { left:8%;right:8%;bottom:9%;height:7px;background:linear-gradient(90deg,#81e7d8 0 20%,transparent 20% 40%,#f1cf78 40% 60%,transparent 60% 80%,#e06b71 80%);animation:oracle-scene-power-bus 1.5s steps(5,end) infinite; }
+.scene-machine-power-cycle.phase-twist .oracle-chaos-panel { animation:oracle-scene-emergency-boot 1.35s steps(9,end) both; }
+
+/* 09 — UI collapse: layout fragments obey gravity, copy remains an anchored recovery console. */
+.oracle-chaos-stage.scene-oracle-ui-collapse::before { background:linear-gradient(172deg,rgba(3,47,61,.76),rgba(0,6,18,.96)),repeating-linear-gradient(90deg,transparent 0 9vw,rgba(185,241,243,.06) 9.1vw 9.2vw); }
+.oracle-chaos-stage.scene-oracle-ui-collapse .oracle-chaos-panel { grid-template-columns:180px minmax(300px,1fr) 180px;width:min(92vw,1000px);min-height:330px;border:2px solid rgba(176,239,242,.29);background:linear-gradient(110deg,rgba(4,41,55,.97),rgba(2,14,31,.98));clip-path:polygon(0 0,38% 0,38% 5%,58% 5%,58% 0,100% 0,100% 82%,94% 82%,94% 100%,48% 100%,48% 94%,0 94%);animation:oracle-scene-ui-console-flicker 4.2s steps(10,end) both; }
+.scene-oracle-ui-collapse.phase-twist .oracle-chaos-panel { animation:oracle-scene-ui-rebuild 2.35s cubic-bezier(.15,.82,.18,1) both; }
+.scene-oracle-ui-collapse .oracle-chaos-panel>b { color:#ef777c;font-size:clamp(38px,8vw,94px);animation:oracle-scene-nan .38s steps(2,end) infinite; }
+.scene-oracle-ui-collapse .oracle-event-props>i { top:10%;width:clamp(70px,13vw,180px);height:clamp(34px,7vw,90px);border:1px solid rgba(173,237,241,.32);background:rgba(6,53,65,.76);animation:oracle-scene-ui-fragment 2.45s cubic-bezier(.42,.02,.72,.55) infinite; }
+.scene-oracle-ui-collapse .oracle-event-props>i:nth-child(1){left:5%;--ui-r:-18deg}.scene-oracle-ui-collapse .oracle-event-props>i:nth-child(2){left:28%;--ui-r:27deg;animation-delay:.18s}.scene-oracle-ui-collapse .oracle-event-props>i:nth-child(3){right:28%;--ui-r:-42deg;animation-delay:.36s}.scene-oracle-ui-collapse .oracle-event-props>i:nth-child(4){right:5%;--ui-r:54deg;animation-delay:.54s}
+.scene-oracle-ui-collapse .oracle-event-props>b { left:6%;bottom:8%;color:rgba(229,251,250,.5);font:800 clamp(18px,4vw,48px) var(--mono);animation:oracle-scene-code-fall 2s steps(8,end) infinite; }
+.scene-oracle-ui-collapse .oracle-event-props>b::before { content:"DEPTH: NaN   WITNESS: 07???"; }
+
+/* 10 — golden ocean: palace towers rise from a luminous, horizontal tide. */
+.oracle-chaos-stage.scene-golden-ocean-jackpot { --scene-accent:255,226,133;place-items:end center; }
+.oracle-chaos-stage.scene-golden-ocean-jackpot::before { background:radial-gradient(ellipse at 50% 16%,rgba(255,246,193,.54),transparent 30%),linear-gradient(180deg,rgba(42,97,106,.36),rgba(59,57,52,.82) 58%,rgba(4,24,37,.97));animation:oracle-scene-golden-tide 2.4s ease-in-out infinite alternate; }
+.oracle-chaos-stage.scene-golden-ocean-jackpot .oracle-chaos-panel { grid-template-columns:220px minmax(300px,600px) 190px;width:min(94vw,1100px);min-height:390px;border:3px solid rgba(255,229,143,.52);border-radius:48% 48% 0 0;background:radial-gradient(ellipse at 50% 0,rgba(255,237,160,.28),transparent 52%),linear-gradient(110deg,rgba(28,68,69,.97),rgba(12,24,38,.98));box-shadow:0 0 0 11px rgba(255,224,125,.035),0 0 90px rgba(255,212,82,.18); }
+.scene-golden-ocean-jackpot .oracle-chaos-panel>b { color:#fff0ae;animation:oracle-scene-crown-bloom 1.75s cubic-bezier(.15,.82,.18,1) infinite alternate; }
+.scene-golden-ocean-jackpot .oracle-event-props>i { bottom:0;width:14%;border:2px solid rgba(255,229,142,.28);border-bottom:0;background:repeating-linear-gradient(90deg,rgba(255,229,142,.1) 0 12px,transparent 12px 24px),rgba(7,40,48,.72);clip-path:polygon(0 18%,18% 18%,18% 0,36% 0,36% 18%,64% 18%,64% 0,82% 0,82% 18%,100% 18%,100% 100%,0 100%);animation:oracle-scene-palace-rise 1.9s cubic-bezier(.16,.8,.18,1) both; }
+.scene-golden-ocean-jackpot .oracle-event-props>i:nth-child(1){left:4%;height:46%}.scene-golden-ocean-jackpot .oracle-event-props>i:nth-child(2){left:20%;height:60%;animation-delay:.16s}.scene-golden-ocean-jackpot .oracle-event-props>i:nth-child(3){right:20%;height:60%;animation-delay:.32s}.scene-golden-ocean-jackpot .oracle-event-props>i:nth-child(4){right:4%;height:46%;animation-delay:.48s}
+.scene-golden-ocean-jackpot .oracle-event-props>b { left:50%;top:7%;color:#ffeda2;font:900 clamp(52px,10vw,132px) var(--display);translate:-50% 0;animation:oracle-scene-crown-storm 1.25s ease-in-out infinite; }
+.scene-golden-ocean-jackpot .oracle-event-props>b::before { content:"♛"; }
+
+/* 11 — celebration: the copy floats in the clear eye of a moving school vortex. */
+.oracle-chaos-stage.scene-fish-celebration-jackpot { --scene-accent:141,244,222; }
+.oracle-chaos-stage.scene-fish-celebration-jackpot::before { background:conic-gradient(from 0deg at 50% 50%,rgba(84,230,220,.19),transparent 18%,rgba(255,224,127,.17) 36%,transparent 55%,rgba(113,220,244,.16) 78%,transparent);animation:oracle-scene-celebration-vortex 2.8s linear infinite; }
+.oracle-chaos-stage.scene-fish-celebration-jackpot .oracle-chaos-panel { grid-template-columns:190px minmax(300px,560px) 150px;width:min(82vw,900px);min-height:350px;border:2px solid rgba(172,250,228,.4);border-radius:50%;background:radial-gradient(circle at 50% 50%,rgba(2,20,38,.98) 0 48%,rgba(9,73,77,.88) 72%,transparent);box-shadow:0 0 70px rgba(94,239,218,.12); }
+.scene-fish-celebration-jackpot .oracle-chaos-image { animation:oracle-scene-festival-float 1.1s ease-in-out infinite alternate; }
+.scene-fish-celebration-jackpot .oracle-event-props>i { left:50%;top:50%;width:clamp(190px,38vw,540px);aspect-ratio:1;border:1px dashed rgba(170,248,228,.34);border-radius:50%;translate:-50% -50%;animation:oracle-scene-celebration-ring 3.2s linear infinite; }
+.scene-fish-celebration-jackpot .oracle-event-props>i:nth-child(2){width:50vw;animation-direction:reverse;animation-duration:4.1s}.scene-fish-celebration-jackpot .oracle-event-props>i:nth-child(3){width:64vw;animation-duration:5s}.scene-fish-celebration-jackpot .oracle-event-props>i:nth-child(4){width:78vw;animation-direction:reverse;animation-duration:6s}
+
+/* 12 — abyss dawn: one horizontal ray grows into a white deep-sea proscenium. */
+.oracle-chaos-stage.scene-abyss-dawn-jackpot { --scene-accent:216,250,251;place-items:center stretch;padding-inline:0; }
+.oracle-chaos-stage.scene-abyss-dawn-jackpot::before { background:linear-gradient(180deg,#00030c 0 48%,rgba(199,249,251,.9) 49.5%,#0d5265 50.2%,#031326 72%);animation:oracle-scene-abyss-dawn 3.1s cubic-bezier(.18,.72,.18,1) both; }
+.oracle-chaos-stage.scene-abyss-dawn-jackpot .oracle-chaos-panel { grid-template-columns:minmax(180px,240px) minmax(300px,620px) 170px;width:100%;min-height:330px;border-inline:0;border-color:rgba(231,255,255,.54);background:linear-gradient(90deg,transparent 3%,rgba(2,17,33,.94) 16% 84%,transparent 97%);box-shadow:0 -25px 90px rgba(206,251,252,.16),0 25px 90px rgba(0,6,18,.7); }
+.scene-abyss-dawn-jackpot .oracle-chaos-image { animation:oracle-scene-dawn-reveal 2.2s cubic-bezier(.2,.75,.18,1) both; }
+.scene-abyss-dawn-jackpot .oracle-event-props>i { left:50%;top:49%;width:1px;height:1px;background:#efffff;box-shadow:0 0 50px 18px rgba(201,250,251,.4);animation:oracle-scene-dawn-ray 2.6s ease-out both; }
+.scene-abyss-dawn-jackpot .oracle-event-props>i:nth-child(2){rotate:22deg;animation-delay:.2s}.scene-abyss-dawn-jackpot .oracle-event-props>i:nth-child(3){rotate:-22deg;animation-delay:.4s}.scene-abyss-dawn-jackpot .oracle-event-props>i:nth-child(4){rotate:90deg;animation-delay:.6s}
+.scene-abyss-dawn-jackpot .oracle-event-props>b { left:50%;top:9%;color:#f4ffff;font:900 clamp(36px,8vw,100px) var(--display);translate:-50% 0;text-shadow:0 0 45px rgba(220,254,255,.62); }
+.scene-abyss-dawn-jackpot .oracle-event-props>b::before { content:"☼"; }
+
+/* 13 — overload: the frame gives up; a giant king occupies the viewport. */
+.oracle-chaos-stage.scene-naoking-overload-jackpot { --scene-accent:255,220,119;place-items:center; }
+.oracle-chaos-stage.scene-naoking-overload-jackpot::before { background:radial-gradient(circle at 50% 50%,rgba(255,225,128,.22),transparent 24%),repeating-conic-gradient(from 0deg at 50% 50%,rgba(102,229,237,.08) 0 3deg,transparent 3deg 10deg),rgba(0,8,22,.84);animation:oracle-scene-overload-field .72s steps(8,end) infinite; }
+.oracle-chaos-stage.scene-naoking-overload-jackpot .oracle-chaos-panel { grid-template-columns:minmax(280px,42vw) minmax(280px,500px) 150px;width:100%;min-height:74vh;border:0;background:transparent;box-shadow:none;overflow:visible; }
+.oracle-chaos-stage.scene-naoking-overload-jackpot .oracle-chaos-copy { border:1px solid rgba(255,228,139,.42);background:rgba(1,15,30,.88);box-shadow:0 22px 70px rgba(0,3,14,.65); }
+.scene-naoking-overload-jackpot .oracle-chaos-image { width:145%!important;height:min(70vh,680px)!important;animation:oracle-scene-giant-king 2.2s cubic-bezier(.15,.82,.18,1) both; }
+.scene-naoking-overload-jackpot .oracle-chaos-panel>b { color:#ffe694;font-size:clamp(52px,10vw,150px);animation:oracle-scene-overload-count .44s steps(4,end) infinite; }
+.scene-naoking-overload-jackpot .oracle-event-props>i { width:clamp(34px,5vw,74px);aspect-ratio:1;border:1px solid rgba(255,227,136,.35);border-radius:50%;background:radial-gradient(circle,rgba(255,229,145,.42),rgba(8,43,54,.72));animation:oracle-scene-mini-king 1.7s cubic-bezier(.32,.02,.68,.98) infinite; }
+.scene-naoking-overload-jackpot .oracle-event-props>i:nth-child(1){left:5%;top:12%;--mini-x:74vw;--mini-y:54vh}.scene-naoking-overload-jackpot .oracle-event-props>i:nth-child(2){right:8%;top:8%;--mini-x:-66vw;--mini-y:62vh;animation-delay:-.4s}.scene-naoking-overload-jackpot .oracle-event-props>i:nth-child(3){left:12%;bottom:7%;--mini-x:68vw;--mini-y:-51vh;animation-delay:-.8s}.scene-naoking-overload-jackpot .oracle-event-props>i:nth-child(4){right:4%;bottom:12%;--mini-x:-72vw;--mini-y:-48vh;animation-delay:-1.2s}
+.scene-naoking-overload-jackpot .oracle-event-props>b { left:50%;top:4%;color:#ffec9f;font:900 clamp(30px,7vw,86px) var(--mono);translate:-50% 0;animation:oracle-scene-overload-count .44s steps(4,end) infinite; }
+.scene-naoking-overload-jackpot .oracle-event-props>b::before { content:"×1000"; }
+
+/* Outcome grammar: calm lock / forward coronation / physical collapse / time reversal. */
+.oracle-chaos-stage.phase-twist.outcome-normal .oracle-chaos-panel { border-color:rgba(164,232,238,.28);animation:oracle-outcome-normal-lock 1.25s cubic-bezier(.2,.72,.18,1) both; }
+.oracle-chaos-stage.phase-twist.outcome-normal .oracle-chaos-copy { background:linear-gradient(90deg,rgba(1,19,35,.94),rgba(3,35,46,.82)); }
+.oracle-chaos-stage.phase-twist.outcome-win::after { border-color:rgba(255,230,143,.55);background:radial-gradient(circle at 50% 50%,rgba(255,238,163,.2),transparent 48%);animation:oracle-outcome-win-field 1.85s ease-out both; }
+.oracle-chaos-stage.phase-twist.outcome-win .oracle-chaos-panel { border-color:rgba(255,229,139,.64);box-shadow:0 0 0 9px rgba(255,224,125,.035),0 35px 110px rgba(0,5,20,.62),0 0 70px rgba(255,211,78,.15);animation:oracle-outcome-win-rise 1.55s cubic-bezier(.15,.82,.18,1) both; }
+.oracle-chaos-stage.phase-twist.outcome-win .oracle-chaos-copy strong { color:#fff1b1;text-shadow:0 0 28px rgba(255,215,91,.3); }
+.oracle-chaos-stage.phase-twist.outcome-loss::before { background:linear-gradient(180deg,rgba(18,8,20,.44),rgba(3,7,17,.96));backdrop-filter:grayscale(.75) blur(3px); }
+.oracle-chaos-stage.phase-twist.outcome-loss .oracle-chaos-panel { border-color:rgba(218,104,110,.34);box-shadow:0 32px 90px rgba(0,0,0,.72);animation:oracle-outcome-loss-fall 1.55s cubic-bezier(.42,.02,.78,.54) both; }
+.oracle-chaos-stage.phase-twist.outcome-loss .oracle-chaos-copy { border-color:rgba(223,109,113,.28);background:rgba(18,12,25,.86); }
+.oracle-chaos-stage.phase-twist.outcome-revival::before { background:repeating-radial-gradient(circle at 50% 50%,transparent 0 7vw,rgba(205,253,255,.13) 7.1vw 7.3vw),rgba(0,8,23,.84);animation:oracle-outcome-revival-field 1.55s ease-out both; }
+.oracle-chaos-stage.phase-twist.outcome-revival .oracle-chaos-panel { border-color:rgba(225,254,255,.72);box-shadow:0 0 0 12px rgba(194,250,252,.035),0 0 95px rgba(137,240,246,.2);animation:oracle-outcome-revival-rewind 1.7s cubic-bezier(.12,.8,.16,1) both; }
+.oracle-chaos-stage.phase-twist.outcome-revival .oracle-chaos-copy strong { color:#fff2b2; }
+
+/* Every ending inherits an outcome motion; named endings can redirect its vector. */
+.oracle-chaos-stage.phase-twist[class*="ending-"] .oracle-chaos-image { animation:var(--ending-image-animation,oracle-ending-settle 1.15s cubic-bezier(.2,.72,.18,1) both); }
+.oracle-chaos-stage.phase-twist[class*="ending-"] .oracle-chaos-panel>b { animation:var(--ending-glyph-animation,oracle-ending-glyph-lock .9s cubic-bezier(.2,.72,.18,1) both); }
+.oracle-chaos-stage.phase-twist[class*="ending-"] .oracle-event-props { animation:var(--ending-props-animation,none); }
+
+.oracle-chaos-stage:is(.ending-photo-draw,.ending-mirror-delay) { --ending-image-animation:oracle-ending-photo-scan 1.4s steps(7,end) both;--ending-props-animation:oracle-ending-finish-flash 1.4s steps(2,end) both; }
+.oracle-chaos-stage:is(.ending-lunch-stop,.ending-holiday,.ending-quiet-trench,.ending-empty-instance,.ending-clean-boot,.ending-auto-layout) { --ending-image-animation:oracle-ending-calm-stop 1.3s ease-out both;--ending-glyph-animation:oracle-ending-glyph-lock 1.1s ease-out both; }
+.oracle-chaos-stage:is(.ending-wrong-course,.ending-wrong-class,.ending-wrong-school,.ending-wrong-beacon,.ending-wrong-fuse,.ending-portal-loop,.ending-king-fix) { --ending-image-animation:oracle-ending-wrong-way 1.45s cubic-bezier(.2,.72,.18,1) both; }
+.oracle-chaos-stage:is(.ending-bell-delay,.ending-surface-call,.ending-hand-crank) { --ending-image-animation:oracle-ending-delayed 1.6s steps(6,end) both; }
+
+.oracle-chaos-stage.outcome-win { --ending-image-animation:oracle-ending-win-surge 1.35s cubic-bezier(.15,.82,.18,1) both;--ending-glyph-animation:oracle-ending-crown-lock 1.25s cubic-bezier(.15,.82,.18,1) both; }
+.oracle-chaos-stage:is(.ending-tiny-comeback,.ending-shortcut,.ending-palace-found,.ending-friend-invite,.ending-error-jackpot) { --ending-image-animation:oracle-ending-edge-comeback 1.7s cubic-bezier(.12,.84,.16,1) both; }
+.oracle-chaos-stage:is(.ending-crown-ride,.ending-teacher-crown,.ending-thermal-crown,.ending-mirror-crown,.ending-royal-fuse,.ending-crown-storm,.ending-school-crown,.ending-shadow-crown) { --ending-image-animation:oracle-ending-crown-ride 1.55s cubic-bezier(.16,.8,.18,1) both;--ending-glyph-animation:oracle-ending-crown-orbit 1.55s ease-out both; }
+.oracle-chaos-stage:is(.ending-favorite-win,.ending-gate-slide,.ending-leviathan-guide,.ending-palace-world,.ending-overcharge,.ending-seventh-admin,.ending-royal-current) { --ending-image-animation:oracle-ending-royal-forward 1.3s cubic-bezier(.14,.84,.2,1) both; }
+.oracle-chaos-stage:is(.ending-palace-rise,.ending-white-palace) { --ending-image-animation:oracle-ending-palace-lift 1.7s cubic-bezier(.15,.8,.18,1) both;--ending-props-animation:oracle-ending-palace-props 1.9s ease-out both; }
+.oracle-chaos-stage:is(.ending-fish-parade,.ending-sunrise-school,.ending-thousand-kings) { --ending-props-animation:oracle-ending-parade 2.1s linear both; }
+.oracle-chaos-stage:is(.ending-school-burst,.ending-first-ray,.ending-all-fall-win,.ending-giant-sneeze) { --ending-image-animation:oracle-ending-burst 1.6s cubic-bezier(.17,.8,.2,1) both;--ending-props-animation:oracle-ending-burst-props 1.6s ease-out both; }
+
+.oracle-chaos-stage.outcome-loss { --ending-image-animation:oracle-ending-loss-drop 1.45s cubic-bezier(.42,.02,.78,.54) both;--ending-glyph-animation:oracle-ending-loss-stamp .9s steps(3,end) both; }
+.oracle-chaos-stage:is(.ending-all-fall,.ending-crown-trip,.ending-pressure-return,.ending-css-off) { --ending-image-animation:oracle-ending-trip 1.5s cubic-bezier(.5,.02,.82,.46) both; }
+.oracle-chaos-stage:is(.ending-reverse-runner,.ending-avatar-error,.ending-nan-verdict) { --ending-image-animation:oracle-ending-reverse-reject 1.45s steps(8,end) both; }
+.oracle-chaos-stage:is(.ending-sleep-track,.ending-gate-close,.ending-shadow-block,.ending-instance-full,.ending-portal-refuse,.ending-king-unplug) { --ending-image-animation:oracle-ending-shutout 1.5s cubic-bezier(.3,.05,.65,.95) both; }
+
+.oracle-chaos-stage.outcome-revival { --ending-image-animation:oracle-ending-revival-return 1.65s cubic-bezier(.12,.84,.16,1) both;--ending-glyph-animation:oracle-ending-revival-crown 1.65s ease-out both;--ending-props-animation:oracle-ending-revival-props 1.75s ease-out both; }
+.oracle-chaos-stage:is(.ending-finish-rewind,.ending-bell-rewind,.ending-portal-reverse,.ending-whole-rewind) { --ending-image-animation:oracle-ending-full-rewind 1.8s cubic-bezier(.12,.82,.18,1) both; }
+.oracle-chaos-stage:is(.ending-respawn-class,.ending-respawn,.ending-royal-refresh) { --ending-image-animation:oracle-ending-respawn 1.55s steps(9,end) both; }
+.oracle-chaos-stage:is(.ending-fish-push,.ending-fish-bus,.ending-bubble-lift,.ending-bubble-fuse) { --ending-image-animation:oracle-ending-assisted-lift 1.7s cubic-bezier(.12,.84,.16,1) both;--ending-props-animation:oracle-ending-assist-current 1.7s ease-out both; }
+.oracle-chaos-stage:is(.ending-late-surge,.ending-last-beacon,.ending-distant-signal) { --ending-image-animation:oracle-ending-distant-surge 2s cubic-bezier(.12,.84,.16,1) both; }
+
+/* Site-wide world takeover. These remain intentionally stronger than the pooled family fade. */
+html:is(.oracle-world-seventh-witness,.oracle-world-witness-evacuation,.oracle-world-accordion-reel,.oracle-world-race-track,.oracle-world-royal-school,.oracle-world-cinematic-dive,.oracle-world-portal-world,.oracle-world-machine-power-cycle,.oracle-world-ui-collapse,.oracle-world-golden-ocean,.oracle-world-fish-celebration,.oracle-world-abyss-dawn,.oracle-world-naoking-overload) body[data-page="fortune"] .photo-background { transform-origin:50% 50%;transition:transform .45s ease,filter .45s ease,opacity .45s ease; }
+html.oracle-world-seventh-witness .site-header { -webkit-mask:repeating-linear-gradient(90deg,#000 0 13.8%,transparent 13.9% 14.28%);mask:repeating-linear-gradient(90deg,#000 0 13.8%,transparent 13.9% 14.28%);background:rgba(2,31,47,.94);animation:oracle-world-witness-header 1.3s steps(7,end) infinite; }
+html.oracle-world-seventh-witness .fortune-card { transform:perspective(1200px) scaleX(1.12)!important;clip-path:polygon(0 0,100% 0,98% 100%,2% 100%); }
+html.oracle-world-seventh-witness .depth-rail { box-shadow:inset 0 0 0 2px rgba(255,221,122,.22); }
+
+html.oracle-world-witness-evacuation .site-header { transform:translateX(-22vw)!important;opacity:.22; }
+html.oracle-world-witness-evacuation .fortune-card { transform:translateX(18vw) perspective(900px) rotateY(-7deg)!important;clip-path:polygon(10% 0,100% 0,100% 100%,0 100%,0 18%); }
+html.oracle-world-witness-evacuation .depth-rail { transform:translateX(34vw)!important; }
+html.oracle-world-witness-evacuation body[data-page="fortune"] .photo-background { transform:scale(1.08) translateX(-5%);filter:brightness(.48) saturate(.55)!important; }
+
+html.oracle-world-accordion-reel .fortune-card { animation:oracle-world-accordion-card 1.5s cubic-bezier(.22,.74,.18,1) infinite alternate;transform-origin:50% 50%; }
+html.oracle-world-accordion-reel .site-header { transform:perspective(700px) rotateX(9deg) scaleX(.9)!important; }
+html.oracle-world-accordion-reel .depth-rail { transform:scaleY(1.8)!important; }
+html.oracle-world-accordion-reel body[data-page="fortune"] .photo-background { filter:contrast(1.18) brightness(.5)!important; }
+
+html.oracle-world-race-track .site-header { transform:translateY(-66%)!important;background:repeating-linear-gradient(90deg,#eaf8df 0 20px,#10243a 20px 40px);color:#08192b; }
+html.oracle-world-race-track .fortune-card { transform:perspective(1000px) rotateX(10deg) translateY(18vh) scale(.84)!important;opacity:.28!important; }
+html.oracle-world-race-track .depth-rail { transform:translateX(38vw)!important;opacity:.18; }
+html.oracle-world-race-track body[data-page="fortune"] .photo-background { animation:oracle-world-race-bg .7s linear infinite;filter:contrast(1.15) saturate(.62) brightness(.52)!important; }
+
+html.oracle-world-royal-school .site-header { transform:perspective(700px) rotateX(-18deg) translateY(-15%)!important;border:7px double rgba(221,247,239,.36);background:rgba(13,53,65,.94); }
+html.oracle-world-royal-school .fortune-card { transform:perspective(950px) rotateX(13deg) scale(.78) translateY(19vh)!important;clip-path:polygon(14% 0,86% 0,100% 100%,0 100%);opacity:.32!important; }
+html.oracle-world-royal-school .depth-rail { transform:scaleX(.64) translateY(12vh)!important; }
+html.oracle-world-royal-school body[data-page="fortune"] .photo-background { filter:sepia(.16) saturate(.48) brightness(.57)!important;transform:scale(1.04); }
+
+html.oracle-world-cinematic-dive .site-header { transform:translateY(11vh) scale(.88)!important;filter:blur(1px) brightness(.48);opacity:.26; }
+html.oracle-world-cinematic-dive .fortune-card { transform:perspective(900px) translateZ(-180px) translateY(16vh) scale(.72)!important;filter:brightness(.46) saturate(.55);opacity:.24!important; }
+html.oracle-world-cinematic-dive .depth-rail { transform:scaleY(2.7) translateY(5vh)!important;opacity:.48; }
+html.oracle-world-cinematic-dive body[data-page="fortune"] .photo-background { animation:oracle-world-cinematic-depth 3.4s ease-in-out infinite alternate;filter:brightness(.28) saturate(.42) hue-rotate(5deg)!important; }
+
+html.oracle-world-portal-world .site-header { transform:perspective(800px) rotateY(180deg) translateY(-20%)!important;opacity:.34; }
+html.oracle-world-portal-world .fortune-card { transform:perspective(900px) rotateY(-21deg) scale(.76)!important;clip-path:ellipse(47% 50% at 50% 50%);opacity:.28!important; }
+html.oracle-world-portal-world .depth-rail { transform:translateX(-42vw) rotate(90deg)!important; }
+html.oracle-world-portal-world body[data-page="fortune"] .photo-background { animation:oracle-world-portal-bg 2.8s linear infinite;filter:hue-rotate(34deg) saturate(.7) brightness(.45)!important; }
+
+html.oracle-world-machine-power-cycle .site-header,
+html.oracle-world-machine-power-cycle .fortune-card,
+html.oracle-world-machine-power-cycle .depth-rail,
+html.oracle-world-machine-power-cycle body[data-page="fortune"] .photo-background { animation:oracle-world-power-cut 2s steps(10,end) infinite; }
+html.oracle-world-machine-power-cycle .fortune-card { transform:scale(.9)!important;box-shadow:none!important; }
+html.oracle-world-machine-power-cycle body[data-page="fortune"] .photo-background { filter:brightness(.12) saturate(0)!important; }
+
+html.oracle-world-ui-collapse .site-header { animation:oracle-world-ui-header-fall 2.3s cubic-bezier(.44,.02,.78,.48) both; }
+html.oracle-world-ui-collapse .fortune-card { animation:oracle-world-ui-card-fall 2.5s cubic-bezier(.44,.02,.78,.48) both; }
+html.oracle-world-ui-collapse .depth-rail { animation:oracle-world-ui-rail-fall 2.1s cubic-bezier(.44,.02,.78,.48) both; }
+html.oracle-world-ui-collapse body[data-page="fortune"] .photo-background { transform:rotate(.7deg) scale(1.07);filter:contrast(1.28) brightness(.42)!important; }
+
+html.oracle-world-golden-ocean .site-header { background:linear-gradient(90deg,rgba(31,76,77,.96),rgba(91,73,43,.96),rgba(31,76,77,.96));border-bottom:2px solid rgba(255,229,143,.5);box-shadow:0 20px 80px rgba(255,213,76,.15); }
+html.oracle-world-golden-ocean .fortune-card { transform:translateY(18vh) scale(.82)!important;opacity:.18!important;filter:sepia(.24) brightness(1.12); }
+html.oracle-world-golden-ocean .depth-rail { color:#ffe69c;transform:scaleY(1.5)!important; }
+html.oracle-world-golden-ocean body[data-page="fortune"] .photo-background { animation:oracle-world-golden-ocean 2.4s ease-in-out infinite alternate;filter:sepia(.22) saturate(1.3) brightness(.72)!important; }
+
+html.oracle-world-fish-celebration .site-header { animation:oracle-world-parade-header 1.3s ease-in-out infinite alternate;box-shadow:0 2px rgba(255,226,135,.4),0 18px 60px rgba(92,232,218,.16); }
+html.oracle-world-fish-celebration .fortune-card { animation:oracle-world-parade-card 1.7s ease-in-out infinite alternate;opacity:.32!important; }
+html.oracle-world-fish-celebration .depth-rail { transform:rotate(-3deg) translateX(22vw)!important; }
+html.oracle-world-fish-celebration body[data-page="fortune"] .photo-background { animation:oracle-world-fish-wave 2s ease-in-out infinite alternate;filter:saturate(1.18) brightness(.62)!important; }
+
+html.oracle-world-abyss-dawn .site-header { background:rgba(228,252,252,.92);color:#063047;border-color:#fff;box-shadow:0 14px 80px rgba(212,253,255,.35);animation:oracle-world-dawn-header 2.5s ease-out both; }
+html.oracle-world-abyss-dawn .fortune-card { transform:translateY(22vh) scale(.8)!important;opacity:.2!important; }
+html.oracle-world-abyss-dawn .depth-rail { color:#eaffff;filter:brightness(1.7); }
+html.oracle-world-abyss-dawn body[data-page="fortune"] .photo-background { animation:oracle-world-dawn-bg 3s ease-out both;filter:saturate(.48) brightness(.68)!important; }
+
+html.oracle-world-naoking-overload .site-header { transform:translateX(24vw) rotate(2deg)!important;opacity:.16; }
+html.oracle-world-naoking-overload .fortune-card { transform:translateX(-30vw) rotate(-4deg) scale(.88)!important;opacity:.12!important; }
+html.oracle-world-naoking-overload .depth-rail { transform:translateX(42vw) rotate(8deg)!important;opacity:.14; }
+html.oracle-world-naoking-overload body[data-page="fortune"] .photo-background { transform:scale(1.17);filter:brightness(.42) saturate(.72)!important;animation:oracle-world-overload-bg .55s steps(6,end) infinite; }
+
+/* Scene motion library. */
+@keyframes oracle-scene-witness-scan { 0%{translate:-18% 0;scale:.82}14%{translate:11% -4%;scale:1.04}28%{translate:-7% 3%}42%{translate:14% -2%}56%{translate:-12% 4%}70%{translate:8% -3%}84%,100%{translate:0 0;scale:1} }
+@keyframes oracle-scene-seventh-expand { 0%{transform:scaleX(.68);clip-path:inset(0 16%)}48%{transform:scaleX(1.08);clip-path:inset(0)}72%{transform:scaleX(.96)}100%{transform:scaleX(1)} }
+@keyframes oracle-scene-witness-alert { 0%,46%{opacity:.18}47%,100%{opacity:1} }
+@keyframes oracle-scene-registry-scan { 0%{translate:0 -18vh;opacity:0}12%,82%{opacity:1}100%{translate:0 58vh;opacity:0} }
+@keyframes oracle-scene-evacuate-image { 0%,18%{translate:0 0;rotate:0;scale:1}62%{translate:-42vw -4vh;rotate:-9deg;scale:.82}100%{translate:-84vw -16vh;rotate:-21deg;scale:.5} }
+@keyframes oracle-scene-evacuation-stream { from{translate:-12vw 0}to{translate:118vw 0} }
+@keyframes oracle-scene-exit-sign { 0%,45%{opacity:.28}46%,100%{opacity:1} }
+@keyframes oracle-scene-accordion-bg { from{background-size:88% 100%;filter:brightness(.7)}to{background-size:132% 100%;filter:brightness(1)} }
+@keyframes oracle-scene-accordion-panel { 0%{transform:perspective(1000px) rotateY(-24deg) scaleX(.42)}38%{transform:perspective(1000px) rotateY(8deg) scaleX(1.12)}72%{transform:perspective(1000px) rotateY(-3deg) scaleX(.94)}100%{transform:none} }
+@keyframes oracle-scene-accordion-rewind { 0%{transform:none}45%{transform:perspective(1000px) rotateY(12deg) scaleX(.74)}72%{transform:perspective(1000px) rotateY(-8deg) scaleX(1.18)}100%{transform:perspective(1000px) rotateY(18deg) scaleX(.56)} }
+@keyframes oracle-scene-rib-count { 0%,15%{translate:-22% 0}16%,32%{translate:14% 0}33%,49%{translate:-7% 0}50%,66%{translate:9% 0}67%,83%{translate:-3% 0}84%,100%{translate:0 0} }
+@keyframes oracle-scene-rib-fold { from{transform:perspective(700px) rotateY(-52deg);opacity:.2}to{transform:perspective(700px) rotateY(52deg);opacity:.82} }
+@keyframes oracle-scene-race-current { to{background-position:100vw 0,0 0} }
+@keyframes oracle-scene-racer { 0%,100%{translate:-13% 8%;rotate:-2deg;scale:.96}50%{translate:15% -7%;rotate:2deg;scale:1.04} }
+@keyframes oracle-scene-lane-rush { from{translate:-100vw 0}to{translate:100vw 0} }
+@keyframes oracle-scene-school-sprint { 0%,100%{translate:-7% 8%;rotate:-3deg;scale:1 .92}50%{translate:7% -8%;rotate:3deg;scale:1 1.08} }
+@keyframes oracle-scene-school-gate { 0%{translate:0 -32vh}68%,100%{translate:0 0} }
+@keyframes oracle-scene-dive-darken { from{filter:brightness(1)}to{filter:brightness(.64)} }
+@keyframes oracle-scene-diver-depth { from{translate:-8% -20%;scale:1.12}to{translate:18% 23%;scale:.62} }
+@keyframes oracle-scene-leviathan { 0%{translate:58% 0;scale:.6;opacity:0}45%{opacity:.88}100%{translate:-8% 0;scale:1.4;opacity:.98} }
+@keyframes oracle-scene-dive-bubbles { 0%{translate:0 28vh;scale:.42;opacity:0}18%{opacity:.8}100%{translate:4vw -66vh;scale:1.6;opacity:0} }
+@keyframes oracle-scene-portal-field { to{transform:rotate(360deg) scale(1.08)} }
+@keyframes oracle-scene-portal-avatar { 0%,100%{translate:-18% 0;rotate:-3deg;scale:.78}50%{translate:22% 0;rotate:3deg;scale:1.12} }
+@keyframes oracle-scene-portal-ring { from{transform:rotateX(68deg) rotateZ(0)}to{transform:rotateX(68deg) rotateZ(360deg)} }
+@keyframes oracle-scene-power-room { 0%,10%{filter:brightness(.05)}11%,26%{filter:brightness(.8)}27%,42%{filter:brightness(.18)}43%,68%{filter:brightness(1.1)}69%,100%{filter:brightness(.7)} }
+@keyframes oracle-scene-power-gauge { 0%,16%{translate:0 12%;scale:.2 1}17%,46%{translate:0 5%;scale:.48 1}47%,72%{translate:0 -4%;scale:.76 1}73%,100%{translate:0 -9%;scale:1 1} }
+@keyframes oracle-scene-power-lamp { 0%,52%{opacity:.08;box-shadow:none}53%,100%{opacity:1;box-shadow:0 0 18px #80f5cd} }
+@keyframes oracle-scene-power-bus { 0%{clip-path:inset(0 100% 0 0)}100%{clip-path:inset(0)} }
+@keyframes oracle-scene-emergency-boot { 0%,12%{opacity:.02;transform:scaleY(.02)}13%,28%{opacity:.6;transform:scaleY(1)}29%,46%{opacity:.1;transform:scaleY(.12)}47%,100%{opacity:1;transform:none} }
+@keyframes oracle-scene-ui-console-flicker { 0%,10%{opacity:.18;transform:translateY(-1.2vh)}11%,24%{opacity:1;transform:none}25%,27%{opacity:.44;transform:translateX(3px)}28%,51%{opacity:1;transform:none}52%,54%{opacity:.58;filter:saturate(.5)}55%,100%{opacity:1;transform:none;filter:none} }
+@keyframes oracle-scene-ui-rebuild { 0%{opacity:.18;transform:translate3d(0,22vh,-40px) rotate(4deg);clip-path:polygon(0 0,36% 0,38% 48%,65% 12%,100% 0,92% 100%,42% 82%,0 96%)}36%{opacity:.72;transform:translate3d(-1vw,-3vh,14px) rotate(-1deg)}58%,100%{opacity:1;transform:none;clip-path:polygon(0 0,100% 0,100% 100%,0 100%)} }
+@keyframes oracle-scene-nan { 0%,42%{translate:-4% 0}43%,75%{translate:5% -3%}76%,100%{translate:0 3%} }
+@keyframes oracle-scene-ui-fragment { 0%{transform:translate3d(0,-24vh,90px) rotate(0);opacity:0}16%{opacity:.82}70%{transform:translate3d(3vw,58vh,-30px) rotate(var(--ui-r))}100%{transform:translate3d(5vw,92vh,-80px) rotate(var(--ui-r));opacity:.08} }
+@keyframes oracle-scene-code-fall { 0%{translate:0 -22vh;opacity:0}18%{opacity:.8}100%{translate:9vw 84vh;opacity:.05} }
+@keyframes oracle-scene-golden-tide { from{background-position:0 0;filter:brightness(.82)}to{background-position:0 8vh;filter:brightness(1.18)} }
+@keyframes oracle-scene-crown-bloom { from{translate:0 12%;scale:.82}to{translate:0 -7%;scale:1.12} }
+@keyframes oracle-scene-palace-rise { 0%{translate:0 68%;opacity:0}100%{translate:0 0;opacity:1} }
+@keyframes oracle-scene-crown-storm { 0%{translate:-50% -18vh;rotate:-12deg}50%{translate:-50% 34vh;rotate:8deg}100%{translate:-50% 88vh;rotate:18deg} }
+@keyframes oracle-scene-celebration-vortex { to{transform:rotate(360deg) scale(1.08)} }
+@keyframes oracle-scene-festival-float { from{translate:-5% 4%;rotate:-2deg;scale:.96}to{translate:6% -5%;rotate:2deg;scale:1.06} }
+@keyframes oracle-scene-celebration-ring { to{transform:rotate(360deg)} }
+@keyframes oracle-scene-abyss-dawn { 0%,18%{filter:brightness(.02);background-position:0 25vh}68%{filter:brightness(.72)}100%{filter:brightness(1.18);background-position:0 0} }
+@keyframes oracle-scene-dawn-reveal { 0%{translate:0 38%;scale:.5}62%{translate:0 -5%;scale:1.08}100%{translate:0 0;scale:1} }
+@keyframes oracle-scene-dawn-ray { 0%{scale:0 1;opacity:0}20%{opacity:1}100%{scale:1200 1;opacity:0} }
+@keyframes oracle-scene-overload-field { 0%,100%{translate:0 0}20%{translate:-5px 2px}40%{translate:7px -3px}60%{translate:-4px -2px}80%{translate:6px 3px} }
+@keyframes oracle-scene-giant-king { 0%{translate:-42vw 18vh;scale:.3;rotate:-7deg}62%{translate:8vw -4vh;scale:1.16;rotate:2deg}100%{translate:0 0;scale:1} }
+@keyframes oracle-scene-overload-count { 0%,24%{translate:-6% 0}25%,49%{translate:8% -3%}50%,74%{translate:-3% 4%}75%,100%{translate:0 0} }
+@keyframes oracle-scene-mini-king { 0%{translate:0 0;scale:.3;opacity:0}14%{opacity:.92}100%{translate:var(--mini-x) var(--mini-y);scale:1.25;opacity:0} }
+
+/* Outcome and named-ending motions. */
+@keyframes oracle-outcome-normal-lock { 0%{transform:translateY(7px) scale(.97);filter:saturate(.72)}55%{transform:translateY(-2px) scale(1.01)}100%{transform:none;filter:none} }
+@keyframes oracle-outcome-win-field { 0%{opacity:0;transform:scale(.12) rotate(-18deg)}28%{opacity:1}100%{opacity:0;transform:scale(1.7) rotate(12deg)} }
+@keyframes oracle-outcome-win-rise { 0%{transform:translateY(20vh) scale(.68)}65%{transform:translateY(-2vh) scale(1.04)}100%{transform:none} }
+@keyframes oracle-outcome-loss-fall { 0%{transform:none;filter:none}52%{transform:translateY(9vh) rotate(-2deg);filter:saturate(.5)}100%{transform:translateY(42vh) rotate(-7deg);filter:saturate(.2) brightness(.55)} }
+@keyframes oracle-outcome-revival-field { 0%{opacity:0;transform:scale(2)}65%{opacity:.9}100%{opacity:0;transform:scale(.12)} }
+@keyframes oracle-outcome-revival-rewind { 0%{transform:translateY(48vh) scale(.45) rotate(6deg);filter:brightness(.2)}55%{transform:translateY(-3vh) scale(1.08) rotate(-1deg);filter:brightness(1.4)}100%{transform:none;filter:none} }
+@keyframes oracle-ending-settle { 0%{translate:0 -7%;scale:.95}100%{translate:0 0;scale:1} }
+@keyframes oracle-ending-glyph-lock { 0%{translate:0 -25%;scale:.72;opacity:0}100%{translate:0 0;scale:1;opacity:1} }
+@keyframes oracle-ending-photo-scan { 0%,12%{translate:-18% 0;scale:.86}13%,28%{translate:12% 0;scale:1.05}29%,45%{translate:-6% 0}46%,70%{translate:5% 0}71%,100%{translate:0 0;scale:1} }
+@keyframes oracle-ending-finish-flash { 0%,48%{filter:brightness(.35)}49%,54%{filter:brightness(2)}55%,100%{filter:none} }
+@keyframes oracle-ending-calm-stop { 0%{translate:0 -10%;scale:1.08}70%{translate:0 2%;scale:.98}100%{translate:0 0;scale:1} }
+@keyframes oracle-ending-wrong-way { 0%{translate:0 0;rotate:0}48%{translate:26% -3%;rotate:7deg}100%{translate:-12% 5%;rotate:-4deg} }
+@keyframes oracle-ending-delayed { 0%,18%{translate:0 -8%}19%,42%{translate:0 3%}43%,68%{translate:0 -2%}69%,100%{translate:0 0} }
+@keyframes oracle-ending-win-surge { 0%{translate:-26% 18%;scale:.62}62%{translate:8% -7%;scale:1.12}100%{translate:0 0;scale:1} }
+@keyframes oracle-ending-crown-lock { 0%{translate:0 -42%;rotate:-18deg;scale:.34}68%{translate:0 5%;rotate:3deg;scale:1.15}100%{translate:0 0;rotate:0;scale:1} }
+@keyframes oracle-ending-edge-comeback { 0%{translate:-62vw 14vh;scale:.3;rotate:-12deg}72%{translate:9% -5%;scale:1.17;rotate:2deg}100%{translate:0 0;scale:1;rotate:0} }
+@keyframes oracle-ending-crown-ride { 0%{translate:-28% 42%;rotate:-12deg;scale:.58}45%{translate:8% -22%;rotate:5deg;scale:1.08}72%{translate:-2% 8%;rotate:-2deg}100%{translate:0 0;rotate:0;scale:1} }
+@keyframes oracle-ending-crown-orbit { 0%{transform:rotate(-180deg) translateX(6vw) rotate(180deg);opacity:0}35%{opacity:1}100%{transform:none;opacity:1} }
+@keyframes oracle-ending-royal-forward { 0%{translate:0 48%;scale:.52}65%{translate:0 -7%;scale:1.13}100%{translate:0 0;scale:1} }
+@keyframes oracle-ending-palace-lift { 0%{translate:0 46%;scale:.78}100%{translate:0 -4%;scale:1.08} }
+@keyframes oracle-ending-palace-props { 0%{translate:0 48vh;opacity:0}100%{translate:0 0;opacity:1} }
+@keyframes oracle-ending-parade { 0%{translate:-26vw 0;rotate:-5deg}50%{translate:12vw -4vh;rotate:3deg}100%{translate:0 0;rotate:0} }
+@keyframes oracle-ending-burst { 0%{scale:.06;rotate:-18deg}44%{scale:1.35;rotate:5deg}72%{scale:.92;rotate:-2deg}100%{scale:1;rotate:0} }
+@keyframes oracle-ending-burst-props { 0%{scale:.12;opacity:0;filter:brightness(2)}72%{opacity:1}100%{scale:1;filter:none} }
+@keyframes oracle-ending-loss-drop { 0%{translate:0 -6%;rotate:0;scale:1}52%{translate:-5% 18%;rotate:-6deg;scale:.88}100%{translate:8% 62%;rotate:13deg;scale:.55} }
+@keyframes oracle-ending-loss-stamp { 0%{scale:2.4;rotate:-18deg;opacity:0}55%,100%{scale:1;rotate:-6deg;opacity:1} }
+@keyframes oracle-ending-trip { 0%,32%{translate:-12% 0;rotate:0}58%{translate:5% 12%;rotate:19deg}100%{translate:16% 49%;rotate:72deg;scale:.68} }
+@keyframes oracle-ending-reverse-reject { 0%{translate:38% 0;scale:1.1}45%{translate:-12% 0;scale:.72}100%{translate:48% 0;scale:.12} }
+@keyframes oracle-ending-shutout { 0%{translate:0 0;scale:1}62%{translate:0 9%;scale:.75}100%{translate:0 27%;scale:.3} }
+@keyframes oracle-ending-revival-return { 0%{translate:0 62%;rotate:18deg;scale:.18}62%{translate:0 -10%;rotate:-3deg;scale:1.18}100%{translate:0 0;rotate:0;scale:1} }
+@keyframes oracle-ending-revival-crown { 0%{transform:rotate(540deg) scale(.05);opacity:0}70%{opacity:1;transform:rotate(-8deg) scale(1.2)}100%{transform:none;opacity:1} }
+@keyframes oracle-ending-revival-props { 0%{transform:rotate(180deg) scale(1.8);opacity:0}60%{opacity:1}100%{transform:none;opacity:1} }
+@keyframes oracle-ending-full-rewind { 0%{translate:38% 48%;rotate:24deg;scale:.2}35%{translate:-14% 18%;rotate:-12deg;scale:.66}70%{translate:7% -9%;rotate:5deg;scale:1.14}100%{translate:0 0;rotate:0;scale:1} }
+@keyframes oracle-ending-respawn { 0%,14%{scale:.05;translate:22% 32%}15%,31%{scale:1.2;translate:-8% -7%}32%,48%{scale:.12;translate:10% 18%}49%,72%{scale:1.08;translate:-3% -2%}73%,100%{scale:1;translate:0 0} }
+@keyframes oracle-ending-assisted-lift { 0%{translate:0 48%;scale:.54}48%{translate:-6% 10%;rotate:-5deg;scale:.9}78%{translate:7% -8%;rotate:3deg;scale:1.13}100%{translate:0 0;rotate:0;scale:1} }
+@keyframes oracle-ending-assist-current { 0%{translate:-32vw 26vh;opacity:0}35%{opacity:1}100%{translate:26vw -18vh;opacity:.7} }
+@keyframes oracle-ending-distant-surge { 0%,25%{translate:0 38%;scale:.08}55%{translate:0 12%;scale:.42}82%{translate:0 -8%;scale:1.18}100%{translate:0 0;scale:1} }
+
+/* World motion library. */
+@keyframes oracle-world-witness-header { 0%,13%{translate:-3px 0}14%,27%{translate:3px 0}28%,100%{translate:0 0} }
+@keyframes oracle-world-accordion-card { from{transform:perspective(1100px) rotateY(-8deg) scaleX(.72)}to{transform:perspective(1100px) rotateY(8deg) scaleX(1.12)} }
+@keyframes oracle-world-race-bg { from{translate:-2% 0;scale:1.06}to{translate:2% 0;scale:1.09} }
+@keyframes oracle-world-cinematic-depth { from{transform:scale(1.03) translateY(-1%)}to{transform:scale(1.17) translateY(4%)} }
+@keyframes oracle-world-portal-bg { from{transform:scale(1.08) rotate(-1deg)}50%{transform:scale(1.14) rotate(1deg)}to{transform:scale(1.08) rotate(-1deg)} }
+@keyframes oracle-world-power-cut { 0%,12%{opacity:.03;filter:brightness(0)}13%,29%{opacity:.72}30%,47%{opacity:.08;filter:brightness(.08)}48%,100%{opacity:1} }
+@keyframes oracle-world-ui-header-fall { 0%,16%{transform:none}100%{transform:translate(-12vw,75vh) rotate(-32deg);opacity:.06} }
+@keyframes oracle-world-ui-card-fall { 0%,22%{transform:none}100%{transform:translate(16vw,68vh) rotate(19deg) scale(.74);opacity:.04} }
+@keyframes oracle-world-ui-rail-fall { 0%,10%{transform:none}100%{transform:translate(-28vw,82vh) rotate(74deg);opacity:.05} }
+@keyframes oracle-world-golden-ocean { from{transform:scale(1.04) translateY(-2%)}to{transform:scale(1.1) translateY(3%)} }
+@keyframes oracle-world-parade-header { from{translate:-3vw 0;rotate:-.5deg}to{translate:3vw 0;rotate:.5deg} }
+@keyframes oracle-world-parade-card { from{translate:-2vw 2vh;rotate:-1deg}to{translate:2vw -2vh;rotate:1deg} }
+@keyframes oracle-world-fish-wave { from{transform:scale(1.05) skewX(-1deg)}to{transform:scale(1.1) skewX(1deg)} }
+@keyframes oracle-world-dawn-header { 0%{transform:translateY(-100%);filter:brightness(.1)}100%{transform:none;filter:none} }
+@keyframes oracle-world-dawn-bg { 0%{transform:scale(1.09);filter:brightness(.04) saturate(0)}100%{transform:scale(1.03);filter:brightness(.85) saturate(.55)} }
+@keyframes oracle-world-overload-bg { 0%,100%{translate:0 0}20%{translate:-5px 2px}40%{translate:7px -3px}60%{translate:-4px -2px}80%{translate:6px 3px} }
+
+@media (max-width: 620px) {
+  /* Variable cages retain all witnesses; density changes face crop and labelling. */
+  .slot-reel[data-reel-count="4"] { gap:5px;inset-inline:10px!important; }
+  .slot-reel[data-reel-count="5"] { gap:3px; }
+  .slot-reel[data-reel-count="6"] { gap:3px;inset-inline:7px!important; }
+  .slot-reel[data-reel-count="7"] { gap:2px;inset-inline:6px!important; }
+  .slot-reel[data-reel-count="8"] { gap:1px;inset-inline:5px!important; }
+  .slot-reel[data-reel-count="4"] .shark-face { width:152%!important; }
+  .slot-reel[data-reel-count="5"] .shark-face { width:205%!important; }
+  .slot-reel[data-reel-count="6"] .shark-face { width:228%!important; }
+  .slot-reel[data-reel-count="7"] .shark-face { width:254%!important; }
+  .slot-reel[data-reel-count="8"] .shark-face { width:282%!important; }
+  .slot-reel[data-reel-count="4"] .shark-tile.is-prime .shark-face { width:132%!important; }
+  .slot-reel[data-reel-count="5"] .shark-tile.is-prime .shark-face { width:150%!important; }
+  .slot-reel[data-reel-count="6"] .shark-tile.is-prime .shark-face { width:166%!important; }
+  .slot-reel[data-reel-count="7"] .shark-tile.is-prime .shark-face { width:184%!important; }
+  .slot-reel[data-reel-count="8"] .shark-tile.is-prime .shark-face { width:202%!important; }
+  .slot-reel[data-reel-count="7"] .shark-tile>span,
+  .slot-reel[data-reel-count="8"] .shark-tile>span { display:none; }
+  .slot-window:has(.slot-reel[data-reel-count="7"]),
+  .slot-window:has(.slot-reel[data-reel-count="8"]) { height:232px; }
+
+  /* Mobile schools use fewer actors but preserve family-specific paths. */
+  .oracle-fish-school .oracle-fish { --fish-size:30px!important;filter:drop-shadow(0 5px 8px rgba(0,5,18,.42)); }
+  .oracle-fish-school .oracle-fish:nth-child(n+25) { display:none; }
+  .oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish:nth-child(n+17) { display:none; }
+  .oracle-fish-school:is(.school-small,[data-school="small"],.motion-cross,[data-motion="cross"]) .oracle-fish { animation-name:oracle-school-cross-mobile; }
+  .oracle-fish-school:is(.school-royal,[data-school="royal"],.motion-orbit,[data-motion="orbit"]) .oracle-fish { animation-name:oracle-school-orbit-mobile; }
+  .oracle-fish-school:is(.school-golden,[data-school="golden"],.motion-absorb,[data-motion="absorb"]) .oracle-fish { animation-name:oracle-school-absorb-mobile; }
+  .oracle-fish-school:is(.school-abyss,[data-school="abyss"],.motion-depth,[data-motion="depth"]) .oracle-fish { animation-name:oracle-school-depth-mobile;filter:none; }
+  .oracle-fish-school:is(.school-naoking,[data-school="naoking"],.motion-spiral,[data-motion="spiral"]) .oracle-fish { animation-name:oracle-school-spiral-mobile; }
+
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) { padding:64px 8px 14px; }
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot)::before { backdrop-filter:none; }
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) .oracle-chaos-copy { gap:5px;padding:9px 8px; }
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) .oracle-chaos-copy strong { font-size:clamp(19px,6.5vw,31px); }
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) .oracle-chaos-copy>span { font-size:8px;line-height:1.45; }
+
+  .oracle-chaos-stage.scene-seventh-witness .oracle-chaos-panel { grid-template-columns:76px minmax(0,1fr) 48px;width:96vw;min-height:278px;padding:34px 8px 12px; }
+  .oracle-chaos-stage.scene-seventh-witness .oracle-chaos-panel::before { top:10px;font-size:5px;letter-spacing:.04em;text-align:left;overflow:hidden; }
+  .scene-seventh-witness .oracle-chaos-image { height:120px!important;width:122%!important; }
+  .scene-seventh-witness .oracle-event-props>i { width:17vw;height:48%; }
+  .scene-seventh-witness .oracle-event-props>i:nth-child(1){left:2%}.scene-seventh-witness .oracle-event-props>i:nth-child(2){left:21%}.scene-seventh-witness .oracle-event-props>i:nth-child(3){display:block;right:21%}.scene-seventh-witness .oracle-event-props>i:nth-child(4){display:block;right:2%}
+  .scene-seventh-witness .oracle-event-props>b { font-size:28px; }
+
+  .oracle-chaos-stage.scene-witness-evacuation { padding:0 0 22px; }
+  .oracle-chaos-stage.scene-witness-evacuation .oracle-chaos-panel { grid-template-columns:78px minmax(0,1fr) 44px;width:100%;min-height:218px;padding:20px 8px; }
+  .oracle-chaos-stage.scene-witness-evacuation .oracle-chaos-panel::before { left:1%;width:18%;font-size:5px;letter-spacing:.05em; }
+  .scene-witness-evacuation .oracle-chaos-image { height:116px!important; }
+  .scene-witness-evacuation .oracle-event-props>b { top:10%;right:2%;font-size:28px; }
+
+  .oracle-chaos-stage.scene-accordion-reel .oracle-chaos-panel { grid-template-columns:80px minmax(0,1fr) 50px;width:95vw;min-height:246px;padding:22px 8px;border-inline-width:5px; }
+  .scene-accordion-reel .oracle-chaos-image { height:124px!important; }
+  .scene-accordion-reel .oracle-event-props>i { width:13vw; }
+  .scene-accordion-reel .oracle-event-props>i:nth-child(3),.scene-accordion-reel .oracle-event-props>i:nth-child(4){display:block}
+
+  .oracle-chaos-stage.scene-naoking-race { padding:0 0 26px; }
+  .oracle-chaos-stage.scene-naoking-race .oracle-chaos-panel { grid-template-columns:88px minmax(0,1fr) 46px;width:100%;min-height:215px;padding:24px 8px 12px; }
+  .scene-naoking-race .oracle-chaos-image { height:112px!important;width:126%!important; }
+  .scene-naoking-race .oracle-event-props>i:nth-child(3),.scene-naoking-race .oracle-event-props>i:nth-child(4){display:block}
+  .scene-naoking-race .oracle-event-props>b { right:7%;height:78%; }
+  .scene-naoking-race .oracle-event-props>span { width:19vw;height:10vh; }
+
+  .oracle-chaos-stage.scene-royal-school-dash { padding:58px 6px 10px; }
+  .oracle-chaos-stage.scene-royal-school-dash .oracle-chaos-panel { grid-template-columns:76px minmax(0,1fr) 44px;width:92vw;min-height:350px;padding:24px 8px 14px;border-width:5px; }
+  .scene-royal-school-dash .oracle-chaos-image { height:126px!important; }
+  .scene-royal-school-dash .oracle-event-props>i:nth-child(3),.scene-royal-school-dash .oracle-event-props>i:nth-child(4){display:block}
+  .scene-royal-school-dash .oracle-event-props>b { left:5%;right:5%;height:18%;border-width:4px; }
+
+  .oracle-chaos-stage.scene-realistic-deep-dive { place-items:center;padding:60px 6px 12px; }
+  .oracle-chaos-stage.scene-realistic-deep-dive .oracle-chaos-panel { grid-template-columns:76px minmax(0,1fr) 44px;width:92vw;min-height:66vh;padding:18px 8px; }
+  .scene-realistic-deep-dive .oracle-chaos-image { height:132px!important; }
+  .scene-realistic-deep-dive .oracle-event-props>i:nth-child(3),.scene-realistic-deep-dive .oracle-event-props>i:nth-child(4){display:block}
+  .scene-realistic-deep-dive .oracle-event-props>b { right:2%;width:20px; }
+  .scene-realistic-deep-dive .oracle-event-props>span { left:25%; }
+
+  .oracle-chaos-stage.scene-portal-panic .oracle-chaos-panel { grid-template-columns:78px minmax(0,1fr) 46px;width:95vw;min-height:330px;padding:24px 10px;border-radius:44%; }
+  .scene-portal-panic .oracle-chaos-image { height:126px!important; }
+  .scene-portal-panic .oracle-event-props>i:nth-child(1){width:66vw}.scene-portal-panic .oracle-event-props>i:nth-child(2){width:92vw}.scene-portal-panic .oracle-event-props>i:nth-child(n+3){display:none}
+  .scene-portal-panic .oracle-event-props>b { width:34vw; }
+
+  .oracle-chaos-stage.scene-machine-power-cycle .oracle-chaos-panel { grid-template-columns:78px minmax(0,1fr) 52px;width:95vw;min-height:310px;padding:34px 8px 14px;border-width:6px; }
+  .scene-machine-power-cycle .oracle-chaos-image { height:122px!important; }
+  .scene-machine-power-cycle .oracle-chaos-panel::before { font-size:5px;white-space:nowrap;overflow:hidden; }
+  .scene-machine-power-cycle .oracle-chaos-panel>b { min-height:115px;font-size:34px; }
+  .scene-machine-power-cycle .oracle-event-props>i:nth-child(1){left:12%}.scene-machine-power-cycle .oracle-event-props>i:nth-child(2){left:38%}.scene-machine-power-cycle .oracle-event-props>i:nth-child(3){display:block;left:64%}.scene-machine-power-cycle .oracle-event-props>i:nth-child(4){display:block;left:88%}
+
+  .oracle-chaos-stage.scene-oracle-ui-collapse .oracle-chaos-panel { grid-template-columns:78px minmax(0,1fr) 50px;width:95vw;min-height:278px;padding:20px 8px; }
+  .scene-oracle-ui-collapse .oracle-chaos-image { height:124px!important; }
+  .scene-oracle-ui-collapse .oracle-event-props>i { width:30vw;height:52px; }
+  .scene-oracle-ui-collapse .oracle-event-props>i:nth-child(3),.scene-oracle-ui-collapse .oracle-event-props>i:nth-child(4){display:block}
+  .scene-oracle-ui-collapse .oracle-event-props>b { left:3%;font-size:14px;white-space:nowrap; }
+
+  .oracle-chaos-stage.scene-golden-ocean-jackpot { padding:58px 4px 0; }
+  .oracle-chaos-stage.scene-golden-ocean-jackpot .oracle-chaos-panel { grid-template-columns:82px minmax(0,1fr) 48px;width:96vw;min-height:340px;padding:26px 9px 14px;border-radius:48% 48% 0 0; }
+  .scene-golden-ocean-jackpot .oracle-chaos-image { height:138px!important; }
+  .scene-golden-ocean-jackpot .oracle-event-props>i { display:block;width:23%; }
+  .scene-golden-ocean-jackpot .oracle-event-props>i:nth-child(1){left:1%;height:34%}.scene-golden-ocean-jackpot .oracle-event-props>i:nth-child(2){left:25%;height:44%}.scene-golden-ocean-jackpot .oracle-event-props>i:nth-child(3){right:25%;height:44%}.scene-golden-ocean-jackpot .oracle-event-props>i:nth-child(4){right:1%;height:34%}
+
+  .oracle-chaos-stage.scene-fish-celebration-jackpot .oracle-chaos-panel { grid-template-columns:78px minmax(0,1fr) 46px;width:94vw;min-height:322px;padding:24px 9px;border-radius:48%; }
+  .scene-fish-celebration-jackpot .oracle-chaos-image { height:132px!important; }
+  .scene-fish-celebration-jackpot .oracle-event-props>i:nth-child(1){width:74vw}.scene-fish-celebration-jackpot .oracle-event-props>i:nth-child(2){width:104vw}.scene-fish-celebration-jackpot .oracle-event-props>i:nth-child(n+3){display:none}
+
+  .oracle-chaos-stage.scene-abyss-dawn-jackpot { padding:58px 0 14px; }
+  .oracle-chaos-stage.scene-abyss-dawn-jackpot .oracle-chaos-panel { grid-template-columns:78px minmax(0,1fr) 46px;width:100%;min-height:290px;padding:22px 10px; }
+  .scene-abyss-dawn-jackpot .oracle-chaos-image { height:130px!important; }
+  .scene-abyss-dawn-jackpot .oracle-event-props>i:nth-child(3),.scene-abyss-dawn-jackpot .oracle-event-props>i:nth-child(4){display:block}
+
+  .oracle-chaos-stage.scene-naoking-overload-jackpot { padding:54px 0 8px; }
+  .oracle-chaos-stage.scene-naoking-overload-jackpot .oracle-chaos-panel { grid-template-columns:44% minmax(0,1fr) 38px;width:100%;min-height:76vh;padding:12px 7px; }
+  .scene-naoking-overload-jackpot .oracle-chaos-image { width:178%!important;height:56vh!important; }
+  .scene-naoking-overload-jackpot .oracle-chaos-copy { padding:10px 8px; }
+  .scene-naoking-overload-jackpot .oracle-event-props>i:nth-child(3),.scene-naoking-overload-jackpot .oracle-event-props>i:nth-child(4){display:block}
+
+  /* Mobile world takeover is restrained, but each world still changes a different axis. */
+  html.oracle-world-seventh-witness .fortune-card { transform:scaleX(1.035)!important; }
+  html.oracle-world-witness-evacuation .fortune-card { transform:translateX(9vw) rotate(-1deg)!important; }
+  html.oracle-world-witness-evacuation .site-header { transform:translateX(-9vw)!important; }
+  html.oracle-world-accordion-reel .fortune-card { animation-name:oracle-world-accordion-card-mobile; }
+  html.oracle-world-race-track .fortune-card { transform:translateY(25vh) scale(.72)!important; }
+  html.oracle-world-race-track .site-header { transform:translateY(-55%)!important; }
+  html.oracle-world-royal-school .fortune-card { transform:perspective(800px) rotateX(8deg) scale(.7) translateY(27vh)!important; }
+  html.oracle-world-cinematic-dive .fortune-card { transform:perspective(800px) translateZ(-160px) translateY(25vh) scale(.62)!important; }
+  html.oracle-world-portal-world .fortune-card { transform:perspective(800px) rotateY(-14deg) scale(.67)!important; }
+  html.oracle-world-portal-world .site-header { transform:perspective(700px) rotateY(180deg) translateY(-15%)!important; }
+  html.oracle-world-machine-power-cycle .fortune-card { transform:scale(.76)!important; }
+  html.oracle-world-ui-collapse .fortune-card { animation-name:oracle-world-ui-card-fall-mobile; }
+  html.oracle-world-golden-ocean .fortune-card { transform:translateY(27vh) scale(.68)!important; }
+  html.oracle-world-fish-celebration .fortune-card { animation-name:oracle-world-parade-card-mobile; }
+  html.oracle-world-abyss-dawn .fortune-card { transform:translateY(30vh) scale(.66)!important; }
+  html.oracle-world-naoking-overload .fortune-card { transform:translateX(-34vw) rotate(-5deg) scale(.7)!important; }
+  html.oracle-world-naoking-overload .site-header { transform:translateX(31vw) rotate(2deg)!important; }
+}
+
+@keyframes oracle-school-cross-mobile { 0%{translate:-22vw 0;opacity:0}12%{opacity:.82}100%{translate:112vw 7vh;opacity:0} }
+@keyframes oracle-school-orbit-mobile { 0%{translate:-50% -50%;transform:rotate(0) translateX(36vw) rotate(0);scale:.55;opacity:0}15%{opacity:.86}100%{translate:-50% -50%;transform:rotate(360deg) translateX(36vw) rotate(-360deg);scale:.9;opacity:0} }
+@keyframes oracle-school-absorb-mobile { 0%{translate:calc(-22vw - var(--fish-x)) calc(-12vh - var(--fish-y));scale:1.05;opacity:0}18%{opacity:.85}100%{translate:calc(50vw - var(--fish-x)) calc(48vh - var(--fish-y));scale:.05;opacity:0} }
+@keyframes oracle-school-depth-mobile { 0%{translate:-50% -50%;scale:.04;opacity:0}22%{opacity:.2}100%{translate:calc(-50% + var(--fish-x)) calc(-50% + var(--fish-y));scale:3.2;opacity:0} }
+@keyframes oracle-school-spiral-mobile { 0%{translate:-50% -50%;transform:rotate(0) translateX(43vw) rotate(0);scale:.2;opacity:0}14%{opacity:.86}100%{translate:-50% -50%;transform:rotate(720deg) translateX(4vw) rotate(-720deg);scale:.08;opacity:0} }
+@keyframes oracle-world-accordion-card-mobile { from{transform:perspective(900px) rotateY(-5deg) scaleX(.82) scale(.82)}to{transform:perspective(900px) rotateY(5deg) scaleX(1.04) scale(.82)} }
+@keyframes oracle-world-ui-card-fall-mobile { 0%,22%{transform:scale(.86)}100%{transform:translate(25vw,62vh) rotate(18deg) scale(.58);opacity:.04} }
+@keyframes oracle-world-parade-card-mobile { from{translate:-3vw 2vh;rotate:-1deg;scale:.76}to{translate:3vw -2vh;rotate:1deg;scale:.76} }
+
+@media (prefers-reduced-motion: reduce) {
+  .slot-window[data-reel-motion] .shark-tile { translate:0!important;rotate:0!important;scale:1!important;will-change:auto; }
+
+  .oracle-fish-school.is-visible { display:block!important;visibility:visible!important;opacity:.72!important; }
+  .oracle-fish-school .oracle-fish { animation:none!important;transition:none!important;transform:none!important;translate:0!important;rotate:0!important;scale:.72!important;opacity:.56!important;will-change:auto; }
+  .oracle-fish-school .oracle-fish:nth-child(n+9) { display:none!important; }
+  .oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish { top:var(--fish-y);left:var(--fish-x); }
+  .oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish:nth-child(1){left:8%;top:32%}.oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish:nth-child(2){left:20%;top:38%}.oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish:nth-child(3){left:32%;top:29%}.oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish:nth-child(4){left:44%;top:42%}.oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish:nth-child(5){left:57%;top:34%}.oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish:nth-child(6){left:69%;top:45%}.oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish:nth-child(7){left:81%;top:31%}.oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish:nth-child(8){left:90%;top:40%}
+  .oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish:nth-child(1){left:50%;top:14%}.oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish:nth-child(2){left:72%;top:23%}.oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish:nth-child(3){left:84%;top:48%}.oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish:nth-child(4){left:72%;top:73%}.oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish:nth-child(5){left:50%;top:82%}.oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish:nth-child(6){left:28%;top:73%}.oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish:nth-child(7){left:16%;top:48%}.oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish:nth-child(8){left:28%;top:23%}
+  .oracle-fish-school:is(.school-golden,[data-school="golden"]) .oracle-fish:nth-child(1){left:38%;top:34%}.oracle-fish-school:is(.school-golden,[data-school="golden"]) .oracle-fish:nth-child(2){left:52%;top:27%}.oracle-fish-school:is(.school-golden,[data-school="golden"]) .oracle-fish:nth-child(3){left:64%;top:38%}.oracle-fish-school:is(.school-golden,[data-school="golden"]) .oracle-fish:nth-child(4){left:68%;top:53%}.oracle-fish-school:is(.school-golden,[data-school="golden"]) .oracle-fish:nth-child(5){left:57%;top:66%}.oracle-fish-school:is(.school-golden,[data-school="golden"]) .oracle-fish:nth-child(6){left:42%;top:67%}.oracle-fish-school:is(.school-golden,[data-school="golden"]) .oracle-fish:nth-child(7){left:30%;top:55%}.oracle-fish-school:is(.school-golden,[data-school="golden"]) .oracle-fish:nth-child(8){left:50%;top:49%}
+  .oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish { left:50%;top:50%; }
+  .oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish:nth-child(1){scale:.18!important;translate:-34vw -20vh!important}.oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish:nth-child(2){scale:.28!important;translate:22vw -15vh!important}.oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish:nth-child(3){scale:.38!important;translate:-22vw 12vh!important}.oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish:nth-child(4){scale:.5!important;translate:15vw 18vh!important}.oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish:nth-child(5){scale:.62!important;translate:-12vw -8vh!important}.oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish:nth-child(6){scale:.78!important;translate:10vw 6vh!important}.oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish:nth-child(7){scale:.92!important;translate:-5vw 20vh!important}.oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish:nth-child(8){scale:1.05!important;translate:4vw -19vh!important}
+  .oracle-fish-school:is(.school-naoking,[data-school="naoking"]) .oracle-fish:nth-child(1){left:49%;top:49%;scale:.24!important}.oracle-fish-school:is(.school-naoking,[data-school="naoking"]) .oracle-fish:nth-child(2){left:57%;top:43%;scale:.34!important}.oracle-fish-school:is(.school-naoking,[data-school="naoking"]) .oracle-fish:nth-child(3){left:62%;top:54%;scale:.44!important}.oracle-fish-school:is(.school-naoking,[data-school="naoking"]) .oracle-fish:nth-child(4){left:49%;top:65%;scale:.54!important}.oracle-fish-school:is(.school-naoking,[data-school="naoking"]) .oracle-fish:nth-child(5){left:32%;top:56%;scale:.64!important}.oracle-fish-school:is(.school-naoking,[data-school="naoking"]) .oracle-fish:nth-child(6){left:31%;top:37%;scale:.74!important}.oracle-fish-school:is(.school-naoking,[data-school="naoking"]) .oracle-fish:nth-child(7){left:53%;top:24%;scale:.84!important}.oracle-fish-school:is(.school-naoking,[data-school="naoking"]) .oracle-fish:nth-child(8){left:76%;top:43%;scale:.94!important}
+
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot).is-visible { display:grid!important;visibility:visible!important;opacity:1!important;animation:none!important; }
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot)::before,
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot)::after,
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) *,
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) *::before,
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) *::after { animation:none!important;transition:none!important; }
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) .oracle-chaos-panel { transform:none!important;filter:none!important;opacity:1!important; }
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) .oracle-chaos-image { translate:0!important;rotate:0!important;scale:1!important; }
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) .oracle-event-props { display:block!important; }
+  .oracle-chaos-stage:is(.scene-seventh-witness,.scene-witness-evacuation,.scene-accordion-reel,.scene-naoking-race,.scene-royal-school-dash,.scene-realistic-deep-dive,.scene-portal-panic,.scene-machine-power-cycle,.scene-oracle-ui-collapse,.scene-golden-ocean-jackpot,.scene-fish-celebration-jackpot,.scene-abyss-dawn-jackpot,.scene-naoking-overload-jackpot) .oracle-event-props>* { will-change:auto;opacity:.24; }
+  .oracle-chaos-stage.phase-twist.outcome-normal .oracle-chaos-panel { border-style:solid; }
+  .oracle-chaos-stage.phase-twist.outcome-win .oracle-chaos-panel { translate:0 -2vh;box-shadow:0 0 0 7px rgba(255,224,125,.05),0 22px 70px rgba(0,5,20,.55); }
+  .oracle-chaos-stage.phase-twist.outcome-loss .oracle-chaos-panel { translate:0 7vh;rotate:-2deg;filter:saturate(.35)!important; }
+  .oracle-chaos-stage.phase-twist.outcome-revival .oracle-chaos-panel { box-shadow:0 0 0 10px rgba(194,250,252,.05),0 0 70px rgba(137,240,246,.18); }
 }

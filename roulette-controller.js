@@ -458,10 +458,12 @@
     if (presentation.cutin === false) return 0;
     const premium = Boolean(presentation.premium || presentation.tier === 'extreme');
     const heated = premium || ['hot', 'superhot', 'revival', 'fake-loss'].includes(presentation.tier);
-    if (premium) return phase === 'signal' ? 5000 : 4700;
-    if (heated) return phase === 'signal' ? 4500 : 4200;
-    if (presentation.scene) return phase === 'signal' ? 4000 : 3800;
-    return phase === 'signal' ? 3700 : 3500;
+    // A cut-in is a readable chapter, not a flash frame. These dwells deliberately
+    // slow the reels before the sequence resumes, turning reading time into tension.
+    if (premium) return phase === 'signal' ? 6500 : 6000;
+    if (heated) return phase === 'signal' ? 6000 : 5600;
+    if (presentation.scene) return phase === 'signal' ? 5700 : 5300;
+    return phase === 'signal' ? 5300 : 5000;
   }
 
   function sequenceTimings(presentation) {
@@ -1383,6 +1385,65 @@
     });
   }
 
+  function previewRoute(routeId, phase = 'signal', requestedResultKey = '') {
+    const route = routeById.get(String(routeId || ''));
+    if (!route) throw new Error(`Unknown roulette route: ${routeId}`);
+    const requestedResult = requestedResultKey ? resultByKey.get(String(requestedResultKey)) : null;
+    const template = requestedResult && routeCompatible(route, requestedResult)
+      ? requestedResult
+      : allResults.find(result => routeCompatible(route, result));
+    if (!template) throw new Error(`No compatible result for roulette route: ${routeId}`);
+
+    drawToken += 1;
+    clearScheduledTasks();
+    busy = false;
+    locked = false;
+    resetVisualState();
+
+    const result = Object.freeze({ ...template, message:template.messages[0] });
+    const reelCount = clampReelCount(route.reelCount);
+    const presentation = Object.freeze({
+      ...route,
+      reelCount,
+      category:presentationCategory(route),
+      modifier:Object.freeze({ id:'none', cue:'', detail:'' }),
+      ending:chooseEventEnding(route, result),
+      stopOrder:Object.freeze(makeStopOrder(route.motion, reelCount))
+    });
+    const previewPhase = ['descent', 'cruise', 'signal', 'anomaly', 'judgment', 'revealed'].includes(phase) ? phase : 'signal';
+
+    activeVisualResult = result;
+    activePresentation = presentation;
+    card.classList.add(`is-route-${presentation.id}`);
+    if (presentation.premium) card.classList.add('is-premium');
+    renderSpinCandidates(presentation);
+    setRouteReadout(presentation, previewPhase === 'anomaly' ? 'twist' : previewPhase);
+    setReelMotion(reelMotionFor(presentation, previewPhase, previewPhase === 'revealed' ? 'settled' : 'suspense'));
+    setPhase(previewPhase, previewPhase === 'revealed' && result.kind === 'win' ? 'jackpot' : '');
+    if (previewPhase === 'revealed') {
+      reel.innerHTML = tileSet(result.image, reelCount, true);
+      title.textContent = result.title;
+      message.textContent = result.message;
+    } else if (['signal', 'anomaly', 'judgment'].includes(previewPhase)) {
+      applyRouteMoment(presentation, previewPhase === 'anomaly' ? 'twist' : previewPhase);
+    }
+    return Object.freeze({ route:presentation.id, phase:previewPhase, result:result.key, reelCount });
+  }
+
+  function clearPreview() {
+    drawToken += 1;
+    clearScheduledTasks();
+    busy = false;
+    locked = false;
+    resetVisualState();
+    setButtonCopy('運命を回す');
+    status.textContent = 'ROYAL ORACLE // DORMANT';
+    title.textContent = '海の支配者';
+    message.textContent = 'ボタンを押せ。なおキングが、あなたの都合を見ずに今日の運勢を決める。';
+    setReelCount();
+    reel.innerHTML = tileSet(normalResults[0].image, DEFAULT_REEL_TILE_COUNT, true);
+  }
+
   setReelCount(); reel.innerHTML = tileSet(normalResults[0].image, DEFAULT_REEL_TILE_COUNT, true); status.textContent = 'ROYAL ORACLE // DORMANT';
   if (!window.location || ['localhost', '127.0.0.1'].includes(window.location.hostname)) {
     window.NaokingRouletteDebug = Object.freeze({
@@ -1390,7 +1451,20 @@
       presentationRule:'A frozen result is chosen before an independent compatible presentation route.', routeCount:presentationRoutes.length,
       expansion:Object.freeze({ version:expansion.version || '', research:expansion.research || {}, routeCount:(expansion.routes || []).length, fishFamilies:Object.freeze([...new Set((expansion.routes || []).map(route => route.fishSchool).filter(Boolean))]), reelGrammars:Object.freeze(Object.keys(reelGrammars)) }),
       getState:() => Object.freeze({ busy, locked, resolvedDraws, timerCount:scheduledTasks.length, phase:card.dataset.roulettePhase || '', motion:card.dataset.reelMotion || '', route:activePresentation?.id || '', category:activePresentation?.category || '', reelCount:Number(reel.dataset.reelCount || DEFAULT_REEL_TILE_COUNT), environmentClassCount:activeEnvironmentClasses.size, environmentClasses:[...activeEnvironmentClasses], normalHistory:[...normalHistory], presentationHistory:[...presentationHistory], presentationCategoryHistory:[...presentationCategoryHistory], displayed:displayHistory.map(item => item.key) }),
+      routes:Object.freeze(presentationRoutes.map(route => Object.freeze({ id:route.id, scene:route.scene || '', family:route.family, category:presentationCategory(route), reelCount:clampReelCount(route.reelCount) }))),
+      previewRoute, clearPreview,
       runDiagnostics, runMessageBagDiagnostics, runPresentationDiagnostics, runCutinDiagnostics
     });
+    const previewParams = typeof URLSearchParams === 'function'
+      ? new URLSearchParams(window.location?.search || '')
+      : null;
+    const previewId = previewParams?.get('oraclePreview');
+    if (previewId && routeById.has(previewId)) {
+      window.setTimeout(() => previewRoute(
+        previewId,
+        previewParams.get('oraclePhase') || 'signal',
+        previewParams.get('oracleResult') || ''
+      ), 0);
+    }
   }
 })();
