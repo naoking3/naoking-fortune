@@ -77,25 +77,25 @@
     const PLAYER_EDGE_PADDING = 12;
     const FORCED_SHIFT_MINIMUM = 105;
     const GAP_EDGE_PADDING = 46;
-    const PATTERN_INITIAL_DELAY = 1.95;
-    const PATTERN_RECOVERY_TIME = 0.16;
-    const HAZARD_RANDOM_SPEED = 18;
-    const MINE_SPEED_BONUS = 18;
-    const NET_SPEED_BONUS = 8;
+    const PATTERN_INITIAL_DELAY = 1.85;
+    const PATTERN_RECOVERY_TIME = 0.15;
+    const HAZARD_RANDOM_SPEED = 20;
+    const MINE_SPEED_BONUS = 20;
+    const NET_SPEED_BONUS = 10;
     const CURRENT_GATE_DELAY = 0.2;
-    const CURRENT_DURATION = 2.35;
+    const CURRENT_DURATION = 2.42;
     const FEVER_OBSTACLE_SCALE = 0.84;
     const HAZARD_MIN_SPEED_SCALE = 0.84;
-    const PHASE_TIMES = [4.2, 8.4, 12.6, 16.8];
+    const PHASE_TIMES = [4.1, 8.2, 12.4, 16.6];
     const DOUBLE_GATE_OFFSET = 0.84;
     const SWEEP_GATE_OFFSET = 0.66;
     const LATE_SPEED_RAMP = 3.7;
     const PHASES = [
-      { drain: 8.4, gap: 196, speed: 238, warning: 0.88, shift: 238, current: 102, reward: 42 },
-      { drain: 11.2, gap: 184, speed: 286, warning: 0.76, shift: 268, current: 118, reward: 52 },
-      { drain: 14.8, gap: 172, speed: 333, warning: 0.65, shift: 298, current: 136, reward: 64 },
-      { drain: 18.5, gap: 158, speed: 381, warning: 0.56, shift: 330, current: 156, reward: 78 },
-      { drain: 21.5, gap: 146, speed: 432, warning: 0.48, shift: 360, current: 178, reward: 92 }
+      { drain: 8.4, gap: 194, speed: 242, warning: 0.88, shift: 238, current: 105, reward: 42 },
+      { drain: 11.2, gap: 182, speed: 291, warning: 0.76, shift: 268, current: 122, reward: 52 },
+      { drain: 14.8, gap: 170, speed: 339, warning: 0.65, shift: 298, current: 141, reward: 64 },
+      { drain: 18.5, gap: 156, speed: 388, warning: 0.56, shift: 330, current: 162, reward: 78 },
+      { drain: 21.5, gap: 144, speed: 440, warning: 0.48, shift: 360, current: 172, reward: 92 }
     ];
     const reducedMotionQuery = matchMedia('(prefers-reduced-motion: reduce)');
     let reducedMotion = reducedMotionQuery.matches;
