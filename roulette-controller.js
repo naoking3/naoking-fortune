@@ -7,6 +7,7 @@
  * replace the frozen title, image, message or effect.
  */
 (() => {
+  const expansion = window.NaokingOracleExpansion || Object.freeze({});
   const card = document.querySelector('#card');
   const slot = document.querySelector('#slot');
   const reel = document.querySelector('#reel');
@@ -26,7 +27,10 @@
   const pageRoot = document.documentElement || null;
   const pageBody = document.body || null;
   const environmentTargets = [pageRoot, pageBody].filter(Boolean);
-  const REEL_TILE_COUNT = 5;
+  const DEFAULT_REEL_TILE_COUNT = 5;
+  const MIN_REEL_TILE_COUNT = 4;
+  const MAX_REEL_TILE_COUNT = 8;
+  const clampReelCount = value => Math.max(MIN_REEL_TILE_COUNT, Math.min(MAX_REEL_TILE_COUNT, Number(value) || DEFAULT_REEL_TILE_COUNT));
   const DEFAULT_BUTTON_HINT = 'HOLD YOUR BREATH';
 
   function setButtonCopy(label, hint = DEFAULT_BUTTON_HINT) {
@@ -242,7 +246,8 @@
     { id:'golden-tide', family:'premium', kinds:['win'], effects:['rainbow','crown'], weight:.14, tier:'extreme', world:'golden-tide', motion:'wave', duration:6800, cue:'GOLDEN TIDE', detail:'金の海流がページの端から端まで満ちる。', premium:true },
     { id:'secret-4810', family:'secret', kinds:['win'], weight:.09, tier:'extreme', world:'secret-4810', motion:'skip', duration:11600, cue:'DEPTH 4810 // VAULT', detail:'四個の封印が順に外れ、金庫から寝た王が結果を押し出す。', premium:true, blackout:true, scene:'vault-4810', sequence:'vault', twistMotion:'respin' },
     { id:'palace-open', family:'premium', kinds:['win'], effects:['rainbow','comet'], weight:.13, tier:'extreme', world:'palace-open', motion:'outside-in', duration:7000, cue:'THE PALACE OPENS', detail:'背景の海が割れ、その奥に王宮の光が現れる。', premium:true, freeze:true },
-    { id:'pixel-palace-bonus', family:'premium', category:'premium', kinds:['win'], effects:['rainbow','crown','comet','abyss'], weight:.08, tier:'extreme', world:'pixel-palace', motion:'skip', duration:11200, cue:'ROYAL 8-BIT PALACE', detail:'神託が低解像度の王宮ゲームへ変換。王冠ゲートを開いて帰還する。', premium:true, freeze:true, scene:'pixel-palace', sequence:'pixel-palace', twistMotion:'respin', audioScene:'pixel' }
+    { id:'pixel-palace-bonus', family:'premium', category:'premium', kinds:['win'], effects:['rainbow','crown','comet','abyss'], weight:.08, tier:'extreme', world:'pixel-palace', motion:'skip', duration:11200, cue:'ROYAL 8-BIT PALACE', detail:'神託が低解像度の王宮ゲームへ変換。王冠ゲートを開いて帰還する。', premium:true, freeze:true, scene:'pixel-palace', sequence:'pixel-palace', twistMotion:'respin', audioScene:'pixel' },
+    ...(expansion.routes || [])
   ].map(route => Object.freeze(route)));
 
   const routeById = new Map(presentationRoutes.map(route => [route.id, route]));
@@ -344,7 +349,8 @@
     }),
     'pixel-palace-bonus':sealEndingSet({
       win:[{ variant:'gate', eyebrow:'STAGE CLEAR', title:'王冠Gate、OPEN', detail:'低解像度の王宮を突破し、JACKPOT世界へ帰還します。' },{ variant:'secret-room', eyebrow:'SECRET ROOM', title:'壁の裏に白金王座', detail:'一Pixelの亀裂から、専用Premium宮殿が展開されます。' },{ variant:'boss-sleep', eyebrow:'BOSS ASLEEP', title:'最終王が寝ていた', detail:'戦わず王冠を回収。豪華なのに締まらない完全勝利です。' },{ variant:'extra-life', eyebrow:'1UP → JACKPOT', title:'残機が王冠へ変換', detail:'Retro Fanfareのあと、Page全体がRoyal Sceneへ変わります。' }]
-    })
+    }),
+    ...(expansion.endings || {})
   });
 
   function presentationCategory(route) {
@@ -376,6 +382,34 @@
     theft:[2,0,4,1,3], 'power-cut':[0,4,2,1,3], respin:[2,4,0,3,1],
     breakdown:[0,1,4,3,2]
   });
+
+  const reelGrammars = expansion.reelGrammars || Object.freeze({});
+  function makeStopOrder(strategy, count) {
+    const size = clampReelCount(count);
+    if (size === DEFAULT_REEL_TILE_COUNT && routeStopOrders[strategy]) return [...routeStopOrders[strategy]];
+    const indexes = Array.from({ length:size }, (_, index) => index);
+    const center = (size - 1) / 2;
+    if (['push','reverse'].includes(strategy)) return indexes.reverse();
+    if (['outside-in','witnesses'].includes(strategy)) {
+      const order = [];
+      for (let left = 0, right = size - 1; left <= right; left += 1, right -= 1) {
+        order.push(left);
+        if (right !== left) order.push(right);
+      }
+      return order;
+    }
+    if (['center-last','edge-first'].includes(strategy)) return indexes.sort((a, b) => Math.abs(b - center) - Math.abs(a - center));
+    if (strategy === 'wave') return [...indexes.filter(index => index % 2 === 0), ...indexes.filter(index => index % 2 === 1)];
+    if (strategy === 'skip') return [...indexes.filter(index => index % 2 === 1), ...indexes.filter(index => index % 2 === 0)];
+    if (['theft','respin'].includes(strategy)) return indexes.sort((a, b) => Math.abs(a - center) - Math.abs(b - center));
+    if (strategy === 'power-cut') return indexes.sort((a, b) => Math.abs(b - center) - Math.abs(a - center));
+    return indexes;
+  }
+
+  function reelMotionFor(presentation, phase, fallback) {
+    const grammar = reelGrammars[presentation?.reelGrammar];
+    return grammar?.[phase] || fallback;
+  }
 
   /*
    * Routes no longer share one four-beat clock. A sequence changes the
@@ -412,7 +446,8 @@
     'silent-revival':Object.freeze({ signal:.10, twist:.52, judgment:.70, stop:.85 }),
     coronation:Object.freeze({ signal:.09, twist:.50, judgment:.68, stop:.86 }),
     vault:Object.freeze({ signal:.08, twist:.48, judgment:.66, stop:.84 }),
-    'pixel-palace':Object.freeze({ signal:.07, twist:.48, judgment:.68, stop:.86 })
+    'pixel-palace':Object.freeze({ signal:.07, twist:.48, judgment:.68, stop:.86 }),
+    ...(expansion.sequences || {})
   });
 
   function sequenceFor(presentation) {
@@ -511,22 +546,26 @@
       presentationCategoryHistory.splice(5);
     }
     const jitter = reducedMotion.matches ? 0 : Math.floor(Math.random() * 260);
+    const reelCount = clampReelCount(route.reelCount);
     return Object.freeze({
-      ...route, category:presentationCategory(route), duration:route.duration + jitter,
+      ...route, reelCount, category:presentationCategory(route), duration:route.duration + jitter,
       modifier:presentationModifier(result, context), ending:chooseEventEnding(route, result),
-      stopOrder:Object.freeze([...(routeStopOrders[route.motion] || routeStopOrders.cascade)])
+      stopOrder:Object.freeze(makeStopOrder(route.motion, reelCount))
     });
   }
 
-  const tile = (image, index = 0, stopped = false) => `<div class="shark-tile${stopped ? ' is-stopped' : ''}" data-reel-index="${index}"><span aria-hidden="true">0${index + 1}</span><img class="shark-face" src="${image}" alt="なおキング" draggable="false"></div>`;
-  const fiveTiles = (image, stopped = false) => Array.from({ length:REEL_TILE_COUNT }, (_, index) => tile(image, index, stopped)).join('');
-  const shuffledSpinImages = () => {
+  const tile = (image, index = 0, stopped = false, count = DEFAULT_REEL_TILE_COUNT) => {
+    const prime = Math.abs(index - ((count - 1) / 2)) <= .5;
+    return `<div class="shark-tile${stopped ? ' is-stopped' : ''}${prime ? ' is-prime' : ''}" data-reel-index="${index}" style="--center-distance:${Math.abs(index - ((count - 1) / 2))}"><span aria-hidden="true">${String(index + 1).padStart(2, '0')}</span><img class="shark-face" src="${image}" alt="なおキング" draggable="false"></div>`;
+  };
+  const tileSet = (image, count = DEFAULT_REEL_TILE_COUNT, stopped = false) => Array.from({ length:clampReelCount(count) }, (_, index) => tile(image, index, stopped, clampReelCount(count))).join('');
+  const shuffledSpinImages = (count = DEFAULT_REEL_TILE_COUNT) => {
     const images = normalResults.map(result => result.image);
     for (let index = images.length - 1; index > 0; index -= 1) {
       const swapIndex = Math.floor(Math.random() * (index + 1));
       [images[index], images[swapIndex]] = [images[swapIndex], images[index]];
     }
-    return images.slice(0, REEL_TILE_COUNT);
+    return Array.from({ length:clampReelCount(count) }, (_, index) => images[index % images.length]);
   };
 
   /* Theatre layers are ornamental; readable typography stays outside them. */
@@ -567,8 +606,11 @@
   const oracleTakeover = document.createElement('div');
   oracleTakeover.className = 'oracle-takeover'; oracleTakeover.setAttribute('aria-hidden', 'true');
   oracleTakeover.innerHTML = '<span></span><small></small><i></i>'; pageBody?.append(oracleTakeover);
+  const fishSchool = document.createElement('div');
+  fishSchool.className = 'oracle-fish-school'; fishSchool.setAttribute('aria-hidden', 'true');
+  pageBody?.append(fishSchool);
   const chaosStage = document.createElement('section');
-  chaosStage.className = 'oracle-chaos-stage'; chaosStage.setAttribute('aria-hidden', 'true');
+  chaosStage.className = 'oracle-chaos-stage'; chaosStage.setAttribute('aria-hidden', 'true'); chaosStage.setAttribute('role', 'status'); chaosStage.setAttribute('aria-live', 'polite'); chaosStage.setAttribute('aria-atomic', 'true');
   const chaosPanel = document.createElement('div'); chaosPanel.className = 'oracle-chaos-panel';
   const chaosImage = document.createElement('img'); chaosImage.className = 'oracle-chaos-image'; chaosImage.alt = '';
   const chaosCopy = document.createElement('div'); chaosCopy.className = 'oracle-chaos-copy';
@@ -595,6 +637,7 @@
   let activePresentation = null;
   let chaosInteracted = false;
   let chaosSceneRevision = 0;
+  let fishSchoolRevision = 0;
   let visibilityPausedAt = 0;
   const displayHistory = [];
   const activeEnvironmentClasses = new Set();
@@ -840,8 +883,51 @@
     'giant-naoking':{ image:'assets/characters/naoking-hero.webp', glyph:'王', signal:['ROYAL SCALE ANOMALY','巨大なおキング接近','背景から中景、前景へ。検査理由は不明です。'], twist:['TOO CLOSE','顔で画面が埋まりました','合格、不合格、くしゃみ。離れるまで結末は見えません。'] },
     coronation:{ image:'assets/characters/naoking-jackpot.webp', glyph:'♛', signal:['ROYAL CORONATION','五証人、起立','神託装置を王座へ組み替えます。'], twist:['THE KING ARRIVES','戴冠式を開始','王は少し遅刻しました。'] },
     'vault-4810':{ image:'assets/characters/naoking-sleepy.webp', glyph:'4810', signal:['FOUR ROYAL SEALS','王室金庫を解錠','第一、第二、第三……第四封印。'], twist:['VAULT OPEN','中で王が寝ていた','起こしたので、結果を押し出します。'] },
-    'pixel-palace':{ image:'assets/characters/naoking-jackpot.webp', glyph:'8BIT', signal:['ROYAL GAME MODE','王宮を8-bitへ変換','王冠Gateまで残り一画面。結果はまだ封印中です。'], twist:['FINAL STAGE','Boss Roomを開く','戦闘、居眠り、隠し通路。どのClearかは次のFrameで。'] }
+    'pixel-palace':{ image:'assets/characters/naoking-jackpot.webp', glyph:'8BIT', signal:['ROYAL GAME MODE','王宮を8-bitへ変換','王冠Gateまで残り一画面。結果はまだ封印中です。'], twist:['FINAL STAGE','Boss Roomを開く','戦闘、居眠り、隠し通路。どのClearかは次のFrameで。'] },
+    ...(expansion.scenes || {})
   });
+
+  function hideFishSchool() {
+    fishSchoolRevision += 1;
+    fishSchool.className = 'oracle-fish-school';
+    fishSchool.removeAttribute('data-school');
+    fishSchool.removeAttribute('data-motion');
+    fishSchool.replaceChildren();
+  }
+
+  function showFishSchool(presentation, phase = 'signal', ms = 3600) {
+    const family = presentation.fishSchool;
+    if (!family) return;
+    hideFishSchool();
+    const baseCount = { small:20, royal:28, golden:38, abyss:24, naoking:34 }[family] || 20;
+    const mobileScale = window.innerWidth < 720 ? .56 : 1;
+    const count = reducedMotion.matches ? 7 : Math.max(10, Math.round(baseCount * mobileScale));
+    const fragment = document.createDocumentFragment();
+    for (let index = 0; index < count; index += 1) {
+      const fish = document.createElement('span');
+      fish.className = `oracle-fish fish-${family}`;
+      fish.dataset.fishIndex = String(index);
+      fish.style.setProperty('--fish-index', index);
+      fish.style.setProperty('--fish-x', `${-18 - Math.random() * 30}vw`);
+      fish.style.setProperty('--fish-y', `${4 + Math.random() * 88}%`);
+      fish.style.setProperty('--fish-size', `${20 + Math.round(Math.random() * 34)}px`);
+      fish.style.setProperty('--fish-delay', `${Math.random() * 1.9}s`);
+      fish.style.setProperty('--fish-duration', `${4.6 + Math.random() * 3.8}s`);
+      fish.style.setProperty('--fish-turn', `${index % 3 === 0 ? -7 : 4}deg`);
+      fish.style.setProperty('--fish-depth', `${.24 + Math.random() * .76}`);
+      const body = document.createElement('i');
+      const tail = document.createElement('b');
+      fish.append(body, tail); fragment.append(fish);
+    }
+    const motion = presentation.fishMotion || 'cross';
+    fishSchool.className = `oracle-fish-school is-visible school-${family} motion-${motion} phase-${phase}`;
+    fishSchool.dataset.school = family; fishSchool.dataset.motion = motion;
+    fishSchool.replaceChildren(fragment);
+    const revision = ++fishSchoolRevision;
+    later(() => {
+      if (revision === fishSchoolRevision) hideFishSchool();
+    }, Math.max(1700, ms));
+  }
 
   function hideChaosScene() {
     chaosSceneRevision += 1;
@@ -864,7 +950,7 @@
       ? ` outcome-${presentation.ending.outcome} ending-${presentation.ending.variant || 'default'}`
       : '';
     chaosStage.className = `oracle-chaos-stage is-visible scene-${presentation.scene} phase-${phase}${endingClass}`;
-    chaosStage.setAttribute('aria-hidden', chaosAction.hidden ? 'true' : 'false');
+    chaosStage.setAttribute('aria-hidden', 'false');
     const revision = ++chaosSceneRevision;
     later(() => {
       if (activePresentation?.id === presentation.id && revision === chaosSceneRevision) hideChaosScene();
@@ -893,18 +979,36 @@
     effectLayer.className = 'roulette-fx'; effectLayer.style.removeProperty('--roulette-fx-duration');
     sceneProp.className = 'roulette-scene-prop'; setIntruder({ intrusion:'' }, false);
     crowns.classList.remove('is-raining', 'is-sinking', 'is-constellation');
-    resultRegion?.classList.remove('is-revealing', 'is-false-ending'); oracleTakeover.className = 'oracle-takeover'; hideChaosScene();
+    resultRegion?.classList.remove('is-revealing', 'is-false-ending'); oracleTakeover.className = 'oracle-takeover'; hideChaosScene(); hideFishSchool();
     activeVisualResult = null; activePresentation = null; setPhase('');
     if (blast) blast.hidden = true;
   }
 
-  function renderSpinCandidates() { reel.innerHTML = shuffledSpinImages().map((image, index) => tile(image, index)).join(''); }
+  function setReelCount(count = DEFAULT_REEL_TILE_COUNT) {
+    const safeCount = clampReelCount(count);
+    reel.dataset.reelCount = String(safeCount);
+    slot.dataset.reelCount = String(safeCount);
+    reel.style.setProperty('--reel-count', safeCount);
+    slot.style.setProperty('--reel-count', safeCount);
+    const identity = machineIdentity.querySelector?.('span');
+    const detail = machineIdentity.querySelector?.('small');
+    if (identity) identity.textContent = `ROYAL ORACLE // ${safeCount} WITNESSES`;
+    if (detail) detail.textContent = `深海王国・${safeCount}証言神託機構`;
+    return safeCount;
+  }
+
+  function renderSpinCandidates(presentation = activePresentation) {
+    const count = setReelCount(presentation?.reelCount || DEFAULT_REEL_TILE_COUNT);
+    reel.innerHTML = shuffledSpinImages(count).map((image, index) => tile(image, index, false, count)).join('');
+  }
   function spinTiles() { return Array.from(reel.querySelectorAll?.('.shark-tile') || []); }
   function refreshSpinCandidates(result) {
-    const images = shuffledSpinImages();
+    const count = activePresentation?.reelCount || spinTiles().length || DEFAULT_REEL_TILE_COUNT;
+    const images = shuffledSpinImages(count);
+    const center = (count - 1) / 2;
     spinTiles().forEach((item, index) => {
       const image = item.querySelector?.('img');
-      if (image) image.src = index === 2 && result.kind === 'win' ? normalResults[0].image : images[index % images.length];
+      if (image) image.src = Math.abs(index - center) <= .5 && result.kind === 'win' ? normalResults[0].image : images[index % images.length];
     });
   }
 
@@ -935,13 +1039,14 @@
     if (phase === 'signal') {
       setRouteReadout(presentation, phase);
       const cutinMs = cutinDuration(presentation, 'signal');
-      setReelMotion(cutinMs ? 'suspense' : (presentation.reversal ? 'reverse' : 'anticipation'));
+      setReelMotion(reelMotionFor(presentation, 'signal', cutinMs ? 'suspense' : (presentation.reversal ? 'reverse' : 'anticipation')));
       if (cutinMs && presentation.scene) showChaosScene(presentation, 'signal', cutinMs);
       else if (cutinMs) showTakeover(presentation, 'signal', cutinMs);
-      dispatchOracleBeat(routeBeatCue(presentation, phase), { intensity:presentation.premium ? .92 : presentation.tier === 'superhot' ? .78 : .52 });
+      if (presentation.fishSchool) showFishSchool(presentation, 'signal', cutinMs || 4200);
+      dispatchOracleBeat(routeBeatCue(presentation, phase), { scene:presentation.audioScene || '', beat:phase, durationMs:cutinMs || 1800, reducedMotion:reducedMotion.matches, intensity:presentation.premium ? .92 : presentation.tier === 'superhot' ? .78 : .52 });
       if (presentation.intrusion) { setIntruder(presentation, true); later(() => setIntruder(presentation, false), Math.min(cutinMs || 2300, 2600)); }
       if (cutinMs) later(() => {
-        if (activePresentation?.id === presentation.id && busy) setReelMotion('anticipation');
+        if (activePresentation?.id === presentation.id && busy) setReelMotion(reelMotionFor(presentation, 'anomaly', 'anticipation'));
       }, Math.max(500, cutinMs - 500));
       if (presentation.world === 'constellation') crowns.classList.add('is-constellation');
       if (presentation.world === 'crown-sink') crowns.classList.add('is-sinking');
@@ -956,10 +1061,12 @@
       later(() => card.classList.remove('is-chaos-twist'), 920);
       refreshSpinCandidates(activeVisualResult);
       const cutinMs = cutinDuration(presentation, 'twist');
-      setReelMotion(cutinMs ? 'suspense' : (presentation.twistMotion || 'anticipation'));
+      setReelMotion(reelMotionFor(presentation, 'anomaly', cutinMs ? 'suspense' : (presentation.twistMotion || 'anticipation')));
       if (cutinMs && presentation.scene) showChaosScene(presentation, 'twist', cutinMs);
       else if (cutinMs) showTakeover({ ...presentation, cue:'CURRENT SHIFT', detail:'航路が途中で書き換わった。', modifier:{ cue:'', detail:'' } }, 'twist', cutinMs);
+      if (presentation.fishSchool) showFishSchool(presentation, 'twist', cutinMs || 4200);
       dispatchOracleBeat(routeBeatCue(presentation, phase), {
+        scene:presentation.audioScene || '', beat:phase, durationMs:cutinMs || 1900, reducedMotion:reducedMotion.matches,
         intensity:presentation.premium ? 1 : presentation.tier === 'hot' || presentation.tier === 'superhot' ? .78 : .58,
         silenceMs:['verdict-book'].includes(presentation.scene) ? 720 : undefined
       });
@@ -968,12 +1075,12 @@
       if (presentation.scene === 'escape') { setIntruder({ intrusion:'fish' }, true); later(() => setIntruder(presentation, false), 1250); }
       if (presentation.scene === 'coronation' || presentation.scene === 'vault-4810') crowns.classList.add('is-raining');
       if (cutinMs) later(() => {
-        if (activePresentation?.id === presentation.id && busy) setReelMotion(presentation.twistMotion || 'anticipation');
+        if (activePresentation?.id === presentation.id && busy) setReelMotion(reelMotionFor(presentation, 'anomaly', presentation.twistMotion || 'anticipation'));
       }, Math.max(500, cutinMs - 500));
     }
     if (phase === 'judgment') {
       refreshSpinCandidates(activeVisualResult);
-      dispatchOracleBeat('reel-brake', { intensity:presentation.tier === 'extreme' ? .94 : .64 });
+      dispatchOracleBeat('reel-brake', { scene:presentation.audioScene || '', beat:phase, durationMs:1200, reducedMotion:reducedMotion.matches, intensity:presentation.tier === 'extreme' ? .94 : .64 });
       if (presentation.premium) flash('extreme', 'ROYAL SEAL', 1500);
       else if (presentation.tier === 'superhot') flash('hot', 'VERY HOT', 1050);
     }
@@ -1008,7 +1115,8 @@
   }
 
   function showFinal(result, presentation) {
-    setReelMotion('settled'); slot.classList.remove('is-spinning', 'is-stopping'); reel.innerHTML = fiveTiles(result.image, true);
+    const reelCount = setReelCount(presentation?.reelCount || DEFAULT_REEL_TILE_COUNT);
+    setReelMotion('settled'); slot.classList.remove('is-spinning', 'is-stopping'); reel.innerHTML = tileSet(result.image, reelCount, true);
     title.textContent = result.title; message.textContent = result.message;
     resultRegion?.classList.remove('is-false-ending'); resultRegion?.classList.add('is-revealing'); resultRegion?.setAttribute('aria-busy', 'false');
     setPhase('revealed'); applyFinalEffect(result, presentation); dispatchOracleResult(result, presentation);
@@ -1026,7 +1134,7 @@
       const blackoutHold = 5200;
       const rebootHold = 3100;
       setPhase('fake', 'fake-loss'); setReelMotion('blackout'); card.classList.add('is-failed', 'is-fake', 'is-abyssal-blackout');
-      reel.innerHTML = fiveTiles('assets/characters/naoking-7.webp', true); title.textContent = '通信断';
+      reel.innerHTML = tileSet('assets/characters/naoking-7.webp', presentation.reelCount, true); title.textContent = '通信断';
       message.textContent = '……信号も水流も、完全に停止しました。'; resultRegion?.classList.add('is-false-ending');
       status.textContent = 'POWER FAILURE // ORACLE OFFLINE'; flash('void', 'POWER FAILURE', 4200);
       showTakeover({ ...presentation, cue:'POWER FAILURE', detail:'深海王国の全系統が停止しました。', modifier:{ cue:'', detail:'' } }, 'fake', 4200);
@@ -1047,7 +1155,7 @@
     const fakeHold = presentation.scene ? 1500 : 1800;
     const revivalHold = presentation.scene ? 2000 : 1600;
     setPhase('fake', 'fake-loss'); setReelMotion('settled'); card.classList.add('is-failed', 'is-fake');
-    reel.innerHTML = fiveTiles('assets/characters/naoking-7.webp', true); title.textContent = '判定終了';
+    reel.innerHTML = tileSet('assets/characters/naoking-7.webp', presentation.reelCount, true); title.textContent = '判定終了';
     message.textContent = '……王冠信号なし。神託装置を停止します。'; resultRegion?.classList.add('is-false-ending');
     status.textContent = 'NO SIGNAL // SESSION CLOSED'; flash('void', 'END', 900);
     if (presentation.scene) showTakeover({ ...presentation, cue:'VERDICT CLOSED', detail:'判定書は閉じた。海は、まだ黙っている。', modifier:{ cue:'', detail:'' } }, 'fake', fakeHold);
@@ -1107,27 +1215,27 @@
     dispatchOracleDraw(presentation);
 
     card.classList.add(`is-route-${presentation.id}`); if (presentation.premium) card.classList.add('is-premium');
-    renderSpinCandidates(); slot.classList.add('is-spinning'); setRouteReadout(presentation, 'descent'); setReelMotion('launch'); setPhase('descent');
-    setButtonCopy('五つの証言を採取中…', 'ONE DRAW // DO NOT TAP'); status.textContent = `ROUTE LOCKED // ${presentation.cue}`;
+    renderSpinCandidates(presentation); slot.classList.add('is-spinning'); setRouteReadout(presentation, 'descent'); setReelMotion(reelMotionFor(presentation, 'descent', 'launch')); setPhase('descent');
+    setButtonCopy(`${presentation.reelCount}つの証言を採取中…`, 'ONE DRAW // DO NOT TAP'); status.textContent = `ROUTE LOCKED // ${presentation.cue}`;
     resultRegion?.setAttribute('aria-busy', 'true'); message.textContent = '最終結果は封印済み。王国が、そこへ至る航路を選んでいる。';
 
     const { signalAt, twistAt, judgmentAt, stopAt } = sequenceTimings(presentation);
-    later(() => { setPhase('cruise'); setReelMotion('cruise'); status.textContent = 'FULL CURRENT // WITNESSES ROTATING'; }, 320);
+    later(() => { setPhase('cruise'); setReelMotion(reelMotionFor(presentation, 'cruise', 'cruise')); status.textContent = `FULL CURRENT // ${presentation.reelCount} WITNESSES ROTATING`; }, 320);
     later(() => {
-      setPhase('signal', presentation.fake && result.kind === 'normal' ? 'hot' : ''); setReelMotion(presentation.reversal ? 'reverse' : 'suspense');
+      setPhase('signal', presentation.fake && result.kind === 'normal' ? 'hot' : ''); setReelMotion(reelMotionFor(presentation, 'signal', presentation.reversal ? 'reverse' : 'suspense'));
       status.textContent = `${presentation.tier.toUpperCase()} // OMEN DETECTED`; applyRouteMoment(presentation, 'signal');
     }, signalAt);
     if (twistAt) {
       later(() => {
-        setPhase('anomaly'); setReelMotion('suspense');
+        setPhase('anomaly'); setReelMotion(reelMotionFor(presentation, 'anomaly', 'suspense'));
         status.textContent = `${presentation.scene ? 'SCENE CHANGE' : 'CURRENT SHIFT'} // ROUTE STILL SEALED`; applyRouteMoment(presentation, 'twist');
       }, twistAt);
     }
     later(() => {
-      setPhase('judgment'); setReelMotion('brake'); status.textContent = 'PRESSURE DROP // FINAL ORBIT'; applyRouteMoment(presentation, 'judgment');
+      setPhase('judgment'); setReelMotion(reelMotionFor(presentation, 'judgment', 'brake')); status.textContent = 'PRESSURE DROP // FINAL ORBIT'; applyRouteMoment(presentation, 'judgment');
     }, judgmentAt);
     later(() => {
-      setReelMotion('stopping'); status.textContent = 'FIVE WITNESSES // STAGGERED STOP';
+      setReelMotion(reelMotionFor(presentation, 'stopping', 'stopping')); status.textContent = `${presentation.reelCount} WITNESSES // STAGGERED STOP`;
       stopWitnesses(result, presentation, () => { if (result.effect === 'revival') runFalseEnding(result, presentation); else showFinal(result, presentation); });
     }, stopAt);
   }
@@ -1137,7 +1245,7 @@
     if (event.detail?.page === 'fortune') return;
     drawToken += 1; busy = false; locked = false; taps = []; resetVisualState(); setButtonCopy('運命を回す');
     resultRegion?.setAttribute('aria-busy', 'false'); status.textContent = 'ROYAL ORACLE // DORMANT'; title.textContent = '海の支配者';
-    message.textContent = 'ボタンを押せ。なおキングが、あなたの都合を見ずに今日の運勢を決める。'; reel.innerHTML = fiveTiles(normalResults[0].image, true);
+    message.textContent = 'ボタンを押せ。なおキングが、あなたの都合を見ずに今日の運勢を決める。'; setReelCount(); reel.innerHTML = tileSet(normalResults[0].image, DEFAULT_REEL_TILE_COUNT, true);
     const routeCue = routeReadout.querySelector?.('span'); const routeDetail = routeReadout.querySelector?.('small');
     if (routeCue) routeCue.textContent = 'AWAITING CURRENT'; if (routeDetail) routeDetail.textContent = '演出航路を待機中';
   });
@@ -1205,8 +1313,8 @@
 
   function runPresentationDiagnostics(iterations = 100000) {
     const sampleSize = Math.max(1, Math.min(250000, Math.floor(Number(iterations) || 100000)));
-    const snapshot = snapshotDrawState(); const routes = {}; const families = {}; const categories = {}; const endings = {}; const normalRoutes = new Set();
-    let lastRoute = ''; let lastCategory = ''; let immediateRouteRepeat = 0; let immediateCategoryRepeat = 0; let incompatibleRoutes = 0; let resultPresentationContradictions = 0; let endingContradictions = 0; let nonFrozenPresentations = 0; let minEstimatedRotations = Infinity;
+    const snapshot = snapshotDrawState(); const routes = {}; const families = {}; const categories = {}; const endings = {}; const reelCounts = {}; const normalRoutes = new Set();
+    let lastRoute = ''; let lastCategory = ''; let immediateRouteRepeat = 0; let immediateCategoryRepeat = 0; let incompatibleRoutes = 0; let resultPresentationContradictions = 0; let endingContradictions = 0; let nonFrozenPresentations = 0; let invalidStopOrders = 0; let minEstimatedRotations = Infinity;
     try {
       presentationHistory.splice(0);
       presentationCategoryHistory.splice(0);
@@ -1214,6 +1322,8 @@
         const result = resolveFinalResult();
         const presentation = choosePresentation(result, { spinNumber:(index % 8) + 1, isFirstToday:index === 0, lastResult:index % 29 === 0 ? result.key : '', lastRoute, rareDrought:index % 13 }, true);
         if (!Object.isFrozen(presentation) || !Object.isFrozen(presentation.stopOrder)) nonFrozenPresentations += 1;
+        const uniqueStops = new Set(presentation.stopOrder);
+        if (presentation.stopOrder.length !== presentation.reelCount || uniqueStops.size !== presentation.reelCount || presentation.stopOrder.some(value => value < 0 || value >= presentation.reelCount)) invalidStopOrders += 1;
         if (!routeCompatible(presentation, result)) incompatibleRoutes += 1;
         if (result.kind === 'loss' && (presentation.family === 'premium' || presentation.family === 'revival')) resultPresentationContradictions += 1;
         if (result.kind === 'normal' && ['extreme','revival','jackpot'].includes(presentation.tier)) resultPresentationContradictions += 1;
@@ -1223,6 +1333,7 @@
         if (presentation.category === lastCategory) immediateCategoryRepeat += 1; lastCategory = presentation.category;
         routes[presentation.id] = (routes[presentation.id] || 0) + 1; families[presentation.family] = (families[presentation.family] || 0) + 1;
         categories[presentation.category] = (categories[presentation.category] || 0) + 1;
+        reelCounts[presentation.reelCount] = (reelCounts[presentation.reelCount] || 0) + 1;
         if (presentation.ending) endings[`${presentation.id}:${presentation.ending.outcome}:${presentation.ending.title}`] = (endings[`${presentation.id}:${presentation.ending.outcome}:${presentation.ending.title}`] || 0) + 1;
         if (result.kind === 'normal') normalRoutes.add(presentation.id);
         minEstimatedRotations = Math.min(minEstimatedRotations, Math.floor((presentation.duration * .6) / 225));
@@ -1230,7 +1341,7 @@
     } finally { restoreDrawState(snapshot); }
     const missingRoutes = presentationRoutes.map(route => route.id).filter(id => !routes[id]);
     const largestRouteShare = Math.max(...Object.values(routes)) / sampleSize;
-    return Object.freeze({ iterations:sampleSize, routeDefinitions:presentationRoutes.length, routes:Object.freeze(routes), families:Object.freeze(families), categories:Object.freeze(categories), endings:Object.freeze(endings), normalRouteCount:normalRoutes.size, missingRoutes:Object.freeze(missingRoutes), immediateRouteRepeat, immediateCategoryRepeat, incompatibleRoutes, resultPresentationContradictions, endingContradictions, nonFrozenPresentations, largestRouteShare, minEstimatedRotations, textCutinShare:(categories['text-cutin'] || 0) / sampleSize, fullEventShare:(categories['full-event'] || 0) / sampleSize });
+    return Object.freeze({ iterations:sampleSize, routeDefinitions:presentationRoutes.length, routes:Object.freeze(routes), families:Object.freeze(families), categories:Object.freeze(categories), reelCounts:Object.freeze(reelCounts), endings:Object.freeze(endings), normalRouteCount:normalRoutes.size, missingRoutes:Object.freeze(missingRoutes), immediateRouteRepeat, immediateCategoryRepeat, incompatibleRoutes, resultPresentationContradictions, endingContradictions, nonFrozenPresentations, invalidStopOrders, largestRouteShare, minEstimatedRotations, textCutinShare:(categories['text-cutin'] || 0) / sampleSize, fullEventShare:(categories['full-event'] || 0) / sampleSize });
   }
 
   function runCutinDiagnostics() {
@@ -1240,7 +1351,7 @@
       return Object.freeze({
         id:route.id,
         scene:Boolean(route.scene), family:route.family, category:presentationCategory(route),
-        sceneId:route.scene || '', audioScene:route.audioScene || '',
+        sceneId:route.scene || '', audioScene:route.audioScene || '', reelCount:clampReelCount(route.reelCount), reelGrammar:route.reelGrammar || '', fishSchool:route.fishSchool || '',
         endingOutcomes:Object.freeze(Object.keys(endings)),
         endingVariantCount:Object.values(endings).reduce((total, entries) => total + entries.length, 0),
         signalDwell:timings.signalDwell,
@@ -1272,12 +1383,13 @@
     });
   }
 
-  reel.innerHTML = fiveTiles(normalResults[0].image, true); status.textContent = 'ROYAL ORACLE // DORMANT';
+  setReelCount(); reel.innerHTML = tileSet(normalResults[0].image, DEFAULT_REEL_TILE_COUNT, true); status.textContent = 'ROYAL ORACLE // DORMANT';
   if (!window.location || ['localhost', '127.0.0.1'].includes(window.location.hostname)) {
     window.NaokingRouletteDebug = Object.freeze({
       baseProbabilities:Object.freeze({ normal:0.76, specialWin:0.14, specialLoss:0.10 }), pityRule:'The eighth consecutive non-winning draw becomes rainbow.',
       presentationRule:'A frozen result is chosen before an independent compatible presentation route.', routeCount:presentationRoutes.length,
-      getState:() => Object.freeze({ busy, locked, resolvedDraws, timerCount:scheduledTasks.length, phase:card.dataset.roulettePhase || '', motion:card.dataset.reelMotion || '', route:activePresentation?.id || '', category:activePresentation?.category || '', environmentClassCount:activeEnvironmentClasses.size, environmentClasses:[...activeEnvironmentClasses], normalHistory:[...normalHistory], presentationHistory:[...presentationHistory], presentationCategoryHistory:[...presentationCategoryHistory], displayed:displayHistory.map(item => item.key) }),
+      expansion:Object.freeze({ version:expansion.version || '', research:expansion.research || {}, routeCount:(expansion.routes || []).length, fishFamilies:Object.freeze([...new Set((expansion.routes || []).map(route => route.fishSchool).filter(Boolean))]), reelGrammars:Object.freeze(Object.keys(reelGrammars)) }),
+      getState:() => Object.freeze({ busy, locked, resolvedDraws, timerCount:scheduledTasks.length, phase:card.dataset.roulettePhase || '', motion:card.dataset.reelMotion || '', route:activePresentation?.id || '', category:activePresentation?.category || '', reelCount:Number(reel.dataset.reelCount || DEFAULT_REEL_TILE_COUNT), environmentClassCount:activeEnvironmentClasses.size, environmentClasses:[...activeEnvironmentClasses], normalHistory:[...normalHistory], presentationHistory:[...presentationHistory], presentationCategoryHistory:[...presentationCategoryHistory], displayed:displayHistory.map(item => item.key) }),
       runDiagnostics, runMessageBagDiagnostics, runPresentationDiagnostics, runCutinDiagnostics
     });
   }

@@ -32,6 +32,7 @@ class Element {
     };
   }
   append(...children) { this.children.push(...children); }
+  replaceChildren(...children) { this.children = [...children]; }
   querySelector() { return null; }
   querySelectorAll() { return []; }
   setAttribute(name, value) { this[name] = String(value); }
@@ -63,6 +64,7 @@ const windowMock = {
   clearTimeout,
   CustomEvent: CustomEventMock,
   location: { hostname: 'localhost' },
+  innerWidth: 1280,
   // Keep lifecycle coverage fast while preserving every scheduled phase.
   matchMedia: () => ({ matches: true }),
   addEventListener(type, listener) {
@@ -84,6 +86,7 @@ const documentMock = {
   body,
   querySelector: selector => selectors.get(selector) || null,
   createElement: () => new Element(),
+  createDocumentFragment: () => new Element(),
   addEventListener(type, listener) {
     const listeners = documentListeners.get(type) || [];
     listeners.push(listener);
@@ -101,6 +104,8 @@ const context = {
   Date
 };
 
+const expansionSource = fs.readFileSync(new URL('../roulette-entertainment.js', import.meta.url), 'utf8');
+vm.runInNewContext(expansionSource, context, { filename: 'roulette-entertainment.js' });
 const source = fs.readFileSync(new URL('../roulette-controller.js', import.meta.url), 'utf8');
 vm.runInNewContext(source, context, { filename: 'roulette-controller.js' });
 // A second evaluation represents a stale duplicate script tag. The dataset
@@ -131,14 +136,18 @@ if (resultCount !== 20) failures.push(`only ${resultCount} of 20 result definiti
 if (diagnostic.rates.loss < 0.07 || diagnostic.rates.loss > 0.11) failures.push(`loss rate ${diagnostic.rates.loss}`);
 if (diagnostic.rates.normal < 0.61 || diagnostic.rates.normal > 0.72) failures.push(`normal rate ${diagnostic.rates.normal}`);
 if (diagnostic.rates.win < 0.18 || diagnostic.rates.win > 0.29) failures.push(`win rate ${diagnostic.rates.win}`);
-if (presentationDiagnostic.routeDefinitions !== 62) failures.push(`presentation route count was ${presentationDiagnostic.routeDefinitions}; expected 62`);
+if (presentationDiagnostic.routeDefinitions !== 80) failures.push(`presentation route count was ${presentationDiagnostic.routeDefinitions}; expected 80`);
 if (presentationDiagnostic.missingRoutes.length !== 0) failures.push(`uncovered presentation routes: ${presentationDiagnostic.missingRoutes.join(', ')}`);
 if (presentationDiagnostic.immediateRouteRepeat !== 0) failures.push(`presentation immediately repeated ${presentationDiagnostic.immediateRouteRepeat} times`);
 if (presentationDiagnostic.incompatibleRoutes !== 0) failures.push(`${presentationDiagnostic.incompatibleRoutes} incompatible presentation routes`);
 if (presentationDiagnostic.resultPresentationContradictions !== 0) failures.push(`${presentationDiagnostic.resultPresentationContradictions} result/presentation contradictions`);
 if (presentationDiagnostic.endingContradictions !== 0) failures.push(`${presentationDiagnostic.endingContradictions} event ending contradictions`);
 if (presentationDiagnostic.nonFrozenPresentations !== 0) failures.push(`${presentationDiagnostic.nonFrozenPresentations} presentation objects were mutable`);
-if (presentationDiagnostic.normalRouteCount !== 31) failures.push(`only ${presentationDiagnostic.normalRouteCount} of 31 normal routes appeared`);
+if (presentationDiagnostic.invalidStopOrders !== 0) failures.push(`${presentationDiagnostic.invalidStopOrders} invalid variable-reel stop orders`);
+if (presentationDiagnostic.normalRouteCount !== 45) failures.push(`only ${presentationDiagnostic.normalRouteCount} of 45 normal routes appeared`);
+for (const count of [4, 5, 6, 7, 8]) {
+  if (!presentationDiagnostic.reelCounts[count]) failures.push(`reel count ${count} never appeared`);
+}
 if (presentationDiagnostic.largestRouteShare > 0.15) failures.push(`largest presentation share was ${presentationDiagnostic.largestRouteShare}`);
 if (presentationDiagnostic.minEstimatedRotations < 10) failures.push(`minimum estimated rotations was ${presentationDiagnostic.minEstimatedRotations}`);
 if (presentationDiagnostic.textCutinShare > 0.16) failures.push(`text cut-in share was ${presentationDiagnostic.textCutinShare}`);
@@ -148,8 +157,8 @@ for (const category of ['environment','reel-event','intrusion','character-cutin'
   if (!presentationDiagnostic.categories[category]) failures.push(`presentation category ${category} was never selected`);
 }
 if (sessionDiagnostic.endingContradictions !== 0 || sessionDiagnostic.incompatibleRoutes !== 0) failures.push('200-spin session found a route/result contradiction');
-if (cutinDiagnostic.sceneCount !== 31) failures.push(`scene route count was ${cutinDiagnostic.sceneCount}; expected 31`);
-if (cutinDiagnostic.routeCount !== 62) failures.push(`cut-in diagnostics covered ${cutinDiagnostic.routeCount} routes`);
+if (cutinDiagnostic.sceneCount !== 44) failures.push(`scene route count was ${cutinDiagnostic.sceneCount}; expected 44`);
+if (cutinDiagnostic.routeCount !== 80) failures.push(`cut-in diagnostics covered ${cutinDiagnostic.routeCount} routes`);
 if (cutinDiagnostic.shortestSignalDwell < 3700) failures.push(`shortest signal cut-in was only ${cutinDiagnostic.shortestSignalDwell}ms`);
 if (cutinDiagnostic.shortestTwistDwell < 3500) failures.push(`shortest twist cut-in was only ${cutinDiagnostic.shortestTwistDwell}ms`);
 if (cutinDiagnostic.shortestSceneSignalDwell < 4000) failures.push(`shortest character cut-in was only ${cutinDiagnostic.shortestSceneSignalDwell}ms`);
@@ -160,7 +169,7 @@ if (cutinDiagnostic.restartRoute.signalDwell < 5000) failures.push(`abyssal revi
 if (cutinDiagnostic.netLossImage !== 'assets/characters/naoking-panic.webp') failures.push(`net loss image was ${cutinDiagnostic.netLossImage}`);
 
 const fullEventRoutes = cutinDiagnostic.routes.filter(route => route.family === 'full-event');
-if (fullEventRoutes.length !== 11) failures.push(`full event route count was ${fullEventRoutes.length}; expected 11`);
+if (fullEventRoutes.length !== 15) failures.push(`full event route count was ${fullEventRoutes.length}; expected 15`);
 for (const route of fullEventRoutes) {
   const missingOutcomes = ['normal','win','loss','revival'].filter(outcome => !route.endingOutcomes.includes(outcome));
   if (missingOutcomes.length) failures.push(`${route.id} missing endings: ${missingOutcomes.join(', ')}`);
@@ -170,6 +179,12 @@ for (const route of fullEventRoutes) {
 const requiredChaosScenes = ['crown-goal','news-live','commercial-takeover','repair-disaster','abandon','cctv-chase','lunch-show','council-deadlock','upside-down','giant-naoking','pixel-palace'];
 for (const sceneId of requiredChaosScenes) {
   if (!cutinDiagnostic.routes.some(route => route.sceneId === sceneId)) failures.push(`missing chaos expansion scene: ${sceneId}`);
+}
+for (const sceneId of ['seventh-witness','witness-evacuation','accordion-reel','naoking-race','royal-school-dash','realistic-deep-dive','portal-panic','machine-power-cycle','oracle-ui-collapse','golden-ocean-jackpot','fish-celebration-jackpot','abyss-dawn-jackpot','naoking-overload-jackpot']) {
+  if (!cutinDiagnostic.routes.some(route => route.sceneId === sceneId)) failures.push(`missing ultimate expansion scene: ${sceneId}`);
+}
+for (const family of ['small','royal','golden','abyss','naoking']) {
+  if (!cutinDiagnostic.routes.some(route => route.fishSchool === family)) failures.push(`missing fish-school family: ${family}`);
 }
 const pixelPremium = cutinDiagnostic.routes.find(route => route.id === 'pixel-palace-bonus');
 if (!pixelPremium || pixelPremium.category !== 'premium' || pixelPremium.endingVariantCount < 4 || pixelPremium.audioScene !== 'pixel') failures.push('pixel palace premium contract was incomplete');
@@ -202,14 +217,14 @@ if (dispatchedEvents.filter(event => event.type === 'naoking:oracleresult').leng
 dispatchedEvents.length = 0;
 const beforeSettledDraw = debug.getState();
 clickListeners[0]?.();
-await new Promise(resolve => setTimeout(resolve, 1400));
+await new Promise(resolve => setTimeout(resolve, 2200));
 const afterSettle = debug.getState();
 if (afterSettle.busy) failures.push('settled draw remained busy');
 if (afterSettle.timerCount !== 0) failures.push(`settled draw left ${afterSettle.timerCount} timers active`);
 if (afterSettle.phase !== 'resting') failures.push(`settled draw phase was ${afterSettle.phase}`);
 if (afterSettle.environmentClassCount !== 0) failures.push(`settled draw left ${afterSettle.environmentClassCount} high-cost environment classes`);
 
-// One click must freeze and reveal one result. All five reel stops and every
+// One click must freeze and reveal one result. All variable-count reel stops and every
 // sound/phase cue must belong to that same presentation route.
 const settledDrawEvents = [...dispatchedEvents];
 const drawEvents = settledDrawEvents.filter(event => event.type === 'naoking:oracledraw');
@@ -221,12 +236,13 @@ const settledRoute = afterSettle.route;
 if (afterSettle.resolvedDraws - beforeSettledDraw.resolvedDraws !== 1) failures.push('one settled click did not resolve exactly one draw');
 if (drawEvents.length !== 1) failures.push(`one click emitted ${drawEvents.length} draw events`);
 if (resultEvents.length !== 1) failures.push(`one click emitted ${resultEvents.length} result events`);
-if (stopEvents.length !== 5) failures.push(`one click emitted ${stopEvents.length} reel-stop events instead of 5`);
+const expectedStopCount = afterSettle.reelCount;
+if (stopEvents.length !== expectedStopCount) failures.push(`one click emitted ${stopEvents.length} reel-stop events instead of ${expectedStopCount}`);
 
-if (stopEvents.length === 5) {
+if (stopEvents.length === expectedStopCount) {
   const stopIndexes = stopEvents.map(event => Number(event.detail.index));
-  if (new Set(stopIndexes).size !== 5 || stopIndexes.some(index => index < 0 || index > 4)) failures.push(`reel-stop indexes were not the five unique witnesses: ${stopIndexes.join(', ')}`);
-  if (stopEvents.some(event => Number(event.detail.total) !== 5)) failures.push('a reel-stop event did not report total=5');
+  if (new Set(stopIndexes).size !== expectedStopCount || stopIndexes.some(index => index < 0 || index >= expectedStopCount)) failures.push(`reel-stop indexes were not ${expectedStopCount} unique witnesses: ${stopIndexes.join(', ')}`);
+  if (stopEvents.some(event => Number(event.detail.total) !== expectedStopCount)) failures.push(`a reel-stop event did not report total=${expectedStopCount}`);
   if (stopEvents.filter(event => event.detail.final === true).length !== 1) failures.push('reel-stop events did not identify exactly one final stop');
 }
 

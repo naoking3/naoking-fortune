@@ -38,6 +38,7 @@
   let context = null;
   let masterGain = null;
   let sceneGain = null;
+  let oracleSceneGain = null;
   let compressor = null;
   let noiseBuffer = null;
   let ambientVoice = null;
@@ -53,6 +54,8 @@
   const layerVoices = new Map(LAYERS.map(layer => [layer, new Set()]));
   const timers = new Set();
   const cueTimes = new Map();
+  const reducedMotionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)') || { matches: false };
+  const compactAudioQuery = window.matchMedia?.('(max-width: 620px)') || { matches: false };
   const stats = { cues: 0, dropped: 0, unlocks: 0, suspends: 0, resumes: 0, stops: 0 };
 
   function readStoredBoolean(key, fallback) {
@@ -110,12 +113,14 @@
     catch { context = new AudioContextClass(); }
     masterGain = context.createGain();
     sceneGain = context.createGain();
+    oracleSceneGain = context.createGain();
     compressor = typeof context.createDynamicsCompressor === 'function'
       ? context.createDynamicsCompressor()
       : context.createGain();
 
     masterGain.gain.value = state.volume;
     sceneGain.gain.value = 1;
+    oracleSceneGain.gain.value = 1;
     if (compressor.threshold) {
       compressor.threshold.value = -18;
       compressor.knee.value = 16;
@@ -125,13 +130,14 @@
     }
 
     sceneGain.connect(masterGain);
+    oracleSceneGain.connect(sceneGain);
     masterGain.connect(compressor);
     compressor.connect(context.destination);
 
     LAYERS.forEach(layer => {
       const gain = context.createGain();
       gain.gain.value = LAYER_LEVELS[layer];
-      gain.connect(sceneGain);
+      gain.connect(ORACLE_LAYERS.includes(layer) ? oracleSceneGain : sceneGain);
       layerGains.set(layer, gain);
     });
     return context;
@@ -179,6 +185,17 @@
 
   function makeVoice(layer = 'event') {
     if (!canPlay() || !layerGains.has(layer)) return null;
+    const mobile = Boolean(compactAudioQuery.matches);
+    const layerLimit = layer === 'event' ? (mobile ? 8 : 12) : (mobile ? 7 : 10);
+    const totalLimit = mobile ? 18 : 28;
+    const evictOne = candidates => {
+      const voice = Array.from(candidates).find(item => !item.persistent);
+      if (!voice) return false;
+      voice.stop();
+      return true;
+    };
+    if ((layerVoices.get(layer)?.size || 0) >= layerLimit && !evictOne(layerVoices.get(layer))) return null;
+    if (voices.size >= totalLimit && !evictOne(voices)) return null;
     const output = context.createGain();
     output.gain.value = 1;
     output.connect(layerGains.get(layer));
@@ -251,6 +268,7 @@
     ORACLE_LAYERS.forEach(stopLayer);
     if (includeResult) stopLayer('result');
     clearTimers('oracle');
+    clearSilence(true);
   }
 
   function stopAll({ keepTransition = false } = {}) {
@@ -530,6 +548,132 @@
     return true;
   }
 
+  /*
+   * Declarative sound scenes are intentionally data-only at the route boundary.
+   * They let future shows request a recognisable score without teaching the
+   * roulette controller how Web Audio is assembled.
+   */
+  const SOUND_SCENES = Object.freeze({
+    'fish-school':Object.freeze({
+      signal:[
+        { kind:'tone', frequency:720, endFrequency:1180, duration:.16, delay:0, pan:-.78 },
+        { kind:'tone', frequency:860, endFrequency:1360, duration:.14, delay:.12, pan:-.35 },
+        { kind:'tone', frequency:1040, endFrequency:1510, duration:.13, delay:.25, pan:.12 },
+        { kind:'tone', frequency:920, endFrequency:1420, duration:.15, delay:.39, pan:.56 }
+      ],
+      twist:[
+        { kind:'noise', frequency:1700, endFrequency:540, duration:.62, gain:.065, pan:.72 },
+        { kind:'tone', frequency:1320, endFrequency:690, duration:.24, delay:.08, pan:.6 },
+        { kind:'tone', frequency:1180, endFrequency:620, duration:.22, delay:.26, pan:-.55 }
+      ]
+    }),
+    race:Object.freeze({
+      signal:[
+        { kind:'tone', type:'triangle', frequency:420, endFrequency:470, duration:.07, delay:0, pan:-.65 },
+        { kind:'tone', type:'triangle', frequency:470, endFrequency:540, duration:.065, delay:.18, pan:-.2 },
+        { kind:'tone', type:'triangle', frequency:540, endFrequency:630, duration:.06, delay:.32, pan:.3 },
+        { kind:'tone', frequency:1480, endFrequency:1760, duration:.18, delay:.48, pan:.72 }
+      ],
+      twist:[
+        { kind:'noise', frequency:420, endFrequency:1380, duration:.72, gain:.072, pan:-.7 },
+        { kind:'noise', frequency:1500, endFrequency:470, duration:.68, delay:.13, gain:.064, pan:.7 },
+        { kind:'impact', intensity:.42, delay:.62 }
+      ]
+    }),
+    school:Object.freeze({
+      signal:[
+        { kind:'chord', frequencies:[392,523,659], duration:.38, gain:.045, spread:.055 },
+        { kind:'noise', frequency:2600, endFrequency:1300, duration:.26, delay:.38, gain:.032 }
+      ],
+      twist:[
+        { kind:'tone', type:'triangle', frequency:659, endFrequency:523, duration:.2, pan:-.3 },
+        { kind:'tone', type:'triangle', frequency:784, endFrequency:659, duration:.2, delay:.28, pan:.35 },
+        { kind:'chord', frequencies:[392,494,659], duration:.5, delay:.58, gain:.04, spread:.035 }
+      ]
+    }),
+    dive:Object.freeze({
+      signal:[
+        { kind:'noise', frequency:1800, endFrequency:260, duration:.9, gain:.085 },
+        { kind:'tone', type:'triangle', frequency:260, endFrequency:142, duration:.42, delay:.34, gain:.045 }
+      ],
+      twist:[
+        { kind:'noise', frequency:420, endFrequency:1900, duration:.78, gain:.078, pan:-.35 },
+        { kind:'tone', frequency:180, endFrequency:240, duration:.22, delay:.5, gain:.038, pan:.4 }
+      ]
+    }),
+    portal:Object.freeze({
+      signal:[
+        { kind:'chord', frequencies:[440,660,990], duration:.82, gain:.042, spread:.08 },
+        { kind:'noise', frequency:2400, endFrequency:1100, duration:.34, delay:.28, gain:.035, pan:.65 }
+      ],
+      twist:[
+        { kind:'tone', type:'square', frequency:880, endFrequency:1760, duration:.055, pan:-.7 },
+        { kind:'tone', type:'square', frequency:1320, endFrequency:660, duration:.045, delay:.11, pan:.7 },
+        { kind:'chord', frequencies:[330,495,742], duration:.72, delay:.22, gain:.047, spread:.06 }
+      ]
+    }),
+    'power-failure':Object.freeze({
+      signal:[
+        { kind:'tone', type:'square', frequency:1240, endFrequency:180, duration:.055, gain:.035 },
+        { kind:'noise', frequency:1500, endFrequency:90, duration:.3, delay:.07, gain:.06 },
+        { kind:'silence', durationMs:720, delayMs:190 }
+      ],
+      twist:[
+        { kind:'silence', durationMs:520 },
+        { kind:'tone', frequency:58, endFrequency:92, duration:.19, delay:.48, gain:.055 },
+        { kind:'chord', frequencies:[196,294,392], duration:.48, delay:.62, gain:.045, spread:.045 }
+      ]
+    }),
+    'ui-failure':Object.freeze({
+      signal:[
+        { kind:'tone', type:'square', frequency:980, endFrequency:240, duration:.045, pan:-.8 },
+        { kind:'tone', type:'square', frequency:370, endFrequency:1110, duration:.04, delay:.08, pan:.65 },
+        { kind:'tone', type:'square', frequency:1460, endFrequency:510, duration:.035, delay:.17, pan:-.2 }
+      ],
+      twist:[
+        { kind:'noise', frequency:2200, endFrequency:380, duration:.22, gain:.045 },
+        { kind:'tone', type:'square', frequency:220, endFrequency:1760, duration:.05, delay:.09, pan:.8 },
+        { kind:'silence', durationMs:260, delayMs:180 }
+      ]
+    }),
+    'jackpot-golden':Object.freeze({
+      reveal:[{ kind:'silence', durationMs:140 },{ kind:'impact', intensity:.8, delay:.13 },{ kind:'chord', frequencies:[196,247,294,392,494], duration:1.8, delay:.2, gain:.085, spread:.07 },{ kind:'bell', intensity:.72, delay:.48 }]
+    }),
+    'jackpot-fish':Object.freeze({
+      reveal:[{ kind:'silence', durationMs:120 },{ kind:'tone', frequency:760, endFrequency:1420, duration:.18, delay:.11, pan:-.75 },{ kind:'tone', frequency:940, endFrequency:1660, duration:.18, delay:.23, pan:.72 },{ kind:'chord', frequencies:[220,330,440,660], duration:1.55, delay:.34, gain:.072, spread:.08 }]
+    }),
+    'jackpot-dawn':Object.freeze({
+      reveal:[{ kind:'silence', durationMs:180 },{ kind:'noise', frequency:240, endFrequency:2600, duration:1.45, delay:.17, gain:.075 },{ kind:'chord', frequencies:[247,330,415,554], duration:2.05, delay:.28, gain:.075, spread:.1 },{ kind:'bell', intensity:.68, delay:.8 }]
+    }),
+    'jackpot-overload':Object.freeze({
+      reveal:[{ kind:'tone', type:'square', frequency:880, endFrequency:1760, duration:.045, pan:-.8 },{ kind:'tone', type:'square', frequency:1320, endFrequency:330, duration:.04, delay:.07, pan:.8 },{ kind:'impact', intensity:.9, delay:.14 },{ kind:'chord', frequencies:[196,294,392,588,784], duration:1.7, delay:.22, gain:.078, spread:.045 }]
+    })
+  });
+
+  function playDeclarativeSoundScene(detail = {}) {
+    const scene = SOUND_SCENES[String(detail.scene || '')];
+    if (!scene) return false;
+    const beat = String(detail.beat || 'signal');
+    const entries = scene[beat] || scene.signal;
+    if (!entries?.length) return false;
+    const requestedDuration = Math.max(0, Number(detail.durationMs) || 0);
+    const compact = Boolean(detail.reducedMotion || reducedMotionQuery.matches || requestedDuration && requestedDuration < 650);
+    const scale = compact ? Math.max(.18, Math.min(.42, requestedDuration ? requestedDuration / 1500 : .32)) : 1;
+    const intensity = clamp(detail.intensity ?? .62, .15, 1);
+    const limit = compactAudioQuery.matches ? 6 : 10;
+    entries.slice(0, limit).forEach(entry => {
+      const delay = Math.max(0, Number(entry.delay) || 0) * scale;
+      const gain = (entry.gain ?? .052) * intensity;
+      if (entry.kind === 'tone') tone({ ...entry, layer:'event', delay, duration:Math.max(.035, entry.duration * scale), release:Math.max(.025, (entry.release ?? entry.duration * .55) * scale), gain });
+      else if (entry.kind === 'noise') noise({ ...entry, layer:'event', delay, duration:Math.max(.05, entry.duration * scale), gain });
+      else if (entry.kind === 'chord') chord(entry.frequencies, { ...entry, layer:'event', delay, duration:Math.max(.08, entry.duration * scale), release:Math.max(.06, (entry.release ?? entry.duration * .65) * scale), gain });
+      else if (entry.kind === 'impact') scheduleTimer(() => impact((entry.intensity ?? .6) * intensity, 'event'), delay * 1000, 'oracle');
+      else if (entry.kind === 'bell') royalBell((entry.intensity ?? .6) * intensity, delay, 'event');
+      else if (entry.kind === 'silence') scheduleTimer(() => silence(Math.max(80, entry.durationMs * scale), { fade:.02, depth:0 }), Math.max(0, Number(entry.delayMs) || 0) * scale, 'oracle');
+    });
+    return true;
+  }
+
   function reelLaunch(intensity = 0.62) {
     if (!allowCue('reel:launch', 180)) return;
     noise({ layer: 'reel', duration: 0.42, gain: 0.16 * intensity, frequency: 210, endFrequency: 1600, q: 0.6 });
@@ -592,18 +736,16 @@
     const depth = { home: 0.55, videos: 0.45, fortune: 0.68, game: 0.76, submit: 0.48, join: 0.42 }[page] || 0.5;
     const source = voice.addSource(context.createBufferSource());
     const filter = voice.addNode(context.createBiquadFilter());
-    const hum = voice.addSource(context.createOscillator());
     const shimmer = voice.addSource(context.createOscillator());
     const shimmerGain = voice.addNode(context.createGain());
     source.buffer = getNoiseBuffer(); source.loop = true;
-    filter.type = 'lowpass'; filter.frequency.value = 260 + (1 - depth) * 260; filter.Q.value = 0.55;
-    hum.type = 'sine'; hum.frequency.value = 39 + depth * 13;
-    shimmer.type = 'sine'; shimmer.frequency.value = 115 + (1 - depth) * 48;
-    shimmerGain.gain.value = 0.11;
-    voice.output.gain.value = 0.052;
+    filter.type = 'bandpass'; filter.frequency.value = 360 + (1 - depth) * 260; filter.Q.value = 0.42;
+    shimmer.type = 'sine'; shimmer.frequency.value = 220 + (1 - depth) * 90;
+    shimmerGain.gain.value = 0.045;
+    voice.output.gain.value = 0.041;
     source.connect(filter); filter.connect(voice.output);
-    hum.connect(voice.output); shimmer.connect(shimmerGain); shimmerGain.connect(voice.output);
-    source.start(); hum.start(); shimmer.start();
+    shimmer.connect(shimmerGain); shimmerGain.connect(voice.output);
+    source.start(); shimmer.start();
     ambientVoice = voice;
     [0.15, 1.4, 3.1].forEach((delay, index) => bubble({ layer: 'ambient', delay, pan: index - 1, size: 0.25 + index * 0.17 }));
     return true;
@@ -633,12 +775,12 @@
   }
 
   function silence(duration = 650, { fade = 0.035, depth = 0 } = {}) {
-    if (!canPlay() || !sceneGain) return false;
+    if (!canPlay() || !oracleSceneGain) return false;
     window.clearTimeout(silenceTimer);
     const stamp = now();
-    sceneGain.gain.cancelScheduledValues(stamp);
-    sceneGain.gain.setValueAtTime(Math.max(0, sceneGain.gain.value), stamp);
-    sceneGain.gain.linearRampToValueAtTime(clamp(depth), stamp + Math.max(0.008, fade));
+    oracleSceneGain.gain.cancelScheduledValues(stamp);
+    oracleSceneGain.gain.setValueAtTime(Math.max(0, oracleSceneGain.gain.value), stamp);
+    oracleSceneGain.gain.linearRampToValueAtTime(clamp(depth), stamp + Math.max(0.008, fade));
     state.silenceUntil = Date.now() + duration;
     silenceTimer = window.setTimeout(() => clearSilence(false), Math.max(40, duration));
     return true;
@@ -648,12 +790,12 @@
     window.clearTimeout(silenceTimer);
     silenceTimer = 0;
     state.silenceUntil = 0;
-    if (!sceneGain || !context) return;
+    if (!oracleSceneGain || !context) return;
     const stamp = now();
-    sceneGain.gain.cancelScheduledValues(stamp);
-    sceneGain.gain.setValueAtTime(Math.max(0, sceneGain.gain.value), stamp);
-    if (immediate) sceneGain.gain.setValueAtTime(1, stamp);
-    else sceneGain.gain.linearRampToValueAtTime(1, stamp + 0.18);
+    oracleSceneGain.gain.cancelScheduledValues(stamp);
+    oracleSceneGain.gain.setValueAtTime(Math.max(0, oracleSceneGain.gain.value), stamp);
+    if (immediate) oracleSceneGain.gain.setValueAtTime(1, stamp);
+    else oracleSceneGain.gain.linearRampToValueAtTime(1, stamp + 0.18);
   }
 
   function playOpening({ resumed = false } = {}) {
@@ -801,6 +943,7 @@
 
   function handleOracleBeat(event) {
     const detail = event?.detail || {};
+    if (detail.scene && detail.beat && playDeclarativeSoundScene(detail)) return;
     if (detail.silenceMs) {
       silence(Number(detail.silenceMs));
       return;
@@ -1096,6 +1239,7 @@
       voicesByLayer: Object.freeze(byLayer),
       timers: timers.size,
       silenceActive: state.silenceUntil > Date.now(),
+      oracleBusGain: oracleSceneGain?.gain.value ?? 1,
       oracle: Object.freeze({ ...state.oracle }),
       stopCount: state.stopCount,
       stats: Object.freeze({ ...stats })

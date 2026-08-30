@@ -24,6 +24,10 @@ const eventSceneCues = [
   'abandon-signal','abandon-twist','chase-signal','chase-twist','lunch-signal','lunch-twist',
   'gravity-signal','gravity-twist','giant-signal','giant-twist','pixel-signal','pixel-twist'
 ];
+const declarativeScenes = [
+  'fish-school', 'race', 'school', 'dive', 'portal', 'power-failure', 'ui-failure',
+  'jackpot-golden', 'jackpot-fish', 'jackpot-dawn', 'jackpot-overload'
+];
 
 requiredLayers.forEach(layer => assert.match(source, new RegExp(`['"]${layer}['"]`), `missing audio layer: ${layer}`));
 requiredEvents.forEach(eventName => assert.match(source, new RegExp(eventName), `missing integration event: ${eventName}`));
@@ -33,6 +37,8 @@ eventSceneCues.forEach(cue => {
   assert.match(source, new RegExp(`['"]${scene}['"]`), `missing event sound scene: ${scene}`);
   assert.match(source, new RegExp(`['"]${phase}['"]`), `missing event sound phase: ${phase}`);
 });
+declarativeScenes.forEach(scene => assert.ok(source.includes(scene), `missing declarative sound scene: ${scene}`));
+assert.match(source, /oracleSceneGain/, 'oracle-only silence bus is missing');
 assert.match(source, /pixel-palace-bonus/, 'premium route sound classification is missing pixel palace');
 assert.doesNotMatch(source, /new\s+Audio\s*\(|\.mp3\b|\.wav\b|\.ogg\b|fetch\s*\(/i, 'audio must remain procedural and asset-free');
 assert.match(source, /visibilitychange/);
@@ -206,7 +212,8 @@ const window = Object.assign(windowTarget, {
   webkitAudioContext: FakeAudioContext,
   CustomEvent: FakeCustomEvent,
   setTimeout: fakeSetTimeout,
-  clearTimeout: fakeClearTimeout
+  clearTimeout: fakeClearTimeout,
+  matchMedia: query => ({ matches: query.includes('max-width'), media: query, addEventListener() {}, removeEventListener() {} })
 });
 
 const sandbox = vm.createContext({
@@ -258,6 +265,8 @@ assert.equal(window.NaokingAudio.snapshot().stopCount, 5, 'five stop events must
 
 window.dispatchEvent(new FakeCustomEvent('naoking:oraclebeat', { detail: { cue: 'abyssal-blackout', intensity: 0.18 } }));
 assert.equal(window.NaokingAudio.snapshot().silenceActive, true, 'abyssal blackout must silence the entire oracle scene');
+assert.equal(window.NaokingAudio.snapshot().oracleBusGain, 0, 'oracle blackout must close only the oracle bus');
+assert.ok(window.NaokingAudio.snapshot().voicesByLayer.ambient > 0, 'oracle silence must not destroy the ambient layer');
 window.dispatchEvent(new FakeCustomEvent('naoking:oraclebeat', { detail: { cue: 'abyssal-distant-signal', intensity: 0.22 } }));
 window.dispatchEvent(new FakeCustomEvent('naoking:oraclebeat', { detail: { cue: 'abyssal-reboot', intensity: 1 } }));
 assert.equal(window.NaokingAudio.snapshot().silenceActive, false, 'abyssal reboot must release the blackout silence');
@@ -268,6 +277,17 @@ for (const sceneCue of eventSceneCues) {
 assert.ok(window.NaokingAudio.snapshot().voicesByLayer.event > 0, 'event-specific sound scenes did not create procedural voices');
 window.dispatchEvent(new FakeCustomEvent('naoking:oraclebeat', { detail: { cue: 'abyssal-reboot', intensity: 1 } }));
 assert.equal(window.NaokingAudio.snapshot().silenceActive, false, 'event-scene silence did not release for the next scene');
+
+for (const scene of declarativeScenes) {
+  const beat = scene.startsWith('jackpot-') ? 'reveal' : 'signal';
+  window.dispatchEvent(new FakeCustomEvent('naoking:oraclebeat', { detail: {
+    cue: 'scene', scene, beat, intensity: 0.72, durationMs: 420, reducedMotion: true
+  } }));
+}
+assert.ok(window.NaokingAudio.snapshot().voicesByLayer.event <= 8, 'mobile event polyphony limit was exceeded');
+window.dispatchEvent(new FakeCustomEvent('naoking:pagechange', { detail: { page: 'home' } }));
+assert.equal(window.NaokingAudio.snapshot().voicesByLayer.event, 0, 'page cleanup left declarative scene voices active');
+assert.equal(window.NaokingAudio.snapshot().silenceActive, false, 'page cleanup left declarative scene silence active');
 
 window.dispatchEvent(new FakeCustomEvent('naoking:gameaudio', { detail: { cue: 'start', intensity: 0.6 } }));
 for (let index = 0; index < 10; index += 1) {
