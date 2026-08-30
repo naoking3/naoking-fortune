@@ -13,6 +13,8 @@
   let layerIndex = 0;
   let timer = 0;
   let rotating = false;
+  let paused = false;
+  let changeToken = 0;
 
   layers.forEach((layer, index) => {
     layer.className = `photo-layer${index === 0 ? ' is-visible' : ''}`;
@@ -35,12 +37,14 @@
     return next;
   }
 
-  async function rotate() {
-    if (rotating || document.hidden) return;
+  async function show(index, { restart = false } = {}) {
+    if (document.hidden) return false;
+    const token = ++changeToken;
     rotating = true;
-    const nextIndex = chooseNext();
+    const nextIndex = ((Number(index) || 0) + photos.length) % photos.length;
     const source = photos[nextIndex];
     await preload(source);
+    if (token !== changeToken) return false;
 
     const outgoingLayer = layers[layerIndex];
     layerIndex = 1 - layerIndex;
@@ -63,12 +67,37 @@
     }
     currentIndex = nextIndex;
     rotating = false;
+    window.dispatchEvent(new CustomEvent('naoking:photochange', { detail: { index: currentIndex, source } }));
+    if (restart && !paused) schedule();
+    return true;
+  }
+
+  async function rotate() {
+    if (paused || rotating || document.hidden) return;
+    await show(chooseNext());
+  }
+
+  function schedule() {
+    window.clearInterval(timer);
+    if (paused) return;
+    if (!reducedMotion.matches) timer = window.setInterval(rotate, 8500);
   }
 
   function start() {
-    window.clearInterval(timer);
     rotate();
-    if (!reducedMotion.matches) timer = window.setInterval(rotate, 8500);
+    schedule();
+  }
+
+  function pause() {
+    paused = true;
+    changeToken += 1;
+    rotating = false;
+    window.clearInterval(timer);
+  }
+
+  function resume() {
+    paused = false;
+    schedule();
   }
 
   document.addEventListener('visibilitychange', () => {
@@ -76,5 +105,13 @@
     else start();
   });
   reducedMotion.addEventListener?.('change', start);
+  window.NaokingPhotos = Object.freeze({
+    sources: [...photos],
+    current: () => Math.max(0, currentIndex),
+    select: index => show(index, { restart: true }),
+    isPaused: () => paused,
+    pause,
+    resume
+  });
   start();
 })();

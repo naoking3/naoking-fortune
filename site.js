@@ -14,19 +14,23 @@
   const skipOpening = document.querySelector('#skip-opening');
   const depthValue = document.querySelector('#header-depth-value');
   const depthProgress = document.querySelector('#depth-progress');
+  const openingDepthMeter = document.querySelector('#opening-depth-meter');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const validPages = new Set(pages.map(page => page.id));
   let activePage = 'home';
   let menuOpen = false;
   let openingActive = Boolean(opening);
+  let pageTransitioning = false;
+  let pageTransitionTimer = 0;
+  let pendingPage = null;
 
   function syncInteractiveState() {
-    const backgroundInert = openingActive || menuOpen;
+    const backgroundInert = openingActive || menuOpen || pageTransitioning;
     [main, siteFooter, brand, skipLink].forEach(element => {
       if (element) element.inert = backgroundInert;
     });
-    if (navigation) navigation.inert = openingActive;
-    if (menuButton) menuButton.inert = openingActive;
+    if (navigation) navigation.inert = openingActive || pageTransitioning;
+    if (menuButton) menuButton.inert = openingActive || pageTransitioning;
   }
 
   function closeMenu({ restoreFocus = false } = {}) {
@@ -48,8 +52,14 @@
     window.requestAnimationFrame(() => navigation?.querySelector('.nav-link')?.focus());
   }
 
-  function setPage(name, { updateHistory = true, focus = true } = {}) {
-    const nextName = validPages.has(name) ? name : 'home';
+  function focusPageHeading(pageName, delay = 0) {
+    const heading = document.getElementById(pageName)?.querySelector('h1');
+    if (!heading) return;
+    heading.tabIndex = -1;
+    window.setTimeout(() => heading.focus({ preventScroll: true }), delay);
+  }
+
+  function commitPage(nextName, { updateHistory = true, focus = true } = {}) {
     const nextPage = document.getElementById(nextName);
     if (!nextPage) return;
 
@@ -78,14 +88,44 @@
       window.history.pushState({ page: nextName }, '', `#${nextName}`);
     }
     window.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
-    if (focus) {
-      const heading = nextPage.querySelector('h1');
-      if (heading) {
-        heading.tabIndex = -1;
-        window.setTimeout(() => heading.focus({ preventScroll: true }), reducedMotion.matches ? 0 : 360);
-      }
-    }
+    if (focus) focusPageHeading(nextName, reducedMotion.matches ? 0 : 360);
     window.dispatchEvent(new CustomEvent('naoking:pagechange', { detail: { page: nextName } }));
+  }
+
+  function setPage(name, { updateHistory = true, focus = true } = {}) {
+    const nextName = validPages.has(name) ? name : 'home';
+    const shouldAnimate = focus && nextName !== activePage && !reducedMotion.matches;
+    if (pageTransitioning) {
+      pendingPage = { name: nextName, updateHistory, focus };
+      return;
+    }
+    if (!shouldAnimate) {
+      commitPage(nextName, { updateHistory, focus });
+      return;
+    }
+
+    pageTransitioning = true;
+    body.dataset.nextPage = nextName;
+    body.classList.add('is-page-transitioning');
+    closeMenu();
+    syncInteractiveState();
+    window.clearTimeout(pageTransitionTimer);
+    pageTransitionTimer = window.setTimeout(() => {
+      commitPage(nextName, { updateHistory, focus: false });
+      body.classList.add('is-page-revealing');
+      pageTransitionTimer = window.setTimeout(() => {
+        pageTransitioning = false;
+        body.classList.remove('is-page-transitioning', 'is-page-revealing');
+        delete body.dataset.nextPage;
+        syncInteractiveState();
+        if (focus) focusPageHeading(nextName);
+        if (pendingPage) {
+          const pending = pendingPage;
+          pendingPage = null;
+          if (pending.name !== activePage) setPage(pending.name, pending);
+        }
+      }, 560);
+    }, 260);
   }
 
   document.addEventListener('click', event => {
@@ -130,7 +170,7 @@
   function syncRouteFromLocation() {
     const route = window.location.hash.slice(1);
     const next = validPages.has(route) ? route : 'home';
-    if (next !== activePage) setPage(next, { updateHistory: false });
+    if (pageTransitioning || next !== activePage) setPage(next, { updateHistory: false });
   }
   window.addEventListener('popstate', syncRouteFromLocation);
   window.addEventListener('hashchange', syncRouteFromLocation);
@@ -138,9 +178,17 @@
   let scrollTicking = false;
   function updateScrollState() {
     const scrollTop = window.scrollY;
+    const available = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    const normalized = Math.min(1, Math.max(0, scrollTop / available));
+    const activeSection = document.getElementById(activePage);
+    const pageDepth = Number(activeSection?.dataset.depth || 1280);
+    const scrollRange = activePage === 'home' ? 6770 : 900;
+    const scrollDepth = Math.round(pageDepth + normalized * scrollRange);
+    document.documentElement.style.setProperty('--scroll-progress', normalized.toFixed(4));
+    document.documentElement.style.setProperty('--scroll-depth', `${scrollDepth}`);
+    body.dataset.depthZone = scrollDepth < 2600 ? 'sunlit' : scrollDepth < 5600 ? 'midwater' : 'trench';
     header?.classList.toggle('is-condensed', scrollTop > 28);
     if (activePage === 'home' && depthProgress) {
-      const available = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       const progress = Math.min(100, Math.max(8, (scrollTop / available) * 100));
       depthProgress.style.height = `${progress}%`;
     }
@@ -154,23 +202,33 @@
   }, { passive: true });
 
   let openingTimer = 0;
+  let openingFrame = 0;
   let manageOpeningFocus = false;
+  function animateOpeningDepth(startTime) {
+    if (!openingDepthMeter || !openingActive) return;
+    const progress = Math.min(1, (performance.now() - startTime) / 2250);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    openingDepthMeter.textContent = `${String(Math.round(1280 * eased)).padStart(4, '0')} M`;
+    if (progress < 1) openingFrame = window.requestAnimationFrame(() => animateOpeningDepth(startTime));
+  }
   function finishOpening() {
     if (!opening || opening.classList.contains('is-finished')) return;
     window.clearTimeout(openingTimer);
+    window.cancelAnimationFrame(openingFrame);
+    if (openingDepthMeter) openingDepthMeter.textContent = '1280 M';
     openingActive = false;
     syncInteractiveState();
-    opening.classList.add('is-finished');
-    opening.setAttribute('aria-hidden', 'true');
-    try { window.sessionStorage.setItem('naokingOpeningSeen', '1'); } catch { /* storage may be blocked */ }
-    window.setTimeout(() => opening.remove(), reducedMotion.matches ? 0 : 900);
     if (manageOpeningFocus) {
       const heading = document.querySelector('.page:not([hidden]) h1');
       if (heading) {
         heading.tabIndex = -1;
-        window.setTimeout(() => heading.focus({ preventScroll: true }), reducedMotion.matches ? 0 : 100);
+        heading.focus({ preventScroll: true });
       }
     }
+    opening.classList.add('is-finished');
+    opening.setAttribute('aria-hidden', 'true');
+    try { window.sessionStorage.setItem('naokingOpeningSeen', '1'); } catch { /* storage may be blocked */ }
+    window.setTimeout(() => opening.remove(), reducedMotion.matches ? 0 : 900);
   }
   if (opening) {
     let seen = false;
@@ -178,6 +236,7 @@
     manageOpeningFocus = !seen && !reducedMotion.matches;
     syncInteractiveState();
     if (manageOpeningFocus) window.requestAnimationFrame(() => skipOpening?.focus());
+    if (!seen && !reducedMotion.matches) openingFrame = window.requestAnimationFrame(timestamp => animateOpeningDepth(timestamp));
     openingTimer = window.setTimeout(finishOpening, seen || reducedMotion.matches ? 250 : 2600);
     skipOpening?.addEventListener('click', finishOpening);
   }
