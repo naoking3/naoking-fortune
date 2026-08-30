@@ -94,6 +94,54 @@
   transform: translateY(1px) scale(.985);
 }
 
+.deep-sea-game .game-hud.has-oxygen-meter {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.deep-sea-game .game-oxygen-hud {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-content: center;
+  gap: 4px 10px;
+  min-width: 0;
+  border-left: 1px solid rgba(130, 235, 255, .12);
+}
+
+.deep-sea-game .game-oxygen-hud > b {
+  color: #9ff4ff;
+  text-align: right;
+  font-size: clamp(16px, 1.75vw, 24px);
+  transition: color .16s ease;
+}
+
+.deep-sea-game .game-oxygen-track {
+  grid-column: 1 / -1;
+  position: relative;
+  display: block;
+  height: 7px;
+  overflow: hidden;
+  border: 1px solid rgba(155, 238, 255, .28);
+  border-radius: 999px;
+  background: rgba(1, 27, 39, .78);
+}
+
+.deep-sea-game .game-oxygen-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #54cfe5, #bdf9ff);
+  transform: scaleX(var(--oxygen-level, .78));
+  transform-origin: left center;
+  box-shadow: 0 0 12px rgba(103, 231, 250, .42);
+  transition: transform .12s linear, background .16s ease;
+}
+
+.deep-sea-game.is-oxygen-low .game-oxygen-hud > b { color: #ffe08a; }
+.deep-sea-game.is-oxygen-low .game-oxygen-fill { background: linear-gradient(90deg, #e7a748, #ffe89b); }
+.deep-sea-game.is-oxygen-critical .game-oxygen-hud > b { color: #ff9294; }
+.deep-sea-game.is-oxygen-critical .game-oxygen-fill { background: linear-gradient(90deg, #ed5969, #ffb28e); }
+.deep-sea-game.is-oxygen-critical #game-canvas { border-color: rgba(255, 118, 126, .68); }
+
 /* Runtime state feedback stays short so a failed run can restart immediately. */
 .deep-sea-game.is-fever #game-canvas {
   border-color: rgba(255, 222, 118, .82);
@@ -144,6 +192,9 @@
 
 @media (max-width: 680px) {
   #game-canvas { min-height: 0; border-radius: 15px; }
+
+  .deep-sea-game .game-hud.has-oxygen-meter { grid-template-columns: 1fr 1fr; }
+  .deep-sea-game .game-oxygen-hud { grid-column: 1 / -1; padding-block: 10px; }
 
   #start-game,
   #left-control,

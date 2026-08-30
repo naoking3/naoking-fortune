@@ -65,3 +65,267 @@
   .fortune-card[data-roulette-phase] .slot-window,.fortune-card[data-roulette-phase] .slot-window::after,.result.is-revealing,.result.is-revealing strong,.result.is-revealing p{animation:none!important;transform:none!important}
   .slot-window::after{display:none}
 }
+
+/* Signature Oracle Environment
+   The resolved verdict drives one shared rhythm across machine, water, light
+   and depth telemetry. Routine draws stay restrained; rare verdicts earn the
+   larger environmental response. */
+html.is-oracle-active {
+  --oracle-rgb: 124, 222, 237;
+  --oracle-accent-rgb: 223, 202, 132;
+  --oracle-shadow-rgb: 4, 42, 70;
+  --oracle-env-opacity: .34;
+  --oracle-pulse-scale: 1.016;
+}
+html.oracle-tier-normal { --oracle-env-opacity: .22; --oracle-pulse-scale: 1.008; }
+html.oracle-tier-hot { --oracle-rgb: 121, 239, 239; --oracle-accent-rgb: 239, 210, 115; --oracle-env-opacity: .46; --oracle-pulse-scale: 1.022; }
+html.oracle-tier-superhot { --oracle-rgb: 191, 249, 250; --oracle-accent-rgb: 255, 207, 82; --oracle-env-opacity: .62; --oracle-pulse-scale: 1.03; }
+html.oracle-tier-jackpot { --oracle-rgb: 216, 251, 255; --oracle-accent-rgb: 255, 214, 98; --oracle-shadow-rgb: 31, 65, 104; --oracle-env-opacity: .8; --oracle-pulse-scale: 1.042; }
+html.oracle-tier-fake-loss { --oracle-rgb: 121, 155, 170; --oracle-accent-rgb: 190, 92, 87; --oracle-shadow-rgb: 4, 17, 29; --oracle-env-opacity: .56; --oracle-pulse-scale: .992; }
+html.oracle-tier-revival { --oracle-rgb: 211, 251, 255; --oracle-accent-rgb: 255, 224, 119; --oracle-shadow-rgb: 15, 49, 82; --oracle-env-opacity: .76; --oracle-pulse-scale: 1.048; }
+
+.oracle-environment {
+  position: fixed;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  contain: strict;
+  transition: opacity .6s ease, visibility 0s linear .6s;
+}
+html.is-oracle-active .oracle-environment {
+  visibility: visible;
+  opacity: var(--oracle-env-opacity);
+  transition-delay: 0s;
+}
+.oracle-environment::before,
+.oracle-environment::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+.oracle-environment::before {
+  inset: -18%;
+  background:
+    radial-gradient(ellipse 54% 34% at 50% 44%, rgba(var(--oracle-rgb), .3), transparent 68%),
+    radial-gradient(ellipse 48% 28% at 12% 72%, rgba(var(--oracle-accent-rgb), .12), transparent 74%);
+  transform: scale(.94);
+  opacity: .4;
+}
+.oracle-environment::after {
+  top: -16%;
+  left: 7%;
+  width: 86%;
+  height: 76%;
+  background: repeating-conic-gradient(from 188deg at 50% 0%, transparent 0 8deg, rgba(var(--oracle-rgb), .065) 9deg 12deg, transparent 13deg 23deg);
+  transform: perspective(660px) rotateX(24deg) scaleX(.82);
+  transform-origin: 50% 0;
+  opacity: .3;
+}
+.oracle-current {
+  position: absolute;
+  left: -22vw;
+  width: 142vw;
+  height: 24vh;
+  border: 1px solid rgba(var(--oracle-rgb), .16);
+  border-right: 0;
+  border-left: 0;
+  border-radius: 50%;
+  opacity: .18;
+  transform: rotate(-4deg) translate3d(-7vw, 0, 0);
+}
+.oracle-current-a { top: 30%; }
+.oracle-current-b { top: 61%; transform: rotate(3deg) translate3d(9vw, 0, 0) scaleY(.7); opacity: .12; }
+.oracle-pressure-ring {
+  position: absolute;
+  top: 54%;
+  left: 50%;
+  width: min(78vw, 1040px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(var(--oracle-rgb), .3);
+  border-radius: 50%;
+  box-shadow: inset 0 0 60px rgba(var(--oracle-rgb), .06), 0 0 80px rgba(var(--oracle-rgb), .08);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.3);
+}
+.oracle-bubble {
+  --bubble-size: 8px;
+  --bubble-left: 20%;
+  --bubble-delay: 0s;
+  --bubble-duration: 7s;
+  position: absolute;
+  bottom: -12vh;
+  left: var(--bubble-left);
+  width: var(--bubble-size);
+  aspect-ratio: 1;
+  border: 1px solid rgba(var(--oracle-rgb), .3);
+  border-radius: 47% 53% 45% 55%;
+  background: radial-gradient(circle at 34% 26%, rgba(242, 255, 255, .28), rgba(var(--oracle-rgb), .05) 43%, transparent 68%);
+  box-shadow: inset 1px 1px rgba(255, 255, 255, .12);
+  opacity: 0;
+}
+.oracle-bubble-a { --bubble-size: 4px; --bubble-left: 9%; --bubble-delay: -.8s; --bubble-duration: 5.8s; }
+.oracle-bubble-b { --bubble-size: 10px; --bubble-left: 27%; --bubble-delay: -4.2s; --bubble-duration: 8.2s; }
+.oracle-bubble-c { --bubble-size: 5px; --bubble-left: 44%; --bubble-delay: -1.9s; --bubble-duration: 6.7s; }
+.oracle-bubble-d { --bubble-size: 14px; --bubble-left: 68%; --bubble-delay: -5.3s; --bubble-duration: 9.4s; }
+.oracle-bubble-e { --bubble-size: 7px; --bubble-left: 83%; --bubble-delay: -3.1s; --bubble-duration: 7.5s; }
+.oracle-bubble-f { --bubble-size: 3px; --bubble-left: 94%; --bubble-delay: -1.2s; --bubble-duration: 5.4s; }
+
+html.is-oracle-active .oracle-current-a { animation: oracle-current-drift 5.6s cubic-bezier(.45,.05,.55,.95) infinite alternate; }
+html.is-oracle-active .oracle-current-b { animation: oracle-current-drift-reverse 7.2s cubic-bezier(.45,.05,.55,.95) infinite alternate; }
+html.is-oracle-active .oracle-bubble { animation: oracle-bubble-rise var(--bubble-duration) var(--bubble-delay) ease-in infinite; }
+html.oracle-stage-descent .oracle-environment::before { animation: oracle-water-inhale .85s cubic-bezier(.2,.7,.2,1) both; }
+html.oracle-stage-judgment .oracle-environment::after { animation: oracle-rays-judge 1.2s ease-in-out infinite alternate; }
+html.oracle-stage-judgment .oracle-pressure-ring { animation: oracle-pressure-scan 1.35s cubic-bezier(.18,.75,.2,1) infinite; }
+html.oracle-stage-verdict .oracle-pressure-ring { animation: oracle-pressure-impact .5s cubic-bezier(.15,.76,.16,1) both; }
+html.oracle-stage-revealed.oracle-tier-normal .oracle-environment::before { opacity: .22; transform: scale(1); }
+html.oracle-stage-revealed.oracle-tier-hot .oracle-environment::before,
+html.oracle-stage-revealed.oracle-tier-superhot .oracle-environment::before { animation: oracle-verdict-breathe 3.8s ease-in-out infinite alternate; }
+html.oracle-stage-revealed.oracle-tier-jackpot .oracle-environment::before,
+html.oracle-stage-revealed.oracle-tier-revival .oracle-environment::before { animation: oracle-verdict-breathe 2.4s ease-in-out infinite alternate; }
+html.oracle-tier-fake-loss .oracle-environment::after { opacity: .08; transform: perspective(660px) rotateX(24deg) scaleX(.7); }
+html.oracle-tier-fake-loss .oracle-current { border-color: rgba(var(--oracle-accent-rgb), .16); }
+html.oracle-stage-fake .oracle-environment::before,
+html.oracle-stage-locked .oracle-environment::before { animation: oracle-false-collapse .75s ease-out both; }
+
+/* The photographic kingdom, telemetry and oracle machine share one phase. */
+html.is-oracle-active body[data-page="fortune"] .photo-background {
+  transform: scale(var(--oracle-pulse-scale));
+  filter: saturate(1.02) brightness(.96);
+  transition: transform .85s cubic-bezier(.2,.72,.2,1), filter .85s ease;
+}
+html.oracle-tier-hot body[data-page="fortune"] .photo-background,
+html.oracle-tier-superhot body[data-page="fortune"] .photo-background { filter: saturate(1.14) brightness(1.02); }
+html.oracle-tier-jackpot body[data-page="fortune"] .photo-background,
+html.oracle-tier-revival body[data-page="fortune"] .photo-background { filter: saturate(1.2) brightness(1.07); }
+html.oracle-tier-fake-loss body[data-page="fortune"] .photo-background { filter: saturate(.62) brightness(.68); }
+html.is-oracle-active body[data-page="fortune"] .ocean-atmosphere { transform: scale(var(--oracle-pulse-scale)); transition: transform .85s cubic-bezier(.2,.72,.2,1); }
+html.oracle-stage-judgment body[data-page="fortune"] .caustic { opacity: .26; }
+html.oracle-tier-jackpot body[data-page="fortune"] .caustic,
+html.oracle-tier-revival body[data-page="fortune"] .caustic { opacity: .34; }
+html.is-oracle-active body[data-page="fortune"] .header-depth b,
+html.is-oracle-active body[data-page="fortune"] .depth-rail { color: rgba(var(--oracle-rgb), .92); transition: color .35s ease, text-shadow .35s ease; }
+html.oracle-stage-judgment body[data-page="fortune"] .header-depth b,
+html.oracle-stage-verdict body[data-page="fortune"] .header-depth b { animation: oracle-depth-heartbeat .66s ease-in-out infinite alternate; }
+html.oracle-stage-verdict body[data-page="fortune"] .depth-rail b { box-shadow: 0 0 16px rgba(var(--oracle-rgb), .9); transform: scaleX(3); }
+html.oracle-tier-fake-loss body[data-page="fortune"] .site-header { border-color: rgba(var(--oracle-accent-rgb), .32); }
+html.oracle-tier-jackpot body[data-page="fortune"] .site-header,
+html.oracle-tier-revival body[data-page="fortune"] .site-header { box-shadow: 0 1px rgba(var(--oracle-rgb), .22), 0 16px 55px rgba(var(--oracle-accent-rgb), .08); }
+
+/* Local instrument pulse: deliberately quieter than the special result FX. */
+.oracle-scope {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: .22;
+}
+.oracle-scope i {
+  position: absolute;
+  top: 47%;
+  left: 50%;
+  width: 78%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(var(--oracle-rgb, 124, 222, 237), .2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(.7);
+  opacity: 0;
+}
+.oracle-scope i:nth-child(2) { width: 58%; }
+.oracle-scope i:nth-child(3) { width: 38%; }
+.oracle-scope span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(transparent, rgba(var(--oracle-rgb, 124, 222, 237), .28), transparent);
+  opacity: 0;
+}
+.fortune-card[data-roulette-phase="descent"] .oracle-scope i { animation: oracle-scope-in 1s cubic-bezier(.18,.78,.2,1) both; }
+.fortune-card[data-roulette-phase="descent"] .oracle-scope i:nth-child(2) { animation-delay: .1s; }
+.fortune-card[data-roulette-phase="descent"] .oracle-scope i:nth-child(3) { animation-delay: .2s; }
+.fortune-card[data-roulette-phase="judgment"] .oracle-scope span { opacity: .62; animation: oracle-scope-sweep 1.08s ease-in-out infinite; }
+.fortune-card[data-roulette-phase="verdict"] .oracle-scope i:first-child { animation: oracle-scope-impact .48s ease-out both; }
+.fortune-card[data-roulette-phase="revealed"] .oracle-scope { opacity: .12; }
+.fortune-card[data-roulette-phase="fake"] .oracle-scope { opacity: .08; }
+
+.fortune-card {
+  border-radius: 18px;
+  box-shadow: 0 28px 70px rgba(0, 13, 27, .58), 0 0 0 1px rgba(195, 247, 250, .08), inset 0 0 0 4px rgba(10, 92, 118, .72) !important;
+}
+.machine-plate { position: relative; z-index: 4; }
+.slot-window { position: relative; z-index: 4; border-radius: 14px; }
+.roulette-status,
+.result,
+.fortune-card > #spin,
+.fortune-card > .footnote { position: relative; z-index: 4; }
+.result { border-radius: 12px; box-shadow: inset 0 1px rgba(235, 255, 255, .04); }
+.fortune-card[data-roulette-phase="judgment"] { transform: scale(1.006); transition: transform .52s cubic-bezier(.2,.72,.2,1); }
+.fortune-card[data-roulette-phase="verdict"] { transform: scale(.997); }
+.fortune-card[data-roulette-phase="revealed"] { transform: none; transition: transform .45s ease; }
+.shark-face {
+  visibility: visible !important;
+  opacity: 1 !important;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+.is-spinning .shark-tile { flex: 0 0 230px; }
+
+@keyframes oracle-current-drift { to { opacity: .32; transform: rotate(1deg) translate3d(9vw, 2vh, 0) scaleY(.78); } }
+@keyframes oracle-current-drift-reverse { to { opacity: .26; transform: rotate(-2deg) translate3d(-8vw, -2vh, 0) scaleY(.9); } }
+@keyframes oracle-bubble-rise {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) scale(.62); }
+  16% { opacity: .34; }
+  54% { transform: translate3d(1.3vw, -53vh, 0) scale(.92); }
+  100% { opacity: 0; transform: translate3d(-.8vw, -116vh, 0) scale(1.2); }
+}
+@keyframes oracle-water-inhale { 0% { opacity: 0; transform: scale(.84); } 68% { opacity: .58; } 100% { opacity: .4; transform: scale(1); } }
+@keyframes oracle-rays-judge { to { opacity: .48; transform: perspective(660px) rotateX(21deg) translateX(2%) scaleX(.88); } }
+@keyframes oracle-pressure-scan { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.22); } 38% { opacity: .52; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.08); } }
+@keyframes oracle-pressure-impact { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.42); } 42% { opacity: .9; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.28); } }
+@keyframes oracle-verdict-breathe { to { opacity: .7; transform: scale(1.06) translateY(-1.5%); } }
+@keyframes oracle-false-collapse { 0% { opacity: .54; transform: scale(1.04); } 100% { opacity: .08; transform: scale(.78); } }
+@keyframes oracle-depth-heartbeat { to { color: rgb(var(--oracle-accent-rgb)); text-shadow: 0 0 14px rgba(var(--oracle-rgb), .72); transform: translateY(-1px); } }
+@keyframes oracle-scope-in { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.35); } 65% { opacity: .45; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.16); } }
+@keyframes oracle-scope-sweep { 0%,100% { transform: translateX(-170px); opacity: 0; } 35%,65% { opacity: .58; } 50% { transform: translateX(170px); } }
+@keyframes oracle-scope-impact { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.65); } 42% { opacity: .82; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.36); } }
+
+html.is-oracle-suspended .oracle-environment *,
+html.is-oracle-suspended .oracle-environment::before,
+html.is-oracle-suspended .oracle-environment::after,
+html.is-oracle-suspended .fortune-card *,
+html.is-oracle-suspended .fortune-card::before,
+html.is-oracle-suspended .fortune-card::after { animation-play-state: paused !important; }
+
+@media (max-width: 820px) {
+  .oracle-environment { contain: paint; }
+  .oracle-environment::after { opacity: .2; }
+  .oracle-bubble-e,
+  .oracle-bubble-f { display: none; }
+  html.is-oracle-active body[data-page="fortune"] .photo-background { filter: none; }
+  .oracle-scope { opacity: .14; }
+}
+
+@media (max-width: 560px) {
+  .fortune-card { border-radius: 15px; }
+  .is-spinning .shark-tile { flex-basis: 190px; }
+  .oracle-current { height: 18vh; }
+  .oracle-pressure-ring { width: 112vw; }
+  .oracle-bubble-d { display: none; }
+  html.oracle-stage-judgment body[data-page="fortune"] .caustic { opacity: .16; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oracle-environment { display: none !important; }
+  .oracle-scope { display: none !important; }
+  html.is-oracle-active body[data-page="fortune"] .photo-background,
+  html.is-oracle-active body[data-page="fortune"] .ocean-atmosphere,
+  .fortune-card[data-roulette-phase] { transform: none !important; filter: none !important; }
+  html.is-oracle-active body[data-page="fortune"] .header-depth b,
+  html.is-oracle-active body[data-page="fortune"] .depth-rail b { animation: none !important; transform: none !important; }
+  .shark-face { transform: none; }
+}

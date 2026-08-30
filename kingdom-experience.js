@@ -38,6 +38,9 @@
         hero.style.setProperty('--hero-shift-y', `${(-y * 8).toFixed(2)}px`);
         hero.style.setProperty('--hero-copy-x', `${(x * 2.2).toFixed(2)}px`);
         hero.style.setProperty('--hero-copy-y', `${(y * 1.8).toFixed(2)}px`);
+        hero.style.setProperty('--signature-shift-x', `${(x * 5).toFixed(2)}px`);
+        hero.style.setProperty('--signature-shift-y', `${(y * 4).toFixed(2)}px`);
+        hero.style.setProperty('--signature-tilt', `${(x * 1.4).toFixed(2)}deg`);
       });
     }, { passive: true });
     hero.addEventListener('pointerleave', () => {
@@ -47,6 +50,9 @@
       hero.style.setProperty('--hero-shift-y', '0px');
       hero.style.setProperty('--hero-copy-x', '0px');
       hero.style.setProperty('--hero-copy-y', '0px');
+      hero.style.setProperty('--signature-shift-x', '0px');
+      hero.style.setProperty('--signature-shift-y', '0px');
+      hero.style.setProperty('--signature-tilt', '0deg');
     });
   }
 

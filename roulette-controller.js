@@ -19,6 +19,8 @@
   const button = oldButton;
   button.dataset.rouletteBound = 'true';
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const pageRoot = document.documentElement || null;
+  const pageBody = document.body || null;
 
   function setButtonCopy(label, hint = 'HOLD YOUR BREATH') {
     const labelElement = button.querySelector('span');
@@ -176,17 +178,84 @@
   const intruder = document.createElement('img'); intruder.className = 'dry-shark-intruder'; intruder.src = 'assets/characters/naoking-7.webp'; intruder.alt = ''; card.append(intruder);
   const crowns = document.createElement('div'); crowns.className = 'crown-rain'; crowns.setAttribute('aria-hidden', 'true'); crowns.innerHTML = '<i>♛</i><i>♛</i><i>♛</i><i>♛</i><i>♛</i>'; card.append(crowns);
 
+  const oracleScope = document.createElement('div');
+  oracleScope.className = 'oracle-scope';
+  oracleScope.setAttribute('aria-hidden', 'true');
+  oracleScope.innerHTML = '<i></i><i></i><i></i><span></span>';
+  card.append(oracleScope);
+  const oracleEnvironment = document.createElement('div');
+  oracleEnvironment.className = 'oracle-environment';
+  oracleEnvironment.setAttribute('aria-hidden', 'true');
+  oracleEnvironment.innerHTML = '<i class="oracle-current oracle-current-a"></i><i class="oracle-current oracle-current-b"></i><b class="oracle-pressure-ring"></b><span class="oracle-bubble oracle-bubble-a"></span><span class="oracle-bubble oracle-bubble-b"></span><span class="oracle-bubble oracle-bubble-c"></span><span class="oracle-bubble oracle-bubble-d"></span><span class="oracle-bubble oracle-bubble-e"></span><span class="oracle-bubble oracle-bubble-f"></span>';
+  pageBody?.append(oracleEnvironment);
+
+  const environmentTargets = [pageRoot, pageBody].filter(Boolean);
+  const activeEnvironmentClasses = new Set();
+  function clearOracleEnvironment() {
+    environmentTargets.forEach(target => {
+      activeEnvironmentClasses.forEach(className => target.classList.remove(className));
+      if (target.dataset) {
+        delete target.dataset.oraclePhase;
+        delete target.dataset.oracleTier;
+      }
+    });
+    activeEnvironmentClasses.clear();
+    oracleEnvironment.removeAttribute?.('data-phase');
+    oracleEnvironment.removeAttribute?.('data-tier');
+  }
+  function oracleTier(result, override = '') {
+    if (override) return override;
+    if (!result || result.kind === 'normal') return 'normal';
+    if (result.effect === 'revival') return 'revival';
+    if (result.kind === 'loss') return 'fake-loss';
+    if (result.effect === 'rainbow') return 'jackpot';
+    if (result.effect === 'crown' || result.effect === 'abyss') return 'superhot';
+    return 'hot';
+  }
+  function pulseWaterfield(phase, tier) {
+    if (typeof window.dispatchEvent !== 'function' || typeof window.CustomEvent !== 'function') return;
+    let pulse = null;
+    if (phase === 'descent') pulse = { intensity: .3, duration: 700 };
+    if (phase === 'judgment') pulse = { intensity: tier === 'normal' ? .38 : .6, duration: 800 };
+    if (phase === 'verdict') pulse = { intensity: .7, duration: 500 };
+    if (phase === 'revealed' && (tier === 'jackpot' || tier === 'revival')) pulse = { intensity: 1, duration: 1500 };
+    if (phase === 'fake' || phase === 'locked') pulse = { intensity: .15, duration: 650 };
+    if (!pulse) return;
+    window.dispatchEvent(new window.CustomEvent('naoking:waterpulse', { detail: pulse }));
+  }
+  function syncOracleEnvironment(phase, result, tierOverride = '') {
+    clearOracleEnvironment();
+    if (!phase) return;
+    const tier = oracleTier(result, tierOverride);
+    const classes = ['is-oracle-active', `oracle-stage-${phase}`, `oracle-tier-${tier}`];
+    if (result?.kind) classes.push(`oracle-outcome-${result.kind}`);
+    if (result?.effect) classes.push(`oracle-effect-${result.effect}`);
+    classes.forEach(className => activeEnvironmentClasses.add(className));
+    environmentTargets.forEach(target => {
+      target.classList.add(...classes);
+      if (target.dataset) {
+        target.dataset.oraclePhase = phase;
+        target.dataset.oracleTier = tier;
+      }
+    });
+    oracleEnvironment.setAttribute?.('data-phase', phase);
+    oracleEnvironment.setAttribute?.('data-tier', tier);
+    pulseWaterfield(phase, tier);
+  }
+
   let busy = false;
   let locked = false;
   let taps = [];
   let activeTimers = [];
   let drawToken = 0;
   let resolvedDraws = 0;
+  let activeVisualResult = null;
   const historyList = document.querySelector('#fortune-history');
   const displayHistory = [];
-  const setPhase = phase => {
+  const setPhase = (phase, tierOverride = '') => {
     if (phase) card.dataset.roulettePhase = phase;
     else delete card.dataset.roulettePhase;
+    syncOracleEnvironment(phase, activeVisualResult, tierOverride);
   };
   const later = (fn, ms, token = drawToken) => {
     const delay = reducedMotion.matches ? Math.min(ms, 180) : ms;
@@ -218,6 +287,7 @@
     intruder.classList.remove('is-running');
     crowns.classList.remove('is-raining');
     resultRegion?.classList.remove('is-revealing');
+    activeVisualResult = null;
     setPhase('');
     if (blast) blast.hidden = true;
   };
@@ -263,6 +333,7 @@
     if (taps.length >= 3) {
       drawToken += 1;
       busy = false; locked = true; resetVisualState(); card.classList.add('is-exploded');
+      setPhase('locked', 'fake-loss');
       title.textContent = 'なおキング激怒'; message.textContent = '連打されたので、なおキングは海へ帰りました。別ページに移動して戻るまで停止中。';
       resultRegion?.setAttribute('aria-busy', 'false');
       status.textContent = 'SYSTEM LOCKED // DO NOT TAP'; setButtonCopy('なおキング、怒って停止中…', 'SYSTEM LOCKED');
@@ -273,6 +344,7 @@
     drawToken += 1;
     busy = true; resetVisualState();
     const result = resolveFinalResult(); // The one immutable draw for this click.
+    activeVisualResult = result;
     resolvedDraws += 1;
     setPhase('descent');
     later(() => setPhase('judgment'), Math.min(520, Math.round(result.duration * 0.32)));
@@ -291,10 +363,12 @@
     later(() => {
       slot.classList.remove('is-spinning', 'is-long-spin');
       if (result.effect === 'revival') {
+        setPhase('fake', 'fake-loss');
         card.classList.add('is-failed'); reel.innerHTML = tile('assets/characters/naoking-7.webp'); title.textContent = '干からび寸前'; message.textContent = '……終了。まあ、そういう日もある。'; status.textContent = 'JUDGMENT FAILED // ...';
         later(() => showFinal(result), 820); return;
       }
       if (result.effect === 'blackout') {
+        setPhase('fake', 'fake-loss');
         card.classList.add('is-blackout'); title.textContent = '……！？'; message.textContent = '画面が暗くなった。まさか、これは……'; status.textContent = 'DEEP BLACKOUT'; flash('void', '深海暗転', 1200);
         later(() => showFinal(result), 850); return;
       }
@@ -316,6 +390,12 @@
     message.textContent = 'ボタンを押せ。なおキングが、あなたの都合を見ずに今日の運勢を決める。';
     reel.innerHTML = tile(normalResults[0].image);
   });
+
+  const syncVisibilityState = () => {
+    environmentTargets.forEach(target => target.classList.toggle('is-oracle-suspended', Boolean(document.hidden)));
+  };
+  document.addEventListener?.('visibilitychange', syncVisibilityState);
+  syncVisibilityState();
 
   function runDiagnostics(iterations = 10000) {
     const sampleSize = Math.max(1, Math.min(250000, Math.floor(Number(iterations) || 10000)));

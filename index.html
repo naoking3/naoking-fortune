@@ -22,24 +22,33 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="assets/characters/naoking-hero.webp" as="image" type="image/webp">
   <link rel="preload" href="assets/backgrounds/vrchat-01.webp" as="image" type="image/webp">
-  <link rel="stylesheet" href="deep-sea.css?v=20260830d">
-  <link rel="stylesheet" href="kingdom-experience.css?v=20260830d">
-  <link rel="stylesheet" href="roulette.css?v=20260830d">
-  <link rel="stylesheet" href="deep-sea-game.css?v=20260830d">
+  <link rel="stylesheet" href="deep-sea.css?v=20260830f">
+  <link rel="stylesheet" href="kingdom-experience.css?v=20260830f">
+  <link rel="stylesheet" href="roulette.css?v=20260830f">
+  <link rel="stylesheet" href="deep-sea-game.css?v=20260830f">
 </head>
 <body data-page="home">
   <noscript><style>.opening{display:none!important}</style><p class="noscript-notice">JavaScriptが無効なため、王国門のみ表示しています。</p></noscript>
   <a class="skip-link" href="#main-content">本文へ潜る</a>
   <div class="photo-background" id="photo-background" aria-hidden="true"></div>
+  <canvas id="signature-water" aria-hidden="true"></canvas>
   <div class="ocean-atmosphere" aria-hidden="true">
     <i class="caustic caustic-a"></i><i class="caustic caustic-b"></i>
     <i class="drift drift-a"></i><i class="drift drift-b"></i><i class="drift drift-c"></i><i class="drift drift-d"></i><i class="drift drift-e"></i><i class="drift drift-f"></i>
   </div>
   <div class="kingdom-event-layer" id="kingdom-event-layer" aria-hidden="true"><i></i><i></i><i></i></div>
-  <div class="water-transition" id="water-transition" aria-hidden="true"><span></span></div>
+  <div class="water-transition" id="water-transition" aria-hidden="true">
+    <span class="transition-current"></span><i class="transition-pressure"></i><b id="transition-depth">1280 M</b>
+  </div>
 
   <div class="opening" id="opening" role="dialog" aria-modal="true" aria-label="なおキングダムへ潜航中">
     <div class="opening-water" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="opening-film" aria-hidden="true">
+      <span class="opening-surface-glow"></span>
+      <i class="opening-ridge opening-ridge-a"></i><i class="opening-ridge opening-ridge-b"></i>
+      <figure class="opening-king-pass"><img src="assets/characters/naoking-hero.webp" alt="" width="1120" height="1030"></figure>
+      <div class="opening-film-cues"><span>SURFACE LOST</span><span>PRESSURE RISING</span><span>KINGDOM SIGNAL FOUND</span></div>
+    </div>
     <div class="opening-horizon" aria-hidden="true"></div>
     <div class="opening-lockup">
       <p>NAOKING KINGDOM / GATE 00</p>
@@ -93,6 +102,7 @@
           </dl>
         </div>
         <figure class="hero-king">
+          <div class="sovereign-signature" aria-hidden="true"><i></i><i></i><i></i><span></span><b></b></div>
           <img src="assets/characters/naoking-hero.webp" alt="海の支配者を自称するサメ、なおキング" width="1120" height="1030">
           <figcaption><small>RULER NO. 001</small><strong>海の支配者</strong><span>（自称）</span></figcaption>
         </figure>
@@ -252,6 +262,6 @@
     </div>
   </dialog>
 
-  <script src="site.js?v=20260830d" defer></script><script src="photo-background.js?v=20260830d" defer></script><script src="kingdom-experience.js?v=20260830d" defer></script><script src="submission.js?v=20260824d" defer></script><script src="roulette-controller.js?v=20260830d" defer></script><script src="deep-sea-game.js?v=20260830d" defer></script>
+  <script src="signature-water.js?v=20260830f" defer></script><script src="site.js?v=20260830f" defer></script><script src="photo-background.js?v=20260830d" defer></script><script src="kingdom-experience.js?v=20260830f" defer></script><script src="submission.js?v=20260824d" defer></script><script src="roulette-controller.js?v=20260830f" defer></script><script src="deep-sea-game.js?v=20260830f" defer></script>
 </body>
 </html>

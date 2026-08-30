@@ -18,6 +18,29 @@
     const leftControl = document.getElementById('left-control');
     const rightControl = document.getElementById('right-control');
     const helpOutput = gameRoot.querySelector('.game-help');
+    const gameHud = gameRoot.querySelector('.game-hud');
+
+    const oxygenHud = document.createElement('div');
+    const oxygenLabel = document.createElement('small');
+    const oxygenValue = document.createElement('b');
+    const oxygenTrack = document.createElement('span');
+    const oxygenFill = document.createElement('i');
+    oxygenHud.className = 'game-oxygen-hud';
+    oxygenHud.setAttribute('role', 'meter');
+    oxygenHud.setAttribute('aria-label', '残り酸素');
+    oxygenHud.setAttribute('aria-valuemin', '0');
+    oxygenHud.setAttribute('aria-valuemax', '100');
+    oxygenLabel.textContent = 'OXYGEN';
+    oxygenValue.textContent = '78%';
+    oxygenTrack.className = 'game-oxygen-track';
+    oxygenFill.className = 'game-oxygen-fill';
+    oxygenTrack.setAttribute('aria-hidden', 'true');
+    oxygenTrack.append(oxygenFill);
+    oxygenHud.append(oxygenLabel, oxygenValue, oxygenTrack);
+    if (gameHud) {
+      gameHud.classList.add('has-oxygen-meter');
+      gameHud.append(oxygenHud);
+    }
 
     const canvas = host instanceof HTMLCanvasElement
       ? host
@@ -32,13 +55,21 @@
     canvas.height = 540;
     canvas.tabIndex = 0;
     canvas.setAttribute('role', 'img');
-    canvas.setAttribute('aria-label', 'なおキングを左右に動かし、予兆を見て障害物を避ける高難度回遊ゲーム');
+    canvas.setAttribute('aria-label', 'LIFE 1の深海回遊ゲーム。左右に泳ぎ、予兆の安全帯で酸素餌を取りながら30秒生存する。');
     const context = canvas.getContext('2d', { alpha: false });
     if (!context) return;
 
     const WORLD = { width: 960, height: 540 };
     const GAME_DURATION = 30;
+    const OXYGEN_START = 78;
     const PLAYER_Y = WORLD.height - 92;
+    const PHASES = [
+      { drain: 5.4, gap: 198, speed: 220, warning: 0.95, shift: 230, current: 92, reward: 18 },
+      { drain: 6.8, gap: 188, speed: 260, warning: 0.84, shift: 255, current: 103, reward: 21 },
+      { drain: 8.2, gap: 176, speed: 300, warning: 0.74, shift: 280, current: 114, reward: 24 },
+      { drain: 9.8, gap: 164, speed: 340, warning: 0.66, shift: 305, current: 126, reward: 27 },
+      { drain: 11.6, gap: 152, speed: 380, warning: 0.58, shift: 330, current: 140, reward: 30 }
+    ];
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const keyState = { left: false, right: false };
     const pointerState = { left: false, right: false };
@@ -76,6 +107,9 @@
       pickupTimer: 0,
       patternTimer: 0,
       crownTimer: 0,
+      oxygen: OXYGEN_START,
+      oxygenWarningStage: 0,
+      oxygenFlashFor: 0,
       feverFor: 0,
       currentFor: 0,
       currentStrength: 0,
@@ -190,6 +224,16 @@
         '前の自分には勝った。次は深海に勝て。',
         '新記録やん。そこは普通にえらい。'
       ],
+      oxygen: [
+        '避けるだけで酸素が増えると思った？',
+        '酸素ゼロ。威厳では呼吸できない。',
+        '魚を無視した王様、呼吸にも無視された。',
+        '餌は得点だけじゃない。次は吸え。',
+        '海の支配者、酸欠には支配された。',
+        '青いゲージまで深海に沈めたな。',
+        'あと一匹食べていれば、まだ偉そうにできた。',
+        '障害物は避けた。生存条件も避けた。'
+      ],
       clear: [
         '30秒生還。王国民、本当にやるやん。',
         '完全回遊。なおキング直々に上級者認定。',
@@ -211,14 +255,29 @@
     function randomFrom(values) { return values[Math.floor(Math.random() * values.length)]; }
     function clamp(value, minimum, maximum) { return Math.max(minimum, Math.min(maximum, value)); }
     function difficulty() { return clamp(game.elapsed / GAME_DURATION, 0, 1); }
+    function phaseIndex() {
+      if (game.elapsed >= 20) return 4;
+      if (game.elapsed >= 15) return 3;
+      if (game.elapsed >= 10) return 2;
+      if (game.elapsed >= 5) return 1;
+      return 0;
+    }
+    function phaseConfig() { return PHASES[phaseIndex()]; }
 
     function updateHud() {
       setText(timeOutput, `${Math.min(GAME_DURATION, game.elapsed).toFixed(1)}s`);
       setText(scoreOutput, game.score.toLocaleString('ja-JP'));
       setText(comboOutput, game.combo > 1 ? `${game.combo} COMBO ×${game.multiplier}` : '—');
       setText(bestOutput, `${game.bestTime.toFixed(1)}s`);
+      const oxygenLevel = clamp(game.oxygen, 0, 100);
+      oxygenHud.style.setProperty('--oxygen-level', String(oxygenLevel / 100));
+      oxygenHud.setAttribute('aria-valuenow', String(Math.round(oxygenLevel)));
+      oxygenHud.setAttribute('aria-valuetext', `残り酸素 ${Math.round(oxygenLevel)}パーセント`);
+      setText(oxygenValue, `${Math.ceil(oxygenLevel)}%`);
       gameRoot.classList.toggle('is-fever', game.feverFor > 0);
       gameRoot.classList.toggle('has-current', game.currentFor > 0);
+      gameRoot.classList.toggle('is-oxygen-low', oxygenLevel <= 40);
+      gameRoot.classList.toggle('is-oxygen-critical', oxygenLevel <= 20);
     }
 
     function clearRunState() {
@@ -233,6 +292,7 @@
       Object.assign(game, {
         mode: 'playing', score: 0, combo: 0, runBestCombo: 0, comboWindow: 0, multiplier: 1,
         elapsed: 0, pickupTimer: 0.35, patternTimer: 2.45, crownTimer: 7.5 + Math.random() * 3,
+        oxygen: OXYGEN_START, oxygenWarningStage: 0, oxygenFlashFor: 0,
         feverFor: 0, currentFor: 0, currentStrength: 0, flashFor: 0, shakeFor: 0,
         hitStopFor: 0, deathTimer: 0, deathCause: 'unknown', lastSafeX: WORLD.width / 2,
         recentPatterns: [], announcementTimer: 3.8, lastFrame: performance.now(),
@@ -248,6 +308,7 @@
       startButton.textContent = '回遊中';
       startButton.disabled = true;
       startButton.setAttribute('aria-disabled', 'true');
+      setText(stateOutput, 'LIFE 1。安全帯のO2餌を取りながら30秒生き残れ。');
       setText(rankOutput, '回遊中');
       announce('一度ぶつかれば終了。光る隙間へ泳げ。');
       updateHud();
@@ -257,6 +318,7 @@
       cancelAnimationFrame(game.animationFrame);
       if (curtain) curtain.hidden = true;
       resetGame();
+      announce('LIFE 1。O2は時間で減る。予兆の安全帯で王国餌を取れ。');
       canvas.focus({ preventScroll: true });
       game.animationFrame = requestAnimationFrame(frame);
     }
@@ -271,6 +333,7 @@
     }
 
     function causeGroup(cause) {
+      if (cause.includes('oxygen')) return 'oxygen';
       if (cause.includes('rock')) return 'rock';
       if (cause.includes('net')) return 'net';
       if (cause.includes('mine')) return 'mine';
@@ -280,6 +343,12 @@
 
     function chooseTaunt({ time, cause, isBest, cleared }) {
       const candidates = [];
+      if (!cleared && causeGroup(cause) === 'oxygen') {
+        const oxygenOptions = TAUNTS.oxygen.filter((message) => message !== game.lastTaunt);
+        const oxygenTaunt = randomFrom(oxygenOptions.length ? oxygenOptions : TAUNTS.oxygen);
+        game.lastTaunt = oxygenTaunt;
+        return oxygenTaunt;
+      }
       if (cleared) candidates.push(...TAUNTS.clear);
       else if (time < 3) candidates.push(...TAUNTS.instant);
       else if (time < 7) candidates.push(...TAUNTS.early);
@@ -361,9 +430,9 @@
       }
     }
 
-    function beginDeath(entity) {
+    function beginDeath(entity, bypassShield = false) {
       if (game.mode !== 'playing') return;
-      if (player.shieldFor > 0) {
+      if (!bypassShield && player.shieldFor > 0) {
         player.shieldFor = 0;
         game.flashFor = 0.32;
         game.shakeFor = reducedMotion ? 0 : 0.16;
@@ -373,7 +442,7 @@
         return;
       }
       game.mode = 'dying';
-      game.deathCause = game.currentFor > 0 ? 'current' : (entity.type || 'unknown');
+      game.deathCause = entity.type === 'oxygen' ? 'oxygen' : (game.currentFor > 0 ? 'current' : (entity.type || 'unknown'));
       game.deathTimer = reducedMotion ? 0.12 : 0.38;
       game.hitStopFor = reducedMotion ? 0 : 0.075;
       game.shakeFor = reducedMotion ? 0 : 0.32;
@@ -381,8 +450,8 @@
       player.lives = 0;
       player.velocityX = 0;
       gameRoot.classList.add('is-dying');
-      addParticles(entity.x, entity.y, '#ff7779', 32);
-      announce('被弾。なおキング判定中……');
+      addParticles(entity.x, entity.y, game.deathCause === 'oxygen' ? '#89eaff' : '#ff7779', 32);
+      announce(game.deathCause === 'oxygen' ? '酸素ゼロ。なおキング、静かに沈む……' : '被弾。なおキング判定中……');
     }
 
     function schedule(delay, action) { scheduledEvents.push({ delay, action }); }
@@ -390,12 +459,25 @@
     function spawnPickup() {
       const roll = Math.random();
       const type = roll < 0.59 ? 'sardine' : roll < 0.86 ? 'tuna' : 'pearl';
-      const specs = { sardine: [22, 14, 12], tuna: [34, 19, 28], pearl: [18, 18, 42] }[type];
+      const specs = { sardine: [22, 14, 12, 3], tuna: [34, 19, 28, 5], pearl: [18, 18, 42, 2] }[type];
       entities.push({
         type, x: 54 + Math.random() * (WORLD.width - 108), y: -40,
-        width: specs[0], height: specs[1], points: specs[2], hazard: false,
+        width: specs[0], height: specs[1], points: specs[2], oxygenGain: specs[3], hazard: false,
         speed: 150 + Math.random() * 60 + difficulty() * 35,
         sway: (Math.random() - 0.5) * 34, phase: Math.random() * Math.PI * 2, rotation: 0
+      });
+    }
+
+    function spawnRiskFood({ gapX, gapWidth, speed, hazardType, rewardBoost = 0 }) {
+      const phase = phaseConfig();
+      const playerHitHalf = player.width * 0.61 / 2;
+      const safeOffset = clamp(gapWidth / 2 - playerHitHalf - 6, 28, 50);
+      const direction = Math.random() < 0.5 ? -1 : 1;
+      entities.push({
+        type: 'royalTuna', x: gapX + safeOffset * direction, y: -hazardHeight(hazardType),
+        width: 24, height: 16, points: 45 + phaseIndex() * 20 + rewardBoost * 3,
+        oxygenGain: phase.reward + rewardBoost, hazard: false, riskReward: true, precisePickup: true,
+        speed, sway: 0, phase: Math.random() * Math.PI * 2, rotation: 0
       });
     }
 
@@ -407,10 +489,10 @@
       });
     }
 
-    function gapWidthForCurrentDifficulty() { return 198 - difficulty() * 42; }
+    function gapWidthForCurrentDifficulty() { return phaseConfig().gap; }
 
     function chooseReachableGap(forceShift = true, shiftLimit = null) {
-      const maximumShift = shiftLimit ?? (240 + difficulty() * 90);
+      const maximumShift = shiftLimit ?? phaseConfig().shift;
       let shift = (Math.random() * 2 - 1) * maximumShift;
       if (forceShift && Math.abs(shift) < Math.min(105, maximumShift * 0.68)) {
         const minimumShift = Math.min(105, maximumShift * 0.68);
@@ -423,7 +505,9 @@
       return { gapX, gapWidth };
     }
 
-    function hazardSpeed() { return 220 + difficulty() * 155 + Math.random() * 20; }
+    function hazardSpeed() {
+      return phaseConfig().speed + Math.random() * 18 + Math.max(0, game.elapsed - 20) * 2.5;
+    }
 
     function hazardHeight(hazardType) {
       if (hazardType === 'netGate') return 68;
@@ -455,16 +539,22 @@
       pushSegment(rightStart + rightWidth / 2, rightWidth);
     }
 
-    function telegraphGate({ gapX, gapWidth, hazardType, delay, speed, label = '', previewOnly = false }) {
+    function telegraphGate({
+      gapX, gapWidth, hazardType, delay, speed, label = '', previewOnly = false,
+      reward = false, rewardBoost = 0
+    }) {
       warnings.push({
         kind: 'gate', gapX, gapWidth, hazardType, life: delay, maxLife: delay, label, previewOnly,
-        onExpire: () => spawnGate({ gapX, gapWidth, hazardType, speed })
+        onExpire: () => {
+          spawnGate({ gapX, gapWidth, hazardType, speed });
+          if (reward) spawnRiskFood({ gapX, gapWidth, speed, hazardType, rewardBoost });
+        }
       });
     }
 
     function triggerCurrent(direction) {
       game.currentFor = 2.35;
-      game.currentStrength = direction * (92 + difficulty() * 42);
+      game.currentStrength = direction * phaseConfig().current;
       game.flashFor = 0.08;
       announce(direction > 0 ? '海流発生。右へ流される。逆らえ。' : '海流発生。左へ流される。逆らえ。');
     }
@@ -487,31 +577,31 @@
     }
 
     function spawnPattern() {
-      const intensity = difficulty();
+      const phase = phaseIndex();
       const pool = ['rock-gate', 'mine-gate', 'net-gate'];
-      if (intensity > 0.18) pool.push('double-gate');
-      if (intensity > 0.34) pool.push('current-gate');
-      if (intensity > 0.58) pool.push('sweep-gate');
+      if (phase >= 1) pool.push('double-gate');
+      if (phase >= 2) pool.push('current-gate');
+      if (phase >= 3) pool.push('sweep-gate');
       const pattern = choosePattern(pool);
       rememberPattern(pattern);
-      const warningTime = 0.95 - intensity * 0.33;
+      const warningTime = phaseConfig().warning;
       const first = chooseReachableGap(true);
       const speed = hazardSpeed();
 
       if (pattern === 'rock-gate') {
-        telegraphGate({ ...first, hazardType: 'rockGate', delay: warningTime, speed, label: 'ROCK' });
+        telegraphGate({ ...first, hazardType: 'rockGate', delay: warningTime, speed, label: 'ROCK + O2', reward: true });
         announce('岩壁接近。青い隙間へ。');
         return patternCooldown({ hazardType: 'rockGate', speed, warningDelay: warningTime });
       }
       if (pattern === 'mine-gate') {
         const mineSpeed = speed + 18;
-        telegraphGate({ ...first, hazardType: 'mineGate', delay: warningTime, speed: mineSpeed, label: 'MINE' });
+        telegraphGate({ ...first, hazardType: 'mineGate', delay: warningTime, speed: mineSpeed, label: 'MINE + O2', reward: true });
         announce('機雷列接近。点滅する隙間を見ろ。');
         return patternCooldown({ hazardType: 'mineGate', speed: mineSpeed, warningDelay: warningTime });
       }
       if (pattern === 'net-gate') {
         const netSpeed = speed + 8;
-        telegraphGate({ ...first, hazardType: 'netGate', delay: warningTime, speed: netSpeed, label: 'NET' });
+        telegraphGate({ ...first, hazardType: 'netGate', delay: warningTime, speed: netSpeed, label: 'NET + O2', reward: true });
         announce('漁網接近。開いている場所へ。');
         return patternCooldown({ hazardType: 'netGate', speed: netSpeed, warningDelay: warningTime });
       }
@@ -520,7 +610,10 @@
         telegraphGate({ ...first, hazardType: 'rockGate', delay: warningTime, speed, label: '1 / 2' });
         schedule(0.96, () => {
           const second = chooseReachableGap(true, 155);
-          telegraphGate({ ...second, hazardType: secondType, delay: warningTime, speed, label: 'NEXT 2 / 2', previewOnly: true });
+          telegraphGate({
+            ...second, hazardType: secondType, delay: warningTime, speed,
+            label: 'NEXT 2 / 2 + O2', previewOnly: true, reward: true, rewardBoost: 4
+          });
         });
         announce('連続波。次の隙間まで見て。');
         return patternCooldown({ hazardType: secondType, speed, warningDelay: warningTime, spawnOffset: 0.96 });
@@ -528,7 +621,10 @@
       if (pattern === 'current-gate') {
         const direction = Math.random() < 0.5 ? -1 : 1;
         telegraphCurrent(direction, warningTime);
-        telegraphGate({ ...first, hazardType: 'netGate', delay: warningTime + 0.2, speed, label: 'CURRENT' });
+        telegraphGate({
+          ...first, hazardType: 'netGate', delay: warningTime + 0.2, speed,
+          label: 'CURRENT + O2', reward: true, rewardBoost: 3
+        });
         announce('海流予兆。矢印と隙間を同時に見ろ。');
         return patternCooldown({ hazardType: 'netGate', speed, warningDelay: warningTime + 0.2 });
       }
@@ -539,15 +635,18 @@
       });
       schedule(1.56, () => {
         const third = chooseReachableGap(true, 145);
-        telegraphGate({ ...third, hazardType: 'netGate', delay: warningTime, speed, label: 'NEXT 3 / 3', previewOnly: true });
+        telegraphGate({
+          ...third, hazardType: 'netGate', delay: warningTime, speed,
+          label: 'NEXT 3 / 3 + O2', previewOnly: true, reward: true, rewardBoost: 8
+        });
       });
       announce('三連続波。止まるな。');
       return patternCooldown({ hazardType: 'netGate', speed, warningDelay: warningTime, spawnOffset: 1.56 });
     }
 
     function intersects(entity) {
-      const playerHitWidth = player.width * 0.61;
-      const playerHitHeight = player.height * 0.56;
+      const playerHitWidth = player.width * (entity.precisePickup ? 0.30 : 0.61);
+      const playerHitHeight = player.height * (entity.precisePickup ? 0.46 : 0.56);
       return Math.abs(entity.x - player.x) < (entity.width + playerHitWidth) / 2
         && Math.abs(entity.y - player.y) < (entity.height + playerHitHeight) / 2;
     }
@@ -556,6 +655,8 @@
       if (entity.type === 'crown') {
         game.feverFor = 3.2;
         player.shieldFor = 0.85;
+        game.oxygen = clamp(game.oxygen + 10, 0, 100);
+        game.oxygenFlashFor = 0.42;
         game.score += 100;
         game.combo += 2;
         game.runBestCombo = Math.max(game.runBestCombo, game.combo);
@@ -570,7 +671,13 @@
       game.runBestCombo = Math.max(game.runBestCombo, game.combo);
       const feverMultiplier = game.feverFor > 0 ? 2 : 1;
       game.score += entity.points * game.multiplier * feverMultiplier;
+      const oxygenGain = entity.oxygenGain || 0;
+      if (oxygenGain > 0) {
+        game.oxygen = clamp(game.oxygen + oxygenGain, 0, 100);
+        game.oxygenFlashFor = entity.riskReward ? 0.46 : 0.24;
+      }
       addParticles(entity.x, entity.y, entity.type === 'pearl' ? '#dffcff' : '#ffd66b', entity.type === 'pearl' ? 18 : 9);
+      if (entity.riskReward) announce(`KINGDOM FEED +${oxygenGain}% O2 / ${game.combo} COMBO`);
     }
 
     function updateParticles(delta) {
@@ -603,6 +710,7 @@
       const slowDelta = delta * (reducedMotion ? 1 : 0.32);
       game.deathTimer -= delta;
       game.flashFor = Math.max(0, game.flashFor - delta);
+      game.oxygenFlashFor = Math.max(0, game.oxygenFlashFor - delta);
       game.shakeFor = Math.max(0, game.shakeFor - delta);
       updateParticles(slowDelta);
       updateAmbient(slowDelta);
@@ -621,8 +729,18 @@
       game.feverFor = Math.max(0, game.feverFor - delta);
       game.currentFor = Math.max(0, game.currentFor - delta);
       game.flashFor = Math.max(0, game.flashFor - delta);
+      game.oxygenFlashFor = Math.max(0, game.oxygenFlashFor - delta);
       game.shakeFor = Math.max(0, game.shakeFor - delta);
       player.shieldFor = Math.max(0, player.shieldFor - delta);
+      game.oxygen = Math.max(0, game.oxygen - phaseConfig().drain * delta);
+      if (game.oxygen <= 40 && game.oxygenWarningStage === 0) {
+        game.oxygenWarningStage = 1;
+        announce('O2 40%. 餌を取らないと、避けても沈む。');
+      }
+      if (game.oxygen <= 20 && game.oxygenWarningStage === 1) {
+        game.oxygenWarningStage = 2;
+        announce('O2 CRITICAL. 危険帯の王国餌へ。');
+      }
       if (game.currentFor <= 0) game.currentStrength = 0;
       if (game.comboWindow <= 0 && game.combo > 0) { game.combo = 0; game.multiplier = 1; }
 
@@ -660,7 +778,7 @@
       const obstacleScale = game.feverFor > 0 ? 0.84 : 1;
       for (let index = entities.length - 1; index >= 0; index -= 1) {
         const entity = entities[index];
-        entity.y += entity.speed * delta * (entity.hazard ? obstacleScale : 1);
+        entity.y += entity.speed * delta * (entity.hazard || entity.riskReward ? obstacleScale : 1);
         entity.x += Math.sin(game.elapsed * 2.1 + entity.phase) * entity.sway * delta;
         entity.rotation += delta * (entity.hazard ? 0.9 : 0.25);
         if (intersects(entity)) {
@@ -668,6 +786,15 @@
           if (entity.hazard) beginDeath(entity); else collect(entity);
           if (game.mode === 'dying') break;
         } else if (entity.y > WORLD.height + 90) entities.splice(index, 1);
+      }
+
+      if (game.mode === 'playing' && game.oxygen <= 0) {
+        beginDeath({ type: 'oxygen', x: player.x, y: player.y }, true);
+      }
+      if (game.mode === 'dying') {
+        updateParticles(delta);
+        updateHud();
+        return;
       }
 
       updateParticles(delta);
@@ -812,7 +939,16 @@
     function drawFish(entity) {
       context.save();
       context.translate(entity.x, entity.y);
-      const color = entity.type === 'tuna' ? '#ff9678' : '#ffdd70';
+      if (entity.riskReward) {
+        context.shadowColor = '#79efff';
+        context.shadowBlur = 19;
+        context.strokeStyle = 'rgba(130, 241, 255, .78)';
+        context.lineWidth = 2;
+        context.beginPath();
+        context.arc(0, 0, 22 + Math.sin(game.elapsed * 7 + entity.phase) * 2, 0, Math.PI * 2);
+        context.stroke();
+      }
+      const color = entity.type === 'royalTuna' ? '#8fe8ef' : (entity.type === 'tuna' ? '#ff9678' : '#ffdd70');
       context.fillStyle = entity.type === 'pearl' ? '#dffaff' : color;
       if (entity.type === 'pearl') {
         context.shadowColor = '#bdefff'; context.shadowBlur = 16;
@@ -822,6 +958,13 @@
         context.beginPath(); context.ellipse(0, 0, entity.width / 2, entity.height / 2, 0, 0, Math.PI * 2); context.fill();
         context.beginPath(); context.moveTo(entity.width / 2 - 3, 0); context.lineTo(entity.width / 2 + 14, -entity.height / 2); context.lineTo(entity.width / 2 + 14, entity.height / 2); context.closePath(); context.fill();
         context.fillStyle = '#0c3141'; context.beginPath(); context.arc(-entity.width * 0.22, -2, 2.3, 0, Math.PI * 2); context.fill();
+      }
+      if (entity.riskReward) {
+        context.shadowBlur = 0;
+        context.fillStyle = '#dffcff';
+        context.textAlign = 'center';
+        context.font = '900 11px system-ui, sans-serif';
+        context.fillText(`O2 +${entity.oxygenGain}`, 0, -20);
       }
       context.restore();
     }
@@ -947,7 +1090,14 @@
       drawParticles(); drawPlayer(); drawOverlay();
       if (game.flashFor > 0) {
         const fever = game.feverFor > 0 || player.shieldFor > 0;
-        context.fillStyle = fever ? `rgba(255, 224, 116, ${Math.min(0.42, game.flashFor)})` : `rgba(255, 105, 111, ${Math.min(0.42, game.flashFor)})`;
+        const oxygenDeath = game.mode === 'dying' && game.deathCause === 'oxygen';
+        context.fillStyle = oxygenDeath
+          ? `rgba(94, 202, 238, ${Math.min(0.38, game.flashFor)})`
+          : (fever ? `rgba(255, 224, 116, ${Math.min(0.42, game.flashFor)})` : `rgba(255, 105, 111, ${Math.min(0.42, game.flashFor)})`);
+        context.fillRect(0, 0, WORLD.width, WORLD.height);
+      }
+      if (game.oxygenFlashFor > 0) {
+        context.fillStyle = `rgba(126, 235, 255, ${Math.min(0.16, game.oxygenFlashFor * 0.34)})`;
         context.fillRect(0, 0, WORLD.width, WORLD.height);
       }
       context.restore();
@@ -994,26 +1144,35 @@
         clearRunState();
         Object.assign(game, {
           mode: 'idle', score: 0, combo: 0, runBestCombo: 0, comboWindow: 0, multiplier: 1,
-          elapsed: 0, pickupTimer: 0, patternTimer: 0, crownTimer: 0, feverFor: 0,
+          elapsed: 0, pickupTimer: 0, patternTimer: 0, crownTimer: 0,
+          oxygen: OXYGEN_START, oxygenWarningStage: 0, oxygenFlashFor: 0, feverFor: 0,
           currentFor: 0, currentStrength: 0, flashFor: 0, shakeFor: 0, hitStopFor: 0,
           deathTimer: 0, deathCause: 'unknown', lastSafeX: WORLD.width / 2,
           recentPatterns: [], announcementTimer: 0, resultTaunt: '', resultTitle: '未判定'
         });
         Object.assign(player, { x: WORLD.width / 2, y: PLAYER_Y, velocityX: 0, direction: 1, lives: 1, shieldFor: 0 });
         keyState.left = keyState.right = false; pointerState.left = pointerState.right = false;
-        gameRoot.classList.remove('is-dying', 'is-game-over', 'is-clear', 'is-fever', 'has-current');
+        gameRoot.classList.remove(
+          'is-dying', 'is-game-over', 'is-clear', 'is-fever', 'has-current',
+          'is-oxygen-low', 'is-oxygen-critical'
+        );
         startButton.classList.remove('is-retry-ready');
         setText(rankOutput, '未判定');
-        announce('一撃で終了。5秒の壁を越えろ。');
         updateHud();
         draw();
+        announce('LIFE 1 / O2は餌で回復 / 30秒で完全制覇');
         startButton.disabled = false; startButton.removeAttribute('aria-disabled'); startButton.textContent = '回遊を始める';
       }
     });
     if ('ResizeObserver' in window) new ResizeObserver(() => draw()).observe(host);
 
-    if (helpOutput) helpOutput.textContent = 'LIFE 1。赤い予兆を避けて青い隙間へ。王冠は3.2秒スコア2倍＋一瞬のシールド。30秒生存で完全制覇。';
-    game.mode = 'idle'; updateHud(); setText(rankOutput, '未判定'); announce('一撃で終了。5秒の壁を越えろ。'); startButton.textContent = '回遊を始める'; draw();
+    if (helpOutput) helpOutput.textContent = 'LIFE 1。酸素は時間で減少し、餌で回復。予兆の青い安全帯へ泳ぎ、30秒生存で完全制覇。';
+    game.mode = 'idle';
+    updateHud();
+    setText(rankOutput, '未判定');
+    announce('LIFE 1 / O2は餌で回復 / 30秒で完全制覇');
+    startButton.textContent = '回遊を始める';
+    draw();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialiseDeepSeaGame, { once: true });

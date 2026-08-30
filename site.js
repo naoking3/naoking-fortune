@@ -15,6 +15,7 @@
   const depthValue = document.querySelector('#header-depth-value');
   const depthProgress = document.querySelector('#depth-progress');
   const openingDepthMeter = document.querySelector('#opening-depth-meter');
+  const transitionDepth = document.querySelector('#transition-depth');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const validPages = new Set(pages.map(page => page.id));
   let activePage = 'home';
@@ -105,6 +106,10 @@
     }
 
     pageTransitioning = true;
+    const currentDepth = Number(document.getElementById(activePage)?.dataset.depth || 0);
+    const destinationDepth = Number(document.getElementById(nextName)?.dataset.depth || 0);
+    body.dataset.travelDirection = destinationDepth >= currentDepth ? 'dive' : 'surface';
+    if (transitionDepth) transitionDepth.textContent = `${String(currentDepth).padStart(4, '0')} → ${String(destinationDepth).padStart(4, '0')} M`;
     body.dataset.nextPage = nextName;
     body.classList.add('is-page-transitioning');
     closeMenu();
@@ -117,6 +122,7 @@
         pageTransitioning = false;
         body.classList.remove('is-page-transitioning', 'is-page-revealing');
         delete body.dataset.nextPage;
+        delete body.dataset.travelDirection;
         syncInteractiveState();
         if (focus) focusPageHeading(nextName);
         if (pendingPage) {
@@ -201,20 +207,42 @@
     }
   }, { passive: true });
 
+  const openingFilmDuration = 3200;
   let openingTimer = 0;
   let openingFrame = 0;
+  let openingElapsed = 0;
+  let openingPlaybackStarted = 0;
   let manageOpeningFocus = false;
-  function animateOpeningDepth(startTime) {
+  function currentOpeningElapsed() {
+    return Math.min(openingFilmDuration, openingElapsed + (openingPlaybackStarted ? performance.now() - openingPlaybackStarted : 0));
+  }
+  function animateOpeningDepth() {
     if (!openingDepthMeter || !openingActive) return;
-    const progress = Math.min(1, (performance.now() - startTime) / 2250);
+    const progress = Math.min(1, currentOpeningElapsed() / (openingFilmDuration - 180));
     const eased = 1 - Math.pow(1 - progress, 3);
     openingDepthMeter.textContent = `${String(Math.round(1280 * eased)).padStart(4, '0')} M`;
-    if (progress < 1) openingFrame = window.requestAnimationFrame(() => animateOpeningDepth(startTime));
+    if (progress < 1 && openingPlaybackStarted) openingFrame = window.requestAnimationFrame(animateOpeningDepth);
+  }
+  function startOpeningPlayback() {
+    if (!openingActive || openingPlaybackStarted || document.hidden) return;
+    openingPlaybackStarted = performance.now();
+    window.clearTimeout(openingTimer);
+    openingTimer = window.setTimeout(finishOpening, Math.max(0, openingFilmDuration - openingElapsed));
+    openingFrame = window.requestAnimationFrame(animateOpeningDepth);
+  }
+  function pauseOpeningPlayback() {
+    if (!openingPlaybackStarted) return;
+    openingElapsed = currentOpeningElapsed();
+    openingPlaybackStarted = 0;
+    window.clearTimeout(openingTimer);
+    window.cancelAnimationFrame(openingFrame);
   }
   function finishOpening() {
     if (!opening || opening.classList.contains('is-finished')) return;
     window.clearTimeout(openingTimer);
     window.cancelAnimationFrame(openingFrame);
+    openingPlaybackStarted = 0;
+    openingElapsed = openingFilmDuration;
     if (openingDepthMeter) openingDepthMeter.textContent = '1280 M';
     openingActive = false;
     syncInteractiveState();
@@ -225,19 +253,40 @@
         heading.focus({ preventScroll: true });
       }
     }
+    const cinematicHandoff = body.classList.contains('is-opening-active') && !reducedMotion.matches;
+    body.classList.remove('is-opening-active');
+    if (cinematicHandoff) {
+      body.classList.add('is-opening-handoff');
+      window.setTimeout(() => body.classList.remove('is-opening-handoff'), 1400);
+    }
     opening.classList.add('is-finished');
     opening.setAttribute('aria-hidden', 'true');
     try { window.sessionStorage.setItem('naokingOpeningSeen', '1'); } catch { /* storage may be blocked */ }
-    window.setTimeout(() => opening.remove(), reducedMotion.matches ? 0 : 900);
+    window.setTimeout(() => opening.remove(), reducedMotion.matches ? 0 : 1150);
   }
+  function syncDocumentVisibility() {
+    body.classList.toggle('is-document-hidden', document.hidden);
+    if (!manageOpeningFocus || !openingActive) return;
+    if (document.hidden) pauseOpeningPlayback();
+    else startOpeningPlayback();
+  }
+  document.addEventListener('visibilitychange', syncDocumentVisibility);
+  reducedMotion.addEventListener?.('change', event => {
+    if (event.matches && openingActive) finishOpening();
+  });
+  syncDocumentVisibility();
   if (opening) {
     let seen = false;
     try { seen = window.sessionStorage.getItem('naokingOpeningSeen') === '1'; } catch { /* ignore */ }
     manageOpeningFocus = !seen && !reducedMotion.matches;
     syncInteractiveState();
     if (manageOpeningFocus) window.requestAnimationFrame(() => skipOpening?.focus());
-    if (!seen && !reducedMotion.matches) openingFrame = window.requestAnimationFrame(timestamp => animateOpeningDepth(timestamp));
-    openingTimer = window.setTimeout(finishOpening, seen || reducedMotion.matches ? 250 : 2600);
+    if (manageOpeningFocus) {
+      body.classList.add('is-opening-active');
+      startOpeningPlayback();
+    } else {
+      openingTimer = window.setTimeout(finishOpening, 250);
+    }
     skipOpening?.addEventListener('click', finishOpening);
   }
 

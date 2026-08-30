@@ -536,7 +536,7 @@ img { max-width: 100%; }
   .nav-link { min-height: 76px; padding: 14px; font-size: 16px; }
   .hero { padding-top: 42px; }
   .hero h1 > span { font-size: 16px; }
-  .hero h1 strong { font-size: clamp(54px, 19vw, 86px); }
+  .hero h1 strong { font-size: clamp(52px, 17.5vw, 82px); }
   .hero-japanese { font-size: 27px; }
   .lead { line-height: 1.8; }
   .hero-actions, .hero-actions .action { width: 100%; }
