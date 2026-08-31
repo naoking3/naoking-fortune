@@ -52,41 +52,12 @@
     });
   }
 
-  const eventLayer = document.querySelector('#kingdom-event-layer');
-  let environmentTimer = 0;
-  function scheduleEnvironmentEvent() {
-    window.clearTimeout(environmentTimer);
-    if (!eventLayer || reducedMotion.matches || document.hidden) return;
-    environmentTimer = window.setTimeout(() => {
-      const events = ['is-shoal-passing', 'is-current-glint', 'is-royal-wake'];
-      const eventName = events[Math.floor(Math.random() * events.length)];
-      eventLayer.classList.add(eventName);
-      window.setTimeout(() => eventLayer.classList.remove(eventName), 6200);
-      scheduleEnvironmentEvent();
-    }, 22000 + Math.random() * 18000);
-  }
-  document.addEventListener('visibilitychange', scheduleEnvironmentEvent);
-  reducedMotion.addEventListener?.('change', scheduleEnvironmentEvent);
-  scheduleEnvironmentEvent();
-
-  const dailyData = {
-    decrees: [
-      ['急がず泳げ。速さより、王らしい顔が大事だ。', '今日は遠回りに、小さな魚群が待っています。'],
-      ['王冠が斜めでも、威厳まで斜めとは限らない。', '少し不格好な選択が、意外と良い潮目を作ります。'],
-      ['深呼吸を三回。水中なので、真似はしないこと。', '立ち止まる時間を予定に入れると運勢が整います。'],
-      ['よく分からない扉は、一度だけ押してみよ。', '新しいものに触れるなら、今日がちょうど良い日です。'],
-      ['見栄を張るなら、最後まで堂々と張れ。', '自信は後からついてきます。まず姿勢だけ王様で。'],
-      ['小魚を分けた者には、大魚の夢を見る権利を与える。', '誰かへの小さな親切が、別の流れを連れてきます。'],
-      ['今日は何もしない決断も、正式な王命とする。', '休むことに理由はいりません。海流に預けてください。'],
-      ['迷ったら、いちばん青い方へ進め。', '直感で選んだ色や音に、今日の答えが隠れています。'],
-      ['失敗は沈めよ。反省だけ浮上させればよい。', '昨日より一つ軽くなれば、それで十分です。'],
-      ['王は寝ている。各自、ほどよく幸せになれ。', '誰にも急かされない時間が、今日の宝物です。']
-    ],
-    tides: ['凪 / 透明度 88%', '上げ潮 / やや追い風', '王族性のうねり', '静穏 / 光の筋あり', '気まぐれな横流れ', '深度安定 / 良好'],
-    relics: ['少し曲がった王冠', '青いグラス', '写真フォルダの三枚目', '丸いクッション', '未開封のお菓子', '金色の小物', '小さなサメ', '透明なもの']
-  };
   const today = new Date();
-  const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const todayKey = window.NaokingWorldData?.toLocalDateKey?.(today)
+    || `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const canonicalDaily = window.NaokingWorldData?.getDailyContext?.(todayKey, {
+    photoCount: window.NaokingPhotoCatalog?.length || 26
+  });
   function refreshIfDateChanged() {
     const current = new Date();
     const currentKey = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`;
@@ -94,19 +65,18 @@
   }
   window.addEventListener('focus', refreshIfDateChanged);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshIfDateChanged(); });
-  const dateSeed = Number(todayKey.replaceAll('-', ''));
-  const seededIndex = (seed, length) => Math.abs((seed * 9301 + 49297) % 233280) % length;
-  const decree = dailyData.decrees[seededIndex(dateSeed, dailyData.decrees.length)];
   const dailyDate = document.querySelector('#daily-date');
   const dailyDecree = document.querySelector('#daily-decree');
   const dailyDetail = document.querySelector('#daily-detail');
   const dailyTide = document.querySelector('#daily-tide');
   const dailyRelic = document.querySelector('#daily-relic');
   if (dailyDate) dailyDate.textContent = `TODAY / ${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
-  if (dailyDecree) dailyDecree.textContent = decree[0];
-  if (dailyDetail) dailyDetail.textContent = decree[1];
-  if (dailyTide) dailyTide.textContent = dailyData.tides[seededIndex(dateSeed + 17, dailyData.tides.length)];
-  if (dailyRelic) dailyRelic.textContent = dailyData.relics[seededIndex(dateSeed + 53, dailyData.relics.length)];
+  if (canonicalDaily) {
+    if (dailyDecree) dailyDecree.textContent = canonicalDaily.decree.text;
+    if (dailyDetail) dailyDetail.textContent = canonicalDaily.decree.detail;
+    if (dailyTide) dailyTide.textContent = canonicalDaily.tide.label;
+    if (dailyRelic) dailyRelic.textContent = canonicalDaily.relic.label;
+  }
 
   const passportList = document.querySelector('#passport-stamps');
   const passportStatus = document.querySelector('#passport-status');
@@ -141,6 +111,11 @@
       stampButton.firstChild.textContent = stampedToday ? '本日の謁見は完了 ' : '本日の謁見印を受け取る ';
     }
   }
+  function resetPassport() {
+    passport = { stamps: [] };
+    try { window.localStorage.removeItem(passportKey); } catch { /* private mode */ }
+    renderPassport();
+  }
   stampButton?.addEventListener('click', () => {
     if (!passport.stamps.includes(todayKey)) passport.stamps.push(todayKey);
     passport.stamps = passport.stamps.slice(-28);
@@ -150,6 +125,7 @@
     window.setTimeout(() => stampButton.classList.remove('is-impacting'), 900);
   });
   renderPassport();
+  window.NaokingRoyalPassport = Object.freeze({ reset: resetPassport, render: renderPassport });
 
   const gallery = document.querySelector('#kingdom-gallery');
   const galleryOpen = document.querySelector('#photo-gallery-open');
@@ -159,20 +135,41 @@
   const galleryCaption = document.querySelector('#gallery-caption');
   const galleryStrip = document.querySelector('#gallery-strip');
   const photoRotationToggle = document.querySelector('#photo-rotation-toggle');
-  const photoSources = window.NaokingPhotos?.sources || [];
-  const galleryCaptions = [
-    '潮目の向こうにある王国', '深海遺跡の王族会議', '水面から届いた朝の光', 'クラゲの眠る観測室', 'あたたかな国民交流会', '王国の距離感は近い', 'プールサイド遠征記', '小さな同盟、成立', '夏夜を飾る王国花火', 'クラゲ観測員との記録', '王と国民の極秘会談', '夜更けの空中謁見', '朝寝坊の公式記録', '海辺に届いた夏', '雲の下での休息', '静かな部屋への訪問', '青空駅でひと休み', '光の森を漂う王', '蓮池に浮かぶ水の民', '逆さ空の漂流記', '遺跡の入口で集合', '深海神殿の迷子たち', '光へ向かう王国民', 'クラゲ回廊の夜', '小さな王冠の遠征', '王国風景、第二十六記録'
-  ];
+  const photoCatalog = window.NaokingPhotoCatalog || [];
   let galleryIndex = 0;
   let galleryWasPaused = false;
+  let galleryLoadToken = 0;
 
-  function updateGallery(index, { selectBackground = true } = {}) {
-    if (!photoSources.length || !galleryImage) return;
-    galleryIndex = ((index % photoSources.length) + photoSources.length) % photoSources.length;
-    galleryImage.src = photoSources[galleryIndex];
-    galleryImage.alt = `なおキングダムの王国風景 ${galleryIndex + 1}`;
-    if (galleryCounter) galleryCounter.textContent = `SCENE ${String(galleryIndex + 1).padStart(2, '0')} / ${photoSources.length}`;
-    if (galleryCaption) galleryCaption.textContent = galleryCaptions[galleryIndex] || `王国風景 第${galleryIndex + 1}記録`;
+  function preloadGalleryRecord(record) {
+    return new Promise(resolve => {
+      const image = new Image();
+      image.onload = async () => {
+        try { await image.decode?.(); } catch { /* decoded load is still usable */ }
+        resolve(true);
+      };
+      image.onerror = () => resolve(false);
+      image.src = record.source;
+    });
+  }
+
+  async function updateGallery(index, { selectBackground = true } = {}) {
+    if (!photoCatalog.length || !galleryImage) return;
+    galleryIndex = ((index % photoCatalog.length) + photoCatalog.length) % photoCatalog.length;
+    const record = photoCatalog[galleryIndex];
+    const token = ++galleryLoadToken;
+    gallery?.classList.add('is-loading');
+    galleryImage.parentElement?.setAttribute('aria-busy', 'true');
+    const loaded = await preloadGalleryRecord(record);
+    if (token !== galleryLoadToken) return false;
+    gallery?.classList.remove('is-loading');
+    galleryImage.parentElement?.setAttribute('aria-busy', 'false');
+    if (!loaded) return false;
+    galleryImage.src = record.source;
+    galleryImage.alt = record.alt;
+    galleryImage.dataset.photoIndex = String(galleryIndex);
+    galleryImage.style.objectPosition = `${record.focalX}% ${record.focalY}%`;
+    if (galleryCounter) galleryCounter.textContent = `SCENE ${String(galleryIndex + 1).padStart(2, '0')} / ${photoCatalog.length}`;
+    if (galleryCaption) galleryCaption.textContent = record.caption;
     galleryStrip?.querySelectorAll('button').forEach((button, buttonIndex) => {
       const selected = buttonIndex === galleryIndex;
       button.classList.toggle('is-active', selected);
@@ -180,16 +177,18 @@
       if (buttonIndex === galleryIndex) button.scrollIntoView({ behavior: reducedMotion.matches ? 'auto' : 'smooth', block: 'nearest', inline: 'center' });
     });
     if (selectBackground) window.NaokingPhotos?.select(galleryIndex);
+    window.dispatchEvent(new CustomEvent('naoking:galleryselection', { detail: { index: galleryIndex, record } }));
+    return true;
   }
 
-  if (galleryStrip && photoSources.length) {
+  if (galleryStrip && photoCatalog.length) {
     const fragment = document.createDocumentFragment();
-    photoSources.forEach((source, index) => {
+    photoCatalog.forEach((record, index) => {
       const button = document.createElement('button');
       button.type = 'button';
-      button.setAttribute('aria-label', `王国風景 ${index + 1}を表示`);
+      button.setAttribute('aria-label', `${record.caption}を表示`);
       button.setAttribute('aria-pressed', 'false');
-      button.innerHTML = `<img src="${source}" alt="" loading="lazy" decoding="async" width="160" height="90"><span>${String(index + 1).padStart(2, '0')}</span>`;
+      button.innerHTML = `<img src="${record.thumbnail}" alt="" loading="lazy" decoding="async" width="160" height="90" style="object-position:${record.focalX}% ${record.focalY}%"><span>${String(index + 1).padStart(2, '0')}</span>`;
       button.addEventListener('click', () => updateGallery(index));
       fragment.append(button);
     });
@@ -198,7 +197,6 @@
   function openGallery() {
     if (!gallery) return;
     galleryIndex = window.NaokingPhotos?.current() || 0;
-    updateGallery(galleryIndex, { selectBackground: false });
     let opened = false;
     try {
       if (typeof gallery.showModal === 'function') gallery.showModal();

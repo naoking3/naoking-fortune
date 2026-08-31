@@ -95,7 +95,7 @@ img { max-width: 100%; }
   position: absolute;
   inset: -3%;
   opacity: 0;
-  background-position: var(--photo-x, 50%) center;
+  background-position: var(--photo-x, 50%) var(--photo-y, 50%);
   background-size: cover;
   filter: saturate(1.08) contrast(.96) brightness(.96) sepia(.05) hue-rotate(2deg);
   transform: scale(1.035);
@@ -139,8 +139,8 @@ img { max-width: 100%; }
 .drift-f { left: 48%; bottom: -8%; width: 10px; height: 10px; --bubble-time: 29s; animation-delay: -23s; }
 @keyframes caustic-drift { to { transform: translate3d(-5%, 9%, 0) rotate(8deg) scale(1.1); } }
 @keyframes photo-breathe {
-  from { background-position: var(--photo-x, 50%) 50%; filter: saturate(1.08) contrast(.96) brightness(.96) sepia(.05) hue-rotate(2deg); }
-  to { background-position: calc(var(--photo-x, 50%) + 1.6%) 46%; filter: saturate(1.03) contrast(.95) brightness(1.01) sepia(.04) hue-rotate(3deg); }
+  from { background-position: var(--photo-x, 50%) var(--photo-y, 50%); filter: saturate(1.08) contrast(.96) brightness(.96) sepia(.05) hue-rotate(2deg); }
+  to { background-position: calc(var(--photo-x, 50%) + 1.6%) calc(var(--photo-y, 50%) - 4%); filter: saturate(1.03) contrast(.95) brightness(1.01) sepia(.04) hue-rotate(3deg); }
 }
 @keyframes bubble-rise {
   0% { opacity: 0; transform: translate3d(0, 0, 0) scale(.72); }

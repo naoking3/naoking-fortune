@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const source = fs.readFileSync(path.join(root, 'kingdom-audio.js'), 'utf8');
+const indexSource = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const siteSource = fs.readFileSync(path.join(root, 'site.js'), 'utf8');
 
 new vm.Script(source, { filename: 'kingdom-audio.js' });
 
@@ -28,6 +30,7 @@ const declarativeScenes = [
   'fish-school', 'race', 'school', 'dive', 'portal', 'power-failure', 'ui-failure',
   'jackpot-golden', 'jackpot-fish', 'jackpot-dawn', 'jackpot-overload'
 ];
+const districtProfiles = ['home', 'videos', 'fortune', 'game', 'submit', 'join', 'gallery'];
 
 requiredLayers.forEach(layer => assert.match(source, new RegExp(`['"]${layer}['"]`), `missing audio layer: ${layer}`));
 requiredEvents.forEach(eventName => assert.match(source, new RegExp(eventName), `missing integration event: ${eventName}`));
@@ -38,6 +41,7 @@ eventSceneCues.forEach(cue => {
   assert.match(source, new RegExp(`['"]${phase}['"]`), `missing event sound phase: ${phase}`);
 });
 declarativeScenes.forEach(scene => assert.ok(source.includes(scene), `missing declarative sound scene: ${scene}`));
+districtProfiles.forEach(district => assert.match(source, new RegExp(`\\b${district}: Object\\.freeze`), `missing district audio profile: ${district}`));
 assert.match(source, /oracleSceneGain/, 'oracle-only silence bus is missing');
 assert.match(source, /pixel-palace-bonus/, 'premium route sound classification is missing pixel palace');
 assert.doesNotMatch(source, /new\s+Audio\s*\(|\.mp3\b|\.wav\b|\.ogg\b|fetch\s*\(/i, 'audio must remain procedural and asset-free');
@@ -46,6 +50,12 @@ assert.match(source, /pagehide/);
 assert.match(source, /localStorage/);
 assert.match(source, /userActivation/);
 assert.match(source, /webkitAudioContext/);
+assert.ok(
+  indexSource.indexOf('kingdom-world-data.js') < indexSource.indexOf('kingdom-audio.js')
+  && indexSource.indexOf('kingdom-audio.js') < indexSource.indexOf('kingdom-world.js'),
+  'audio listener must load after world data but before the world runtime emits its initial state'
+);
+assert.match(siteSource, /naoking:opening[\s\S]{0,100}phase:\s*['"]finish['"]/, 'opening completion must hand audio back to the district ambience');
 
 class FakeEventTarget {
   constructor() { this.listeners = new Map(); }
@@ -246,12 +256,21 @@ assert.equal(window.NaokingAudio.volume, 0.64, 'missing storage must use the int
 const soundControl = registry.get('kingdom-sound-control');
 assert.ok(soundControl, 'sound control should be created by the standalone script');
 const soundToggle = soundControl.children[0];
+window.dispatchEvent(new FakeCustomEvent('naoking:audio', { detail: {
+  action: 'world', type: 'state', state: 'sleeping-court'
+} }));
+assert.equal(window.NaokingAudio.snapshot().worldState, 'sleeping-court', 'daily state should be retained before audio consent');
+assert.equal(window.NaokingAudio.snapshot().worldStateAnnounced, false, 'daily state must stay silent before audio consent');
 soundToggle.dispatchEvent({ type: 'click', isTrusted: true, target: soundToggle });
 await Promise.resolve(); await Promise.resolve();
+flushTimers();
 assert.equal(FakeAudioContext.instances.length, 1, 'one trusted toggle click should create exactly one AudioContext');
 assert.equal(window.NaokingAudio.enabled, true);
 assert.equal(window.NaokingAudio.unlocked, true);
 assert.equal(storage.get('naoking-kingdom-sound-enabled-v1'), '1');
+assert.equal(window.NaokingAudio.snapshot().ambientDistrict, 'home', 'unlock should start the home district ambience');
+assert.equal(window.NaokingAudio.snapshot().worldStateAnnounced, true, 'pending daily state should play once after audio consent');
+assert.deepEqual(Array.from(window.NaokingAudio.districts), districtProfiles, 'public district list should describe every ambient identity');
 
 window.dispatchEvent(new FakeCustomEvent('naoking:oraclephase', {
   detail: { phase: 'descent', tier: 'hot', route: 'royal-intrusion', family: 'intrusion', resultKind: 'win' }
@@ -300,6 +319,26 @@ let pageSnapshot = window.NaokingAudio.snapshot();
 assert.equal(pageSnapshot.voicesByLayer.reel, 0, 'page change must release reel audio');
 assert.equal(pageSnapshot.voicesByLayer.game, 0, 'page change must release game audio');
 
+for (const [page, expectedDistrict] of [['record', 'videos'], ['oracle', 'fortune'], ['vrchat', 'submit'], ['gallery', 'gallery']]) {
+  window.dispatchEvent(new FakeCustomEvent('naoking:audio', { detail: { cue: 'ambient-start', page } }));
+  assert.equal(window.NaokingAudio.snapshot().ambientDistrict, expectedDistrict, `${page} did not select its district ambience`);
+  assert.ok(window.NaokingAudio.snapshot().voicesByLayer.ambient >= 1, `${page} ambience did not create a procedural voice`);
+}
+
+const worldCueCount = window.NaokingAudio.snapshot().stats.cues;
+window.dispatchEvent(new FakeCustomEvent('naoking:audio', { detail: { cue: 'world-state', state: 'archive-bloom', intensity: 0.4 } }));
+window.dispatchEvent(new FakeCustomEvent('naoking:audio', { detail: { action: 'world', type: 'discovery', discovery: 'lost-record', intensity: 0.5 } }));
+window.NaokingAudio.world({ type: 'surprise', surprise: 'royal-crossing', intensity: 0.45 });
+assert.ok(window.NaokingAudio.snapshot().stats.cues >= worldCueCount + 3, 'world state, discovery, and surprise cues should use the semantic audio bridge');
+assert.ok(window.NaokingAudio.snapshot().voicesByLayer.signal > 0, 'semantic world cues should create a subtle signal voice');
+
+const finishedOpening = new FakeElement('div', registry);
+finishedOpening.id = 'opening';
+finishedOpening.classList.add('is-finished');
+window.NaokingAudio.stop();
+window.dispatchEvent(new FakeCustomEvent('naoking:opening', { detail: { phase: 'finish' } }));
+assert.equal(window.NaokingAudio.snapshot().ambientDistrict, 'videos', 'opening completion should restore the active route ambience');
+
 window.dispatchEvent(new FakeCustomEvent('naoking:oraclephase', { detail: { phase: 'resting', tier: 'jackpot', resultKind: 'win' } }));
 window.dispatchEvent(new FakeCustomEvent('naoking:oraclephase', { detail: { phase: 'descent', tier: 'normal', route: 'quiet-tide' } }));
 assert.equal(window.NaokingAudio.snapshot().oracle.resultKind, '', 'a new descent must not retain the previous result kind');
@@ -328,6 +367,37 @@ document.dispatchEvent({ type: 'visibilitychange', target: document });
 await Promise.resolve(); await Promise.resolve();
 assert.equal(FakeAudioContext.instances[0].state, 'running', 'visible page may resume an already user-unlocked context');
 assert.ok(window.NaokingAudio.snapshot().voicesByLayer.ambient >= 1, 'ambient layer should resume after visibility returns');
+
+window.dispatchEvent(new FakeCustomEvent('naoking:pagechange', { detail: { page: 'game' } }));
+window.dispatchEvent(new FakeCustomEvent('naoking:gameaudio', { detail: { cue: 'start', intensity: 0.72 } }));
+assert.equal(window.NaokingAudio.snapshot().gameRunning, true, 'game audio state should remember an active run');
+document.hidden = true;
+document.dispatchEvent({ type: 'visibilitychange', target: document });
+await Promise.resolve();
+document.hidden = false;
+document.dispatchEvent({ type: 'visibilitychange', target: document });
+await Promise.resolve(); await Promise.resolve();
+assert.ok(window.NaokingAudio.snapshot().voicesByLayer.game >= 1, 'active game hum should resume after visibility returns');
+
+window.dispatchEvent(new FakeCustomEvent('naoking:oraclephase', { detail: { phase: 'signal', tier: 'hot', route: 'royal-intrusion' } }));
+document.hidden = true;
+document.dispatchEvent({ type: 'visibilitychange', target: document });
+await Promise.resolve();
+document.hidden = false;
+document.dispatchEvent({ type: 'visibilitychange', target: document });
+await Promise.resolve(); await Promise.resolve();
+assert.ok(window.NaokingAudio.snapshot().voicesByLayer.reel >= 1, 'active oracle reel should resume after visibility returns');
+
+finishedOpening.classList.remove('is-finished');
+window.dispatchEvent(new FakeCustomEvent('naoking:opening', { detail: { phase: 'descent' } }));
+document.hidden = true;
+document.dispatchEvent({ type: 'visibilitychange', target: document });
+await Promise.resolve();
+document.hidden = false;
+document.dispatchEvent({ type: 'visibilitychange', target: document });
+await Promise.resolve(); await Promise.resolve();
+assert.ok(window.NaokingAudio.snapshot().voicesByLayer.opening >= 1, 'opening soundscape should resume while the opening remains active');
+finishedOpening.classList.add('is-finished');
 
 window.NaokingAudio.stop();
 flushTimers();

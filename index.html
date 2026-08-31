@@ -22,10 +22,11 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="assets/characters/naoking-hero.webp" as="image" type="image/webp">
   <link rel="preload" href="assets/backgrounds/vrchat-01.webp" as="image" type="image/webp">
-  <link rel="stylesheet" href="deep-sea.css?v=20260830f">
-  <link rel="stylesheet" href="kingdom-experience.css?v=20260830h">
+  <link rel="stylesheet" href="deep-sea.css?v=20260831f">
+  <link rel="stylesheet" href="kingdom-experience.css?v=20260831f">
   <link rel="stylesheet" href="roulette.css?v=20260831b">
   <link rel="stylesheet" href="deep-sea-game.css?v=20260830g">
+  <link rel="stylesheet" href="kingdom-world.css?v=20260831f">
 </head>
 <body data-page="home">
   <noscript><style>.opening{display:none!important}</style><p class="noscript-notice">JavaScriptが無効なため、王国門のみ表示しています。</p></noscript>
@@ -36,7 +37,9 @@
     <i class="caustic caustic-a"></i><i class="caustic caustic-b"></i>
     <i class="drift drift-a"></i><i class="drift drift-b"></i><i class="drift drift-c"></i><i class="drift drift-d"></i><i class="drift drift-e"></i><i class="drift drift-f"></i>
   </div>
-  <div class="kingdom-event-layer" id="kingdom-event-layer" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="kingdom-world-layer" id="kingdom-world-layer" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <div class="kingdom-actor" id="kingdom-actor" aria-hidden="true"><img src="assets/characters/naoking-hero.webp" alt="" width="1120" height="1030"><span></span></div>
+  <div class="kingdom-surprise" id="kingdom-surprise" aria-hidden="true"><div><img src="assets/characters/naoking-hero.webp" alt="" width="1120" height="1030"><p><b></b><span></span></p></div></div>
   <div class="water-transition" id="water-transition" aria-hidden="true">
     <span class="transition-current"></span><i class="transition-pressure"></i><b id="transition-depth">1280 M</b>
   </div>
@@ -78,13 +81,14 @@
       <button class="nav-link" type="button" data-tab="join"><span>05</span>入国儀式</button>
     </nav>
   </header>
+  <button class="kingdom-logbook-toggle" id="kingdom-logbook-open" type="button" aria-label="王国手帳を開く" aria-haspopup="dialog" aria-controls="kingdom-logbook"><span id="kingdom-discovery-count" aria-hidden="true">0</span><b>王国手帳</b></button>
 
   <aside class="depth-rail" aria-hidden="true">
     <span>SURFACE</span><i><b id="depth-progress"></b></i><span>ABYSS</span>
   </aside>
 
   <main id="main-content">
-    <section class="page is-active" id="home" data-depth="1280" aria-labelledby="home-title">
+    <section class="page is-active" id="home" data-depth="1280" data-district="home" data-transition="tide" aria-labelledby="home-title">
       <div class="hero section-frame">
         <div class="hero-copy">
           <p class="kicker"><span>00</span> THE KINGDOM GATE / 深度 1,280M</p>
@@ -126,7 +130,7 @@
             <button class="snapshot-expand" id="photo-gallery-open" type="button"><span>26 SCENES</span>王国風景をひらく <i>↗</i></button>
           </article>
           <div class="royal-status">
-            <article><span>ROYAL WEATHER</span><strong id="kingdom-condition">水圧、やや偉そう</strong><p>国王の機嫌とは関係ありません。</p></article>
+            <article><span>TODAY'S KINGDOM STATE</span><strong id="kingdom-condition">水圧、やや偉そう</strong><p id="kingdom-condition-detail">国王の機嫌とは関係ありません。</p></article>
             <article><span>DECREE #034</span><strong>見学は歓迎する。</strong><p>ただし、ヒレはしまっておけ。</p></article>
             <article><span>ROYAL PROFILE</span><strong>なおキング</strong><p>王 / 案内役 / 責任は取らない</p></article>
           </div>
@@ -134,6 +138,12 @@
       </section>
 
       <section class="daily-audience section-frame" aria-labelledby="daily-title">
+        <aside class="kingdom-day-signal" aria-label="本日の王国信号">
+          <span id="kingdom-day-code">DAY SIGNAL / RECEIVING</span>
+          <strong id="kingdom-state-name">王国状態を観測中</strong>
+          <p id="kingdom-state-summary">光と海流の報告を待っています。</p>
+          <i aria-hidden="true"></i>
+        </aside>
         <header class="section-heading heading-inline">
           <div><p class="kicker"><span>DAILY</span> ROYAL AUDIENCE</p><h2 id="daily-title">今日だけの、<br><em>王国通達。</em></h2></div>
           <p>日付が変わると、潮の機嫌と王のひとことも変わります。七日分の謁見印を集めると、少しだけ偉い。</p>
@@ -152,6 +162,10 @@
             <button type="button" id="daily-stamp">本日の謁見印を受け取る <span>♛</span></button>
           </article>
         </div>
+        <section class="royal-errands" aria-labelledby="royal-errands-title">
+          <header><div><span>OPTIONAL / NO STREAK</span><h3 id="royal-errands-title">本日の王国用事。</h3></div><p>やっても、やらなくても、王国民としての地位は変わりません。</p></header>
+          <ol id="royal-errand-list"></ol>
+        </section>
       </section>
 
       <section class="portal-section section-frame" aria-labelledby="portal-title">
@@ -178,19 +192,20 @@
       </section>
     </section>
 
-    <section class="page" id="videos" data-depth="2360" aria-labelledby="videos-title" hidden>
-      <div class="page-hero section-frame"><p class="kicker"><span>01</span> ROYAL MOTION ARCHIVE</p><h1 id="videos-title">王国<br><em>映像記録。</em></h1><p>なおキングダムで起きた出来事を、記録係が逃げ出す前に保存しています。</p></div>
+    <section class="page" id="videos" data-depth="2360" data-district="record" data-transition="shutter" aria-labelledby="videos-title" hidden>
+      <div class="page-hero record-hero section-frame"><p class="kicker"><span>01</span> ROYAL MOTION ARCHIVE</p><h1 id="videos-title">王国<br><em>映像記録。</em></h1><p>なおキングダムで起きた出来事を、記録係が逃げ出す前に保存しています。</p><div class="district-mark" aria-hidden="true"><span>REC</span><i></i><i></i><i></i></div></div>
       <div class="archive-layout section-frame">
         <article class="featured-film">
           <div class="film-frame"><iframe src="https://www.youtube.com/embed/ur3w4qmnQW8" title="なおキングダム 最新映像記録" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe><span>FEATURED / RECORD 001</span></div>
           <div class="film-copy"><p class="kicker">LATEST DISPATCH</p><h2>なおキングダム、<br>最新の映像記録。</h2><p>海のどこかで撮影された、王国の公式っぽい記録。最後まで見ても、入会方法は分かりません。</p><a class="action action-primary" href="https://www.youtube.com/watch?v=ur3w4qmnQW8" target="_blank" rel="noreferrer">YOUTUBEで視聴 <span>↗</span></a></div>
         </article>
-        <div class="archive-ledger"><article><span>RECORD 002 / CLASSIFIED</span><b>次の記録を編集中</b><p>映像は存在する。完成日は深海に沈んでいる。</p></article><article><span>RECORD 003 / MISSING</span><b>記録係、行方不明</b><p>戻り次第、過去映像の整理を始める予定。</p></article></div>
+        <div class="archive-ledger"><article><span>RECORD 002 / CLASSIFIED</span><b>次の記録を編集中</b><p>映像は存在する。完成日は深海に沈んでいる。</p></article><button class="missing-record" id="missing-record" type="button"><span>RECORD 003 / MISSING</span><b>記録係、行方不明</b><p>信号の残響を調べる。記録係が戻る保証はありません。</p><i>微弱信号を照合 →</i></button></div>
+        <aside class="archive-console" aria-label="王国記録庫の状態"><span>PRESSURE PROJECTOR</span><strong id="archive-scan-status">26件の王国風景と記録波形を照合中</strong><div aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><button id="archive-scan" type="button">記録波形を走査する</button></aside>
       </div>
     </section>
 
-    <section class="page" id="fortune" data-depth="4810" aria-labelledby="fortune-title" hidden>
-      <div class="page-hero oracle-hero section-frame"><div><p class="kicker"><span>02</span> THE SOVEREIGN ORACLE</p><h1 id="fortune-title">深海<br><em>神託装置。</em></h1></div><p>結果は一度だけ確定し、王国の演出装置を経てあなたへ届きます。連打は王への反逆です。</p></div>
+    <section class="page" id="fortune" data-depth="4810" data-district="oracle" data-transition="pressure" aria-labelledby="fortune-title" hidden>
+      <div class="page-hero oracle-hero section-frame"><div><p class="kicker"><span>02</span> THE SOVEREIGN ORACLE</p><h1 id="fortune-title">深海<br><em>神託装置。</em></h1></div><p>結果は一度だけ確定し、王国の演出装置を経てあなたへ届きます。連打は王への反逆です。</p><div class="district-mark" aria-hidden="true"><span>4810</span><i></i><i></i><i></i></div></div>
       <div class="oracle-layout section-frame">
         <div class="fortune-card" id="card">
           <div class="machine-plate"><span>NAOKING ORACLE // UNIT 03</span><i>ONLINE</i></div>
@@ -205,8 +220,8 @@
       </div>
     </section>
 
-    <section class="page" id="game" data-depth="3280" aria-labelledby="game-title" hidden>
-      <div class="page-hero game-page-hero section-frame"><div><p class="kicker"><span>03</span> ROYAL HUNTING GROUND</p><h1 id="game-title">なおキングの<br><em>回遊。</em></h1></div><p>魚を食べ、コンボを繋ぎ、王冠でフィーバー。網と岩は王様にも平等に危険です。</p></div>
+    <section class="page" id="game" data-depth="3280" data-district="game" data-transition="emergency" aria-labelledby="game-title" hidden>
+      <div class="page-hero game-page-hero section-frame"><div><p class="kicker"><span>03</span> ROYAL HUNTING GROUND</p><h1 id="game-title">なおキングの<br><em>回遊。</em></h1></div><p>魚を食べ、コンボを繋ぎ、王冠でフィーバー。網と岩は王様にも平等に危険です。</p><div class="district-mark" aria-hidden="true"><span>O₂</span><i></i><i></i><i></i></div></div>
       <div class="game-shell deep-sea-game section-frame">
         <div class="game-topline"><span>EXPEDITION // SECTOR 7</span><strong id="game-state" aria-live="polite">出航待機中</strong><b id="game-rank">未判定</b></div>
         <div class="game-hud"><div><small>TIME</small><b id="game-time">30.0</b></div><div><small>SCORE</small><b id="game-score">00000</b></div><div><small>COMBO</small><b id="game-combo">× 1</b></div><div><small>BEST</small><b id="game-high-score">00000</b></div></div>
@@ -214,12 +229,14 @@
         <div class="game-actions"><button class="action action-primary" id="start-game" type="button">回遊を始める <span>→</span></button><div class="game-controls"><button id="left-control" type="button" aria-label="左へ泳ぐ">← <span>LEFT</span></button><button id="right-control" type="button" aria-label="右へ泳ぐ"><span>RIGHT</span> →</button></div></div>
         <p class="game-help">小魚 +12 / マグロ +28 / 真珠 +42 / 王冠 +100・フィーバー。コンボとフィーバーで得点倍率が上がります。</p>
       </div>
+      <aside class="expedition-log section-frame" aria-label="本日の遠征状態"><span>EXPEDITION LOG / LOCAL</span><strong id="expedition-summary">まだ本日の回遊記録はありません。</strong><p>記録はこのブラウザの中だけに残ります。休んでも王冠は没収されません。</p></aside>
     </section>
 
-    <section class="page" id="submit" data-depth="6120" aria-labelledby="submit-title" hidden>
-      <div class="page-hero offering-hero section-frame"><div><p class="kicker"><span>04</span> ROYAL MATERIAL OFFERING</p><h1 id="submit-title">写真素材<br><em>献上窓口。</em></h1></div><p>あなたが撮影した王国の記録を、動画素材としてなおキングへ献上できます。</p></div>
+    <section class="page" id="submit" data-depth="6120" data-district="workshop" data-transition="portal" aria-labelledby="submit-title" hidden>
+      <div class="page-hero offering-hero section-frame"><div><p class="kicker"><span>04</span> ROYAL MATERIAL OFFERING</p><h1 id="submit-title">写真素材<br><em>献上窓口。</em></h1></div><p>あなたが撮影した王国の記録を、動画素材としてなおキングへ献上できます。</p><div class="district-mark" aria-hidden="true"><span>LINK</span><i></i><i></i><i></i></div></div>
+      <aside class="facility-status section-frame" aria-label="異世界接続施設の状態"><span>VRCHAT MEMORY APERTURE</span><strong>PORTAL STABLE</strong><p>写真は献上窓口へ。加工だけなら、下の王国フレーム工房へ。</p><i aria-hidden="true"></i></aside>
       <div class="offering-layout section-frame">
-        <aside class="offering-guidance"><span>OFFERING PROTOCOL</span><h2>送る前に、<br>三つだけ確認。</h2><ul><li>自分で撮影した、または使用許可がある</li><li>動画・SNSで使用される可能性に同意する</li><li>JPEG / PNG / WebP、10MB以内</li></ul><p>採用の保証はありません。王の気まぐれです。</p><p class="privacy-note">写真・投稿日時・任意のニックネームは管理者用の記録庫に保存されます。削除を希望する場合は、なおキングへ直接お知らせください。</p></aside>
+        <aside class="offering-guidance" role="button" tabindex="0" aria-label="写真献上の安全案内を確認する"><span>OFFERING PROTOCOL</span><h2>送る前に、<br>三つだけ確認。</h2><ul><li>自分で撮影した、または使用許可がある</li><li>動画・SNSで使用される可能性に同意する</li><li>JPEG / PNG / WebP、10MB以内</li></ul><p>採用の保証はありません。王の気まぐれです。</p><p class="privacy-note">写真・投稿日時・任意のニックネームは管理者用の記録庫に保存されます。削除を希望する場合は、なおキングへ直接お知らせください。</p></aside>
         <div class="submit-frame" id="submit-frame"><form class="photo-submit-form" id="photo-submit-form">
           <label class="file-drop" for="photo-file"><span class="file-index">01 / IMAGE</span><strong>写真を選ぶ</strong><small>DROP OR TAP TO SELECT</small><img class="photo-preview" id="photo-preview" alt="選択した写真のプレビュー" hidden><span class="photo-preview-name" id="photo-preview-name" hidden></span><input id="photo-file" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required></label>
           <label class="field-label"><span>02 / CREDIT</span>撮影者名・ニックネーム（任意）<input id="photo-credit" name="credit" type="text" maxlength="50" placeholder="例：なおキングの民" autocomplete="nickname"></label>
@@ -241,12 +258,13 @@
       </section>
     </section>
 
-    <section class="page" id="join" data-depth="8050" aria-labelledby="join-title" hidden>
-      <div class="page-hero decree-hero section-frame"><div><p class="kicker"><span>05</span> ROYAL DECREE / DOCUMENT 404</p><h1 id="join-title">なおキングダム<br><em>入会方法。</em></h1></div><p>王国の公式記録によれば、入会には所定の手続きが必要です。所定の意味は非公開です。</p></div>
+    <section class="page" id="join" data-depth="8050" data-district="bureau" data-transition="stamp" aria-labelledby="join-title" hidden>
+      <div class="page-hero decree-hero section-frame"><div><p class="kicker"><span>05</span> ROYAL DECREE / DOCUMENT 404</p><h1 id="join-title">なおキングダム<br><em>入会方法。</em></h1></div><p>王国の公式記録によれば、入会には所定の手続きが必要です。所定の意味は非公開です。</p><div class="district-mark" aria-hidden="true"><span>404</span><i></i><i></i><i></i></div></div>
       <article class="decree section-frame">
-        <header><div class="decree-seal">王</div><div><span>ABYSSAL COURT — OFFICIAL DOCUMENT</span><h2>王国入会に関する布告</h2></div><b>CLASSIFIED</b></header>
+        <header><button class="decree-seal" id="decree-seal" type="button" aria-label="王印を押す">王</button><div><span>ABYSSAL COURT — OFFICIAL DOCUMENT</span><h2>王国入会に関する布告</h2></div><b>CLASSIFIED</b></header>
         <ol class="decree-steps"><li><span>第一条</span><div><h3>所定の門を探す</h3><p>門の所在地は非公開です。門が存在するかどうかも、現在確認中です。</p></div><i>STATUS / MISSING</i></li><li><span>第二条</span><div><h3>所定の者に会う</h3><p>所定の者は不在です。帰還予定は「所定の時刻」と記録されています。</p></div><i>STATUS / AWAY</i></li><li><span>最終条</span><div><h3>入会したことにする</h3><p>ここまで読んだ者は、たぶん入会できています。王への報告は不要です。</p></div><i>STATUS / MAYBE</i></li></ol>
         <footer><p>結論</p><strong>入会方法は、<em>完全に謎。</em></strong><small>なおキングも、よく分かっていません。</small></footer>
+        <p class="bureau-response" id="bureau-response" role="status" aria-live="polite">王印は押せますが、効力は確認されていません。</p>
       </article>
     </section>
   </main>
@@ -257,12 +275,23 @@
   <dialog class="kingdom-gallery" id="kingdom-gallery" aria-labelledby="gallery-title">
     <div class="gallery-shell">
       <header><p class="kicker"><span>ROYAL SCENERY</span> 26 LINKED MEMORIES</p><h2 id="gallery-title">王国風景記録庫。</h2><button type="button" id="gallery-close" aria-label="写真記録庫を閉じる">CLOSE <span>×</span></button></header>
-      <figure><img id="gallery-image" src="assets/backgrounds/vrchat-01.webp" alt="なおキングダムの王国風景 1" width="1600" height="900"><figcaption aria-live="polite"><span id="gallery-counter">SCENE 01 / 26</span><strong id="gallery-caption">潮目の向こうにある王国</strong><small>選んだ風景はサイト背景にも反映されます</small></figcaption></figure>
-      <div class="gallery-navigation"><button type="button" id="gallery-prev">← 前の風景</button><button type="button" id="gallery-next">次の風景 →</button></div>
+      <figure aria-busy="false"><img id="gallery-image" src="assets/backgrounds/vrchat-01.webp" data-photo-index="0" alt="青い光が差し込む海底遺跡を泳ぐ、なおキングたち" width="1600" height="900"><figcaption aria-live="polite"><span id="gallery-counter">SCENE 01 / 26</span><strong id="gallery-caption">光差す海底遺跡へ</strong><small>選んだ風景はサイト背景にも反映されます</small></figcaption></figure>
+      <div class="gallery-navigation"><button type="button" id="gallery-prev">← 前の風景</button><button class="gallery-favorite" type="button" id="gallery-favorite" aria-pressed="false">☆ 記憶に留める</button><button type="button" id="gallery-next">次の風景 →</button></div>
       <div class="gallery-strip" id="gallery-strip" aria-label="王国風景一覧"></div>
     </div>
   </dialog>
 
-  <script src="signature-water.js?v=20260830f" defer></script><script src="site.js?v=20260830f" defer></script><script src="photo-background.js?v=20260830d" defer></script><script src="royal-abyss-lens.js?v=20260830h" defer></script><script src="kingdom-experience.js?v=20260830h" defer></script><script src="submission.js?v=20260824d" defer></script><script src="roulette-entertainment.js?v=20260831b" defer></script><script src="roulette-controller.js?v=20260831b" defer></script><script src="deep-sea-game.js?v=20260831a" defer></script><script src="kingdom-audio.js?v=20260831b" defer></script>
+  <dialog class="kingdom-logbook" id="kingdom-logbook" aria-labelledby="kingdom-logbook-title" aria-describedby="kingdom-logbook-intro">
+    <div class="logbook-shell">
+      <header><div><span>LOCAL MEMORY / NO ACCOUNT</span><h2 id="kingdom-logbook-title">王国航海手帳。</h2></div><button id="kingdom-logbook-close" type="button">閉じる <span>×</span></button></header>
+      <p class="logbook-intro" id="kingdom-logbook-intro">このブラウザが覚えている、王国での小さな発見です。</p>
+      <dl class="logbook-stats"><div><dt>VISIT DAYS</dt><dd id="logbook-visit-days">0</dd></div><div><dt>DISTRICTS</dt><dd id="logbook-districts">0 / 6</dd></div><div><dt>MEMORIES</dt><dd id="logbook-memories">0 / 26</dd></div><div><dt>SECRETS</dt><dd id="logbook-secrets">0</dd></div></dl>
+      <section><h3>発見済みの記録</h3><ul id="logbook-discoveries"><li>まだ何も見つかっていません。</li></ul></section>
+      <section><h3>訪れた地区</h3><ol id="logbook-district-list"></ol></section>
+      <footer><p>記録は端末内だけに保存され、来なかった日を責めません。</p><button id="kingdom-logbook-clear" type="button">王国手帳を初期化</button></footer>
+    </div>
+  </dialog>
+
+  <script src="signature-water.js?v=20260830f" defer></script><script src="site.js?v=20260831f" defer></script><script src="photo-catalog.js?v=20260831f" defer></script><script src="photo-background.js?v=20260831f" defer></script><script src="royal-abyss-lens.js?v=20260830h" defer></script><script src="kingdom-world-data.js?v=20260831f" defer></script><script src="kingdom-experience.js?v=20260831f" defer></script><script src="kingdom-audio.js?v=20260831f" defer></script><script src="kingdom-world.js?v=20260831f" defer></script><script src="submission.js?v=20260824d" defer></script><script src="roulette-entertainment.js?v=20260831b" defer></script><script src="roulette-controller.js?v=20260831b" defer></script><script src="deep-sea-game.js?v=20260831a" defer></script>
 </body>
 </html>

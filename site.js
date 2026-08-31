@@ -64,8 +64,11 @@
     const nextPage = document.getElementById(nextName);
     if (!nextPage) return;
 
+    const previousPage = activePage;
     activePage = nextName;
     body.dataset.page = nextName;
+    body.dataset.district = nextPage.dataset.district || nextName;
+    body.dataset.transitionStyle = nextPage.dataset.transition || 'tide';
     pages.forEach(page => {
       const selected = page === nextPage;
       page.classList.toggle('is-active', selected);
@@ -90,7 +93,14 @@
     }
     window.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
     if (focus) focusPageHeading(nextName, reducedMotion.matches ? 0 : 360);
-    window.dispatchEvent(new CustomEvent('naoking:pagechange', { detail: { page: nextName } }));
+    window.dispatchEvent(new CustomEvent('naoking:pagechange', {
+      detail: {
+        page: nextName,
+        previousPage,
+        district: body.dataset.district,
+        transition: body.dataset.transitionStyle
+      }
+    }));
   }
 
   function setPage(name, { updateHistory = true, focus = true } = {}) {
@@ -109,6 +119,7 @@
     const currentDepth = Number(document.getElementById(activePage)?.dataset.depth || 0);
     const destinationDepth = Number(document.getElementById(nextName)?.dataset.depth || 0);
     body.dataset.travelDirection = destinationDepth >= currentDepth ? 'dive' : 'surface';
+    body.dataset.transitionStyle = document.getElementById(nextName)?.dataset.transition || 'tide';
     if (transitionDepth) transitionDepth.textContent = `${String(currentDepth).padStart(4, '0')} → ${String(destinationDepth).padStart(4, '0')} M`;
     body.dataset.nextPage = nextName;
     body.classList.add('is-page-transitioning');
@@ -261,6 +272,7 @@
     }
     opening.classList.add('is-finished');
     opening.setAttribute('aria-hidden', 'true');
+    window.dispatchEvent(new CustomEvent('naoking:opening', { detail: { phase: 'finish' } }));
     try { window.sessionStorage.setItem('naokingOpeningSeen', '1'); } catch { /* storage may be blocked */ }
     window.setTimeout(() => opening.remove(), reducedMotion.matches ? 0 : 1150);
   }

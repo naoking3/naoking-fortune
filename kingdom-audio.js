@@ -3,7 +3,7 @@
 
   if (window.NaokingAudio) return;
 
-  const VERSION = '1.0.0';
+  const VERSION = '1.1.0';
   const STORAGE_ENABLED = 'naoking-kingdom-sound-enabled-v1';
   const STORAGE_VOLUME = 'naoking-kingdom-sound-volume-v1';
   const DEFAULT_VOLUME = 0.64;
@@ -23,6 +23,57 @@
   });
   const ORACLE_LAYERS = Object.freeze(['reel', 'signal', 'tension', 'event']);
   const PREMIUM_ROUTES = new Set(['royal-audience', 'golden-tide', 'secret-4810', 'palace-open', 'pixel-palace-bonus']);
+  const DISTRICT_AUDIO_PROFILES = Object.freeze({
+    home: Object.freeze({
+      noiseType:'bandpass', noiseFrequency:620, noiseQ:.34, noiseLevel:.72,
+      bedFrequency:174, bedType:'sine', bedLevel:.19, harmonicRatio:1.5, harmonicLevel:.055,
+      modulationRate:.075, modulationDepth:.022, outputLevel:.038,
+      motif:[261.63, 329.63, 392], motifGain:.021, motifDuration:.74,
+      bubbles:[{ delay:.18, pan:-.72, size:.25 }, { delay:1.55, pan:.62, size:.36 }]
+    }),
+    videos: Object.freeze({
+      noiseType:'lowpass', noiseFrequency:430, noiseQ:.5, noiseLevel:.78,
+      bedFrequency:98, bedType:'triangle', bedLevel:.15, harmonicRatio:2.02, harmonicLevel:.035,
+      modulationRate:.115, modulationDepth:.018, outputLevel:.035,
+      motif:[196, 146.83, 220], motifGain:.018, motifDuration:.92,
+      bubbles:[{ delay:.7, pan:-.46, size:.18 }, { delay:2.25, pan:.42, size:.22 }]
+    }),
+    fortune: Object.freeze({
+      noiseType:'bandpass', noiseFrequency:255, noiseQ:.68, noiseLevel:.82,
+      bedFrequency:55, bedType:'sine', bedLevel:.26, harmonicRatio:1.5, harmonicLevel:.045,
+      modulationRate:.052, modulationDepth:.028, outputLevel:.037,
+      motif:[110, 164.81, 123.47], motifGain:.018, motifDuration:1.22,
+      bubbles:[{ delay:1.15, pan:-.2, size:.46 }]
+    }),
+    game: Object.freeze({
+      noiseType:'bandpass', noiseFrequency:385, noiseQ:.48, noiseLevel:.76,
+      bedFrequency:63, bedType:'triangle', bedLevel:.21, harmonicRatio:2, harmonicLevel:.052,
+      modulationRate:.42, modulationDepth:.032, outputLevel:.037,
+      motif:[126, 168, 189], motifGain:.018, motifDuration:.48,
+      bubbles:[{ delay:.32, pan:-.74, size:.2 }, { delay:1.05, pan:.7, size:.3 }]
+    }),
+    submit: Object.freeze({
+      noiseType:'bandpass', noiseFrequency:760, noiseQ:.3, noiseLevel:.63,
+      bedFrequency:146.83, bedType:'sine', bedLevel:.15, harmonicRatio:2, harmonicLevel:.04,
+      modulationRate:.095, modulationDepth:.016, outputLevel:.034,
+      motif:[293.66, 369.99, 440], motifGain:.019, motifDuration:.66,
+      bubbles:[{ delay:.24, pan:.58, size:.2 }, { delay:1.82, pan:-.62, size:.27 }]
+    }),
+    join: Object.freeze({
+      noiseType:'lowpass', noiseFrequency:520, noiseQ:.38, noiseLevel:.64,
+      bedFrequency:130.81, bedType:'sine', bedLevel:.16, harmonicRatio:1.5, harmonicLevel:.042,
+      modulationRate:.065, modulationDepth:.015, outputLevel:.034,
+      motif:[261.63, 392, 523.25], motifGain:.019, motifDuration:1.08,
+      bubbles:[{ delay:1.35, pan:.18, size:.2 }]
+    }),
+    gallery: Object.freeze({
+      noiseType:'bandpass', noiseFrequency:890, noiseQ:.28, noiseLevel:.56,
+      bedFrequency:220, bedType:'sine', bedLevel:.13, harmonicRatio:1.5, harmonicLevel:.046,
+      modulationRate:.045, modulationDepth:.014, outputLevel:.032,
+      motif:[440, 554.37, 659.25], motifGain:.017, motifDuration:1.36,
+      bubbles:[{ delay:.48, pan:-.8, size:.16 }, { delay:2.6, pan:.76, size:.24 }]
+    })
+  });
 
   const state = {
     enabled: readStoredBoolean(STORAGE_ENABLED, false),
@@ -42,8 +93,13 @@
   let compressor = null;
   let noiseBuffer = null;
   let ambientVoice = null;
+  let ambientDistrict = '';
+  let currentWorldState = document.body?.dataset?.worldState || '';
+  let worldStateAnnounced = false;
   let reelVoice = null;
   let gameVoice = null;
+  let gameRunning = false;
+  let gameIntensity = 0.5;
   let silenceTimer = 0;
   let disableTimer = 0;
   let control = null;
@@ -102,6 +158,16 @@
 
   function canPlay() {
     return Boolean(state.enabled && state.unlocked && context && context.state === 'running' && !state.hidden);
+  }
+
+  function scheduleWorldStateCue(delay = 720) {
+    const worldState = currentWorldState || document.body?.dataset?.worldState || '';
+    if (!worldState || worldStateAnnounced) return;
+    currentWorldState = worldState;
+    scheduleTimer(() => {
+      if (worldStateAnnounced || currentWorldState !== worldState) return;
+      worldStateAnnounced = playWorldSemanticCue('state', { state:worldState, intensity:.34 });
+    }, delay, 'world');
   }
 
   function createMixer() {
@@ -172,8 +238,12 @@
       masterGain.gain.setValueAtTime(state.volume, stamp);
       silentUnlockPulse();
       updateControl();
-      if (isOpeningActive()) playOpening({ resumed: true });
-      else startAmbient(state.page);
+      if (isOpeningActive()) {
+        playOpening({ resumed: true });
+      } else {
+        startAmbient(state.page);
+        scheduleWorldStateCue();
+      }
       emitState();
       return true;
     } catch {
@@ -232,7 +302,10 @@
         this.sources.clear();
         voices.delete(this);
         layerVoices.get(this.layer)?.delete(this);
-        if (ambientVoice === this) ambientVoice = null;
+        if (ambientVoice === this) {
+          ambientVoice = null;
+          ambientDistrict = '';
+        }
         if (reelVoice === this) reelVoice = null;
         if (gameVoice === this) gameVoice = null;
       }
@@ -262,6 +335,7 @@
 
   function stopLayer(layer) {
     Array.from(layerVoices.get(layer) || []).forEach(voice => voice.stop());
+    if (layer === 'ambient') ambientDistrict = '';
   }
 
   function stopOracleScene({ includeResult = false } = {}) {
@@ -727,27 +801,63 @@
     if (final && reelVoice) reelVoice.stop(0.05);
   }
 
+  function normalizeDistrict(page = 'home') {
+    const name = String(page || 'home').trim().toLowerCase();
+    if (/^(record|records|archive|video|videos)$/.test(name)) return 'videos';
+    if (/^(oracle|fortune)$/.test(name)) return 'fortune';
+    if (/^(vrchat|workshop|offering|submit)$/.test(name)) return 'submit';
+    if (/^(decree|entry|join)$/.test(name)) return 'join';
+    if (/^(gallery|photos?|scenery|memory)$/.test(name)) return 'gallery';
+    return DISTRICT_AUDIO_PROFILES[name] ? name : 'home';
+  }
+
   function startAmbient(page = 'home') {
     if (!canPlay() || state.hidden || isOpeningActive()) return false;
-    if (ambientVoice) ambientVoice.stop();
+    const district = normalizeDistrict(page);
+    if (ambientVoice && ambientDistrict === district) return true;
+    stopLayer('ambient');
+    clearTimers('ambient');
     const voice = makeVoice('ambient');
     if (!voice) return false;
     voice.persistent = true;
-    const depth = { home: 0.55, videos: 0.45, fortune: 0.68, game: 0.76, submit: 0.48, join: 0.42 }[page] || 0.5;
+    const profile = DISTRICT_AUDIO_PROFILES[district];
     const source = voice.addSource(context.createBufferSource());
     const filter = voice.addNode(context.createBiquadFilter());
-    const shimmer = voice.addSource(context.createOscillator());
-    const shimmerGain = voice.addNode(context.createGain());
+    const noiseGain = voice.addNode(context.createGain());
+    const bed = voice.addSource(context.createOscillator());
+    const bedGain = voice.addNode(context.createGain());
+    const harmonic = voice.addSource(context.createOscillator());
+    const harmonicGain = voice.addNode(context.createGain());
+    const drift = voice.addSource(context.createOscillator());
+    const driftGain = voice.addNode(context.createGain());
     source.buffer = getNoiseBuffer(); source.loop = true;
-    filter.type = 'bandpass'; filter.frequency.value = 360 + (1 - depth) * 260; filter.Q.value = 0.42;
-    shimmer.type = 'sine'; shimmer.frequency.value = 220 + (1 - depth) * 90;
-    shimmerGain.gain.value = 0.045;
-    voice.output.gain.value = 0.041;
-    source.connect(filter); filter.connect(voice.output);
-    shimmer.connect(shimmerGain); shimmerGain.connect(voice.output);
-    source.start(); shimmer.start();
+    filter.type = profile.noiseType;
+    filter.frequency.value = profile.noiseFrequency;
+    filter.Q.value = profile.noiseQ;
+    noiseGain.gain.value = profile.noiseLevel;
+    bed.type = profile.bedType;
+    bed.frequency.value = profile.bedFrequency;
+    bedGain.gain.value = profile.bedLevel;
+    harmonic.type = 'sine';
+    harmonic.frequency.value = profile.bedFrequency * profile.harmonicRatio;
+    harmonicGain.gain.value = profile.harmonicLevel;
+    drift.type = 'sine';
+    drift.frequency.value = profile.modulationRate;
+    driftGain.gain.value = profile.modulationDepth;
+    voice.output.gain.value = profile.outputLevel;
+    source.connect(filter); filter.connect(noiseGain); connectWithPan(noiseGain, voice, -.08);
+    bed.connect(bedGain); connectWithPan(bedGain, voice, -.22);
+    harmonic.connect(harmonicGain); connectWithPan(harmonicGain, voice, .24);
+    drift.connect(driftGain); driftGain.connect(bedGain.gain);
+    source.start(); bed.start(); harmonic.start(); drift.start();
     ambientVoice = voice;
-    [0.15, 1.4, 3.1].forEach((delay, index) => bubble({ layer: 'ambient', delay, pan: index - 1, size: 0.25 + index * 0.17 }));
+    ambientDistrict = district;
+    profile.motif.forEach((frequency, index) => tone({
+      layer:'ambient', frequency, endFrequency:frequency * (index === profile.motif.length - 1 ? 1.008 : 1),
+      duration:profile.motifDuration, gain:profile.motifGain, delay:.24 + index * .34,
+      attack:.16, release:profile.motifDuration * .58, pan:(index - 1) * .34
+    }));
+    profile.bubbles.forEach(options => bubble({ layer:'ambient', ...options }));
     return true;
   }
 
@@ -799,13 +909,26 @@
   }
 
   function playOpening({ resumed = false } = {}) {
-    if (!canPlay() || !isOpeningActive() || !allowCue('opening', 2800)) return false;
+    if (!canPlay() || !isOpeningActive() || (!resumed && !allowCue('opening', 2800))) return false;
     stopLayer('opening');
     noise({ layer: 'opening', duration: 2.85, gain: 0.18, filterType: 'lowpass', frequency: 2300, endFrequency: 190, q: 0.55 });
     tone({ layer: 'opening', frequency: 164, endFrequency: 43, duration: 2.65, gain: 0.18, attack: 0.08, release: 0.48 });
     [0.28, 0.55, 0.92, 1.44].forEach((delay, index) => bubble({ layer: 'opening', delay, pan: index % 2 ? 0.6 : -0.5, size: 0.35 + index * 0.1 }));
     royalBell(0.55, resumed ? 1.45 : 2.1, 'opening');
     return true;
+  }
+
+  function handleOpeningAudio(event) {
+    const phase = String(event?.detail?.phase || '').toLowerCase();
+    if (/^(finish|finished|complete|completed|skip)$/.test(phase)) {
+      stopLayer('opening');
+      if (canPlay()) {
+        startAmbient(state.page);
+        scheduleWorldStateCue(520);
+      }
+      return true;
+    }
+    return playOpening(event?.detail || {});
   }
 
   function playTransition(direction = document.body?.dataset?.travelDirection || 'dive') {
@@ -955,6 +1078,12 @@
     const detail = event?.detail || {};
     const name = String(detail.cue || '');
     const intensity = clamp(detail.intensity ?? 0.58, 0.15, 1);
+    if (['start', 'retry'].includes(name)) {
+      gameRunning = true;
+      gameIntensity = intensity;
+    } else if (['death', 'clear', 'game-over', 'exit'].includes(name)) {
+      gameRunning = false;
+    }
     if (!canPlay() || !name || !allowCue(`game:${name}`, name === 'pickup' ? 55 : 120)) return;
     switch (name) {
       case 'start':
@@ -1017,6 +1146,82 @@
     }
   }
 
+  function playWorldSemanticCue(type, options = {}) {
+    if (!canPlay()) return false;
+    const semanticType = String(type || 'state').toLowerCase();
+    const identity = String(options.state || options.worldState || options.discovery || options.surprise || options.kind || 'current')
+      .toLowerCase().replace(/[\s_.:/]+/g, '-');
+    const intensity = clamp(options.intensity ?? .46, .12, .82);
+    if (!allowCue(`world:${semanticType}:${identity}`, semanticType === 'state' ? 900 : 220)) return false;
+
+    if (semanticType === 'discovery') {
+      const variation = routeVariation(identity);
+      const base = 293.66 * variation.pitch;
+      chord([base, base * 1.25, base * 1.5], {
+        layer:'signal', duration:.72, gain:.045 * intensity, attack:.02, release:.46,
+        spread:.11, pan:variation.pan * .42
+      });
+      bubble({ layer:'signal', delay:.34, pan:-variation.pan, size:.2 + intensity * .22 });
+      return true;
+    }
+
+    if (semanticType === 'surprise') {
+      if (/crossing|intrusion|naoking|king|sleep|lunch/.test(identity)) {
+        sillyKing(.7 * intensity);
+        waterWhoosh('surface', .32 * intensity, 'event');
+      } else if (/shadow|giant|leviathan|pressure/.test(identity)) {
+        noise({ layer:'event', duration:1.15, gain:.075 * intensity, filterType:'lowpass', frequency:260, endFrequency:88, q:.4 });
+        lowPulse(.62 * intensity, .28, 'event');
+      } else if (/crown|royal|festival|palace/.test(identity)) {
+        royalBell(.64 * intensity, 0, 'signal');
+      } else if (/migration|jelly|fish|bubble/.test(identity)) {
+        waterWhoosh('surface', .28 * intensity, 'event');
+        [-.66, -.08, .62].forEach((pan, index) => bubble({ layer:'event', delay:.12 + index * .17, pan, size:.18 + index * .1 }));
+      } else if (/reverse|glitch|anomaly|lost/.test(identity)) {
+        noise({ layer:'event', duration:.52, gain:.065 * intensity, frequency:330, endFrequency:1480, q:.55 });
+        tone({ layer:'event', frequency:196, endFrequency:294, duration:.34, type:'triangle', gain:.05 * intensity, pan:.4 });
+      } else {
+        royalBell(.38 * intensity, 0, 'signal');
+        bubble({ layer:'signal', delay:.12, pan:.36, size:.28 });
+      }
+      return true;
+    }
+
+    if (/luminous|dawn|bright|surface/.test(identity)) {
+      waterWhoosh('surface', .28 * intensity, 'ambient');
+      chord([261.63, 329.63, 392], { layer:'signal', duration:1.08, gain:.026 * intensity, release:.72, spread:.08 });
+    } else if (/quiet|sleep|still|trench/.test(identity)) {
+      tone({ layer:'signal', frequency:146.83, endFrequency:130.81, duration:1.4, gain:.032 * intensity, attack:.24, release:.86 });
+    } else if (/reverse|anomaly|storm|rough/.test(identity)) {
+      noise({ layer:'ambient', duration:.78, gain:.052 * intensity, frequency:360, endFrequency:1280, q:.46 });
+      tone({ layer:'signal', frequency:110, endFrequency:164.81, duration:.58, gain:.038 * intensity, release:.34 });
+    } else if (/festival|royal|crown|palace/.test(identity)) {
+      royalBell(.48 * intensity, 0, 'signal');
+    } else if (/migration|jelly|fish/.test(identity)) {
+      [-.58, .08, .64].forEach((pan, index) => bubble({ layer:'signal', delay:index * .16, pan, size:.17 + index * .08 }));
+    } else if (/archive|memory|record|bloom/.test(identity)) {
+      chord([196, 293.66], { layer:'signal', duration:1.12, gain:.026 * intensity, release:.76, spread:.18 });
+    } else {
+      tone({ layer:'signal', frequency:220, endFrequency:277.18, duration:.7, gain:.028 * intensity, release:.44 });
+      bubble({ layer:'signal', delay:.22, pan:.24, size:.22 });
+    }
+    return true;
+  }
+
+  function world(detail = {}) {
+    const type = String(detail.type || detail.semantic || detail.kind || 'state').toLowerCase();
+    if (type === 'state') {
+      const nextState = String(detail.state || detail.worldState || '').trim();
+      if (nextState && nextState !== currentWorldState) worldStateAnnounced = false;
+      if (nextState) currentWorldState = nextState;
+      if (!canPlay()) return false;
+      const played = playWorldSemanticCue('state', { ...detail, state:currentWorldState || nextState });
+      if (played) worldStateAnnounced = true;
+      return played;
+    }
+    return playWorldSemanticCue(type, detail);
+  }
+
   function cue(name, options = {}) {
     if (!canPlay() || !name) return false;
     const intensity = clamp(options.intensity ?? 0.58, 0.1, 1);
@@ -1036,6 +1241,11 @@
         sillyKing(intensity);
         impact(0.28 * intensity, 'event', 0.06);
         break;
+      case 'world-state': world({ ...options, type:'state' }); break;
+      case 'world-discovery':
+      case 'discovery': world({ ...options, type:'discovery' }); break;
+      case 'world-surprise':
+      case 'surprise': world({ ...options, type:'surprise' }); break;
       case 'glitch': glitch(intensity); break;
       case 'alarm': alarm(intensity, options.layer || 'event'); break;
       case 'blackout':
@@ -1233,6 +1443,10 @@
       unlocked: state.unlocked,
       hidden: state.hidden,
       page: state.page,
+      ambientDistrict,
+      gameRunning,
+      worldState: currentWorldState,
+      worldStateAnnounced,
       contextState: context?.state || 'uncreated',
       volume: state.volume,
       activeVoices: voices.size,
@@ -1263,12 +1477,26 @@
     context.resume().then(() => {
       stats.resumes += 1;
       updateControl();
+      if (isOpeningActive()) {
+        playOpening({ resumed: true });
+        return;
+      }
       startAmbient(state.page);
+      scheduleWorldStateCue();
+      if (gameRunning && state.page === 'game') startGameLoop(gameIntensity);
+      const phase = state.oracle.phase;
+      if (['descent', 'cruise', 'signal', 'anomaly', 'judgment', 'verdict'].includes(phase)) {
+        const mode = phase === 'descent' ? 'launch'
+          : ['signal', 'anomaly'].includes(phase) ? (/reverse|rewind/.test(state.oracle.route) ? 'reverse' : 'anticipation')
+            : ['judgment', 'verdict'].includes(phase) ? 'brake' : 'cruise';
+        startReelLoop(mode, tierIntensity(state.oracle.tier));
+      }
     }).catch(() => { state.unlocked = false; updateControl(); });
   }
 
   function handlePageChange(event) {
     state.page = event?.detail?.page || document.body?.dataset?.page || 'home';
+    if (state.page !== 'game') gameRunning = false;
     stopOracleScene({ includeResult: true });
     stopLayer('game');
     stopLayer('opening');
@@ -1299,18 +1527,29 @@
     uiTick(0.34);
   }
 
+  function bindGalleryAmbient() {
+    const gallery = document.getElementById?.('kingdom-gallery');
+    const galleryOpen = document.getElementById?.('photo-gallery-open');
+    if (!gallery || !galleryOpen) return;
+    const enterGallery = () => scheduleTimer(() => startAmbient('gallery'), 0, 'page');
+    const leaveGallery = () => scheduleTimer(() => startAmbient(state.page), 0, 'page');
+    galleryOpen.addEventListener('click', enterGallery);
+    gallery.addEventListener('close', leaveGallery);
+  }
+
   window.addEventListener('naoking:pagechange', handlePageChange);
   window.addEventListener('naoking:oraclephase', handleOraclePhase);
   window.addEventListener('naoking:oraclestop', handleOracleStop);
   window.addEventListener('naoking:oracleresult', event => resultSound(event.detail || {}));
   window.addEventListener('naoking:oraclebeat', handleOracleBeat);
   window.addEventListener('naoking:gameaudio', handleGameAudio);
-  window.addEventListener('naoking:opening', event => playOpening(event.detail || {}));
+  window.addEventListener('naoking:opening', handleOpeningAudio);
   window.addEventListener('naoking:transition', event => playTransition(event.detail?.direction));
   window.addEventListener('naoking:audio', event => {
     const detail = event.detail || {};
     if (detail.action === 'stop') stopLayer(detail.layer || 'event');
     else if (detail.action === 'silence') silence(Number(detail.duration) || 650);
+    else if (detail.action === 'world') world(detail);
     else cue(detail.cue || detail.name, detail);
   });
   document.addEventListener('visibilitychange', handleVisibility);
@@ -1326,6 +1565,7 @@
   const api = {
     version: VERSION,
     layers: LAYERS,
+    districts: Object.freeze(Object.keys(DISTRICT_AUDIO_PROFILES)),
     get enabled() { return state.enabled; },
     get unlocked() { return state.unlocked; },
     get volume() { return state.volume; },
@@ -1335,6 +1575,7 @@
     unlock,
     setVolume,
     cue,
+    world,
     silence,
     freeze: silence,
     clearSilence,
@@ -1361,6 +1602,11 @@
     });
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', createControl, { once: true });
-  else createControl();
+  function initialize() {
+    createControl();
+    bindGalleryAmbient();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize, { once: true });
+  else initialize();
 })();

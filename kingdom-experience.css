@@ -495,17 +495,6 @@ body.is-opening-handoff .royal-abyss-lens { animation: royal-lens-arrival 1.35s 
 }
 @keyframes current-ring { to { transform: translate3d(-3%, 5%, 0) rotate(7deg) scale(1.045); } }
 
-.kingdom-event-layer { position: fixed; z-index: 4; inset: 0; overflow: hidden; pointer-events: none; }
-.kingdom-event-layer i { position: absolute; top: var(--event-y, 30%); left: -12vw; width: 38px; height: 13px; border-radius: 52% 48% 48% 52%; opacity: 0; background: rgba(119, 212, 226, .16); filter: blur(2px); }
-.kingdom-event-layer i::after { content: ""; position: absolute; right: -9px; top: 2px; border: 5px solid transparent; border-left: 0; border-right-color: rgba(119, 212, 226, .15); }
-.kingdom-event-layer i:nth-child(2) { --event-y: 38%; width: 24px; height: 9px; animation-delay: .9s !important; }
-.kingdom-event-layer i:nth-child(3) { --event-y: 25%; width: 29px; height: 10px; animation-delay: 1.7s !important; }
-.kingdom-event-layer.is-shoal-passing i { animation: shoal-pass 5.8s var(--ease-water) both; }
-.kingdom-event-layer.is-current-glint::before { content: ""; position: absolute; inset: -30%; opacity: 0; background: linear-gradient(111deg, transparent 34%, rgba(204, 251, 255, .15) 46%, transparent 58%); filter: blur(15px); animation: current-glint 5.4s ease-in-out; }
-.kingdom-event-layer.is-royal-wake::after { content: ""; position: absolute; right: -20vw; top: 64%; width: 50vw; height: 2px; opacity: 0; background: linear-gradient(90deg, transparent, rgba(244,223,160,.32), rgba(187,242,247,.1), transparent); filter: blur(1px); animation: royal-wake 5.8s var(--ease-water); }
-@keyframes shoal-pass { 0% { opacity: 0; transform: translate3d(0, 0, 0); } 18% { opacity: .48; } 100% { opacity: 0; transform: translate3d(124vw, -7vh, 0); } }
-@keyframes current-glint { 0%, 100% { opacity: 0; transform: translateX(-15%); } 38%, 58% { opacity: 1; } 100% { transform: translateX(15%); } }
-@keyframes royal-wake { 0% { opacity: 0; transform: translateX(0); } 35% { opacity: .65; } 100% { opacity: 0; transform: translateX(-130vw) scaleX(1.8); } }
 
 .snapshot-expand { position: absolute; z-index: 4; top: 18px; right: 18px; display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 14px; border: 1px solid rgba(217, 249, 251, .42); color: var(--mist); background: rgba(4, 48, 72, .68); font-weight: 700; cursor: pointer; backdrop-filter: blur(10px); transition: background .25s ease, border-color .25s ease, transform .25s ease; }
 .snapshot-pause { position: absolute; z-index: 4; top: 18px; left: 18px; min-height: 44px; padding: 0 13px; border: 1px solid rgba(217,249,251,.3); color: var(--cyan-soft); background: rgba(4,48,72,.62); font: 700 7px var(--mono); letter-spacing: .12em; cursor: pointer; backdrop-filter: blur(10px); }
@@ -668,7 +657,6 @@ body.gallery-open { overflow: hidden; }
   body.is-page-transitioning #signature-water.is-ready { opacity: .2; }
   .motion-section { opacity: 1 !important; filter: none !important; transform: none !important; }
   .water-transition { display: none; }
-  .kingdom-event-layer { display: none; }
   .opening,
   .opening::before,
   .opening::after,

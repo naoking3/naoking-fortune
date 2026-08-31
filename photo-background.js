@@ -4,8 +4,12 @@
   const background = document.querySelector('#photo-background');
   if (!background) return;
 
-  // Keep the background and snapshot gallery on the same 26-image source of truth.
-  const photos = Array.from({ length: 26 }, (_, index) => `assets/backgrounds/vrchat-${String(index + 1).padStart(2, '0')}.webp`);
+  const catalog = window.NaokingPhotoCatalog;
+  if (!Array.isArray(catalog) || !catalog.length) {
+    console.error('[NAOKING] Photo catalog is unavailable.');
+    return;
+  }
+  const photos = Object.freeze(catalog.map(record => record.source));
   const layers = [document.createElement('i'), document.createElement('i')];
   const snapshots = [...document.querySelectorAll('.snapshot-photo')];
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -42,7 +46,8 @@
     const token = ++changeToken;
     rotating = true;
     const nextIndex = ((Number(index) || 0) + photos.length) % photos.length;
-    const source = photos[nextIndex];
+    const record = catalog[nextIndex];
+    const source = record.source;
     await preload(source);
     if (token !== changeToken) return false;
 
@@ -50,7 +55,8 @@
     layerIndex = 1 - layerIndex;
     const incomingLayer = layers[layerIndex];
     incomingLayer.style.backgroundImage = `url('${source}')`;
-    incomingLayer.style.setProperty('--photo-x', `${35 + Math.round(Math.random() * 30)}%`);
+    incomingLayer.style.setProperty('--photo-x', `${record.focalX}%`);
+    incomingLayer.style.setProperty('--photo-y', `${record.focalY}%`);
     incomingLayer.classList.add('is-visible');
     outgoingLayer.classList.remove('is-visible');
 
@@ -58,7 +64,8 @@
       const outgoingPhoto = snapshots.find(photo => photo.classList.contains('is-visible')) || snapshots[0];
       const incomingPhoto = snapshots.find(photo => photo !== outgoingPhoto) || snapshots[0];
       incomingPhoto.src = source;
-      incomingPhoto.alt = `なおキングダムの王国風景 ${nextIndex + 1}`;
+      incomingPhoto.alt = record.alt;
+      incomingPhoto.style.objectPosition = `${record.focalX}% ${record.focalY}%`;
       incomingPhoto.removeAttribute('aria-hidden');
       incomingPhoto.classList.add('is-visible');
       outgoingPhoto.alt = '';
@@ -67,7 +74,7 @@
     }
     currentIndex = nextIndex;
     rotating = false;
-    window.dispatchEvent(new CustomEvent('naoking:photochange', { detail: { index: currentIndex, source } }));
+    window.dispatchEvent(new CustomEvent('naoking:photochange', { detail: { index: currentIndex, source, record } }));
     if (restart && !paused) schedule();
     return true;
   }
@@ -106,7 +113,7 @@
   });
   reducedMotion.addEventListener?.('change', start);
   window.NaokingPhotos = Object.freeze({
-    sources: [...photos],
+    sources: photos,
     current: () => Math.max(0, currentIndex),
     select: index => show(index, { restart: true }),
     isPaused: () => paused,
