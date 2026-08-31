@@ -9,3 +9,5 @@ These sounds were created specifically for NAOKING KINGDOM. They use determinist
 - Regeneration: run `node tools/generate-royal-oracle-audio.mjs`
 
 The short mono format keeps browser transfer and decode cost modest while preserving the underwater bubbles, whistle, impacts, relay clicks, sonar, and metallic crown tones used by the scenes.
+
+Normal spins use a ten-sound shuffle bag: the original underwater loop plus bubble, glass-water, soft-sonar, royal-bell, light-mechanical, tiny-fish, near-silence, cold-water, and deliberately clumsyなおキング variations. Every family plays once before the bag reshuffles, and the same family never starts twice in a row.

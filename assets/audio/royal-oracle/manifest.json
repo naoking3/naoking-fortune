@@ -14,6 +14,42 @@
       "durationSeconds": 4
     },
     {
+      "file": "spin-bubble-parade.wav",
+      "durationSeconds": 3.25
+    },
+    {
+      "file": "spin-glass-water.wav",
+      "durationSeconds": 3.4
+    },
+    {
+      "file": "spin-soft-sonar.wav",
+      "durationSeconds": 3.6
+    },
+    {
+      "file": "spin-royal-bell.wav",
+      "durationSeconds": 3.45
+    },
+    {
+      "file": "spin-light-mechanical.wav",
+      "durationSeconds": 3.1
+    },
+    {
+      "file": "spin-tiny-fish.wav",
+      "durationSeconds": 3.3
+    },
+    {
+      "file": "spin-near-silence.wav",
+      "durationSeconds": 3.8
+    },
+    {
+      "file": "spin-cold-water.wav",
+      "durationSeconds": 3.55
+    },
+    {
+      "file": "spin-ponkotsu.wav",
+      "durationSeconds": 3.15
+    },
+    {
       "file": "crown-goal.wav",
       "durationSeconds": 3.45
     },

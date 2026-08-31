@@ -129,6 +129,7 @@ if (pagechangeListeners.length !== 1) failures.push(`pagechange listener count w
 if (diagnostic.repeatedNormal !== 0) failures.push(`normal result repeated ${diagnostic.repeatedNormal} times`);
 if (diagnostic.immediateMessageRepeat !== 0) failures.push(`message repeated ${diagnostic.immediateMessageRepeat} times`);
 if (diagnostic.integrityMismatches !== 0) failures.push(`result integrity mismatched ${diagnostic.integrityMismatches} times`);
+if (diagnostic.normalMessageMismatches !== 0) failures.push(`normal result/message tone mismatched ${diagnostic.normalMessageMismatches} times`);
 if (diagnostic.nonFrozenResults !== 0) failures.push(`${diagnostic.nonFrozenResults} result objects were mutable`);
 if (bagDiagnostic.duplicateWithinBag !== 0) failures.push(`message bag duplicated ${bagDiagnostic.duplicateWithinBag} times before exhaustion`);
 if (bagDiagnostic.boundaryRepeats !== 0) failures.push(`message bag repeated ${bagDiagnostic.boundaryRepeats} times at a cycle boundary`);

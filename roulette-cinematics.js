@@ -153,7 +153,7 @@
       <div class="ro-blackout-darkness" aria-hidden="true"></div>
       <div class="ro-emergency">${image('emergency-lamp.svg', 'ro-emergency-lamp')}<small>非常用</small></div>
       <div class="ro-distant-signal"><i></i><i></i><i></i><span>・　・　・</span></div>
-      <div class="ro-restart-core"><i></i><b>♛</b><strong>再起動</strong></div>
+      <div class="ro-restart-core"><i></i><b>♛</b><strong>動いた！</strong></div>
       <div class="ro-blackout-eyes"><i></i><i></i></div>
       <div class="ro-cinematic-caption"><small>電源トラブル</small><strong>あ、消えた</strong></div>
     `);
@@ -197,8 +197,8 @@
       at(120, 'soccer-prepare', '王、いちおう構えた');
       at(1150, 'soccer-run', '助走は本気');
       at(3550, 'soccer-kick', '蹴った！');
-      at(4300, 'soccer-flight', '王冠ボール、飛行中');
-      at(5900, 'soccer-keeper', '守護魚が飛んだ');
+      at(4300, 'soccer-flight', '王冠ボール、飛んだ！');
+      at(5900, 'soccer-keeper', 'キーパーが飛んだ');
       at(7600, 'soccer-suspense', '入る？　止める？');
     } else if (type === 'race') {
       at(180, 'race-gate', '全員、同じ王です');
@@ -259,7 +259,7 @@
     } else if (active.type === 'race') {
       stage(kind === 'win' ? 'race-win' : kind === 'loss' ? 'race-lose' : 'race-draw', kind === 'win' ? '3号が優勝！ 本人は3号を知らない' : kind === 'loss' ? '王、写真にも入ってない' : 'ほぼ同時。たぶん');
     } else if (active.type === 'blackout') {
-      if (kind === 'win' || effect === 'revival') stage('blackout-restart', '王国ぜんぶ、再起動！');
+      if (kind === 'win' || effect === 'revival') stage('blackout-restart', '全部、動いた！');
       else stage('blackout-end', kind === 'loss' ? '直らなかった。王は帰った' : 'なんとか戻った。たぶん');
     } else if (active.type === 'jackpot') {
       stage(kind === 'win' ? 'jackpot-burst' : 'jackpot-fade', kind === 'win' ? '大当たり！ 王国ぜんぶがお祝い中' : '光は集まった。結果は普通');
@@ -306,7 +306,7 @@
     const detail = event.detail || {};
     if (!active || (detail.route && detail.route !== active.route)) return;
     if (active.type === 'blackout' && detail.phase === 'fake') blackoutFakePhase();
-    if (active.type === 'blackout' && detail.phase === 'revival') stage('blackout-restart', '王国ぜんぶ、再起動！');
+    if (active.type === 'blackout' && detail.phase === 'revival') stage('blackout-restart', '全部、動いた！');
     if (detail.phase === 'resting' && active.resultKind) later(() => cleanup('resting'), 450);
   }
 
@@ -338,7 +338,7 @@
     if (!active || (route && route !== active.route)) return;
     if (active.type === 'blackout' && phase === 'blackout') blackoutFakePhase();
     if (active.type === 'blackout' && phase === 'distant-signal') stage('blackout-signal', '遠くで何か光った');
-    if (active.type === 'blackout' && phase === 'revival') stage('blackout-restart', '王国ぜんぶ、再起動！');
+    if (active.type === 'blackout' && phase === 'revival') stage('blackout-restart', '全部、動いた！');
   }
 
   function listen(name, handler) {

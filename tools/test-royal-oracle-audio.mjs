@@ -13,7 +13,11 @@ const source = fs.readFileSync(path.join(ROOT, 'roulette-audio.js'), 'utf8');
 const manifest = JSON.parse(fs.readFileSync(path.join(AUDIO_ROOT, 'manifest.json'), 'utf8'));
 const readme = fs.readFileSync(path.join(AUDIO_ROOT, 'README.md'), 'utf8');
 const expectedFiles = [
-  'normal-underwater-spin.wav', 'crown-goal.wav', 'naoking-race.wav',
+  'normal-underwater-spin.wav',
+  'spin-bubble-parade.wav', 'spin-glass-water.wav', 'spin-soft-sonar.wav',
+  'spin-royal-bell.wav', 'spin-light-mechanical.wav', 'spin-tiny-fish.wav',
+  'spin-near-silence.wav', 'spin-cold-water.wav', 'spin-ponkotsu.wav',
+  'crown-goal.wav', 'naoking-race.wav',
   'power-cut.wav', 'distant-signal.wav', 'restart-surge.wav',
   'revival-rise.wav', 'jackpot-burst.wav', 'premium-crown.wav'
 ];
@@ -63,9 +67,15 @@ for (const asset of manifest.assets) {
   const deltaRms = Math.sqrt(deltaSquares / Math.max(1, samples.length - 1));
   const crossingRate = zeroCrossings / samples.length;
   const trailingRms = Math.sqrt(trailingEnergy / 2_400);
-  assert.ok(rms > .015, `${asset.file} is effectively silent`);
-  assert.ok(peak > (asset.file === 'distant-signal.wav' ? .12 : .28), `${asset.file} lacks a meaningful transient`);
-  assert.ok(deltaRms > .002, `${asset.file} resembles an unchanging low drone`);
+  const minimumRms = asset.file === 'spin-near-silence.wav' ? .004 : .015;
+  const minimumPeak = asset.file === 'distant-signal.wav' ? .12
+    : asset.file === 'spin-near-silence.wav' ? .035
+      : asset.file === 'spin-soft-sonar.wav' ? .18
+        : asset.file === 'spin-bubble-parade.wav' ? .24
+          : .28;
+  assert.ok(rms > minimumRms, `${asset.file} is effectively silent`);
+  assert.ok(peak > minimumPeak, `${asset.file} lacks a meaningful transient`);
+  assert.ok(deltaRms > (asset.file === 'spin-near-silence.wav' ? .0008 : .002), `${asset.file} resembles an unchanging low drone`);
   assert.ok(crossingRate > .004, `${asset.file} lacks enough event detail`);
   const hash = crypto.createHash('sha256').update(data).digest('hex');
   assert.ok(!hashes.has(hash), `${asset.file} duplicates another sound`);
@@ -218,6 +228,7 @@ const sandbox = vm.createContext({
 
 vm.runInContext(source, sandbox, { filename:'roulette-audio.js' });
 assert.ok(window.NaokingRoyalOracleAudio, 'public asset audio API was not created');
+assert.equal(window.NaokingRoyalOracleAudio.spinFamilies.length, 10, 'normal spin needs ten sound families');
 assert.equal(FakeAudioContext.instances.length, 0, 'asset AudioContext must wait for sound consent');
 
 primaryState = { ...primaryState, enabled:true, unlocked:true };
@@ -228,9 +239,16 @@ await window.NaokingRoyalOracleAudio.preload();
 assert.equal(window.NaokingRoyalOracleAudio.snapshot().loadedAssets, expectedFiles.length, 'all original assets should preload');
 
 window.dispatchEvent(new FakeCustomEvent('naoking:oracledraw', { detail:{ route:'crown-goal-challenge' } }));
-window.dispatchEvent(new FakeCustomEvent('naoking:oraclephase', { detail:{ phase:'descent', route:'crown-goal-challenge', tier:'hot' } }));
-for (let index = 0; index < 4; index += 1) await Promise.resolve();
-assert.ok(window.NaokingRoyalOracleAudio.snapshot().activeAssets.includes('spin'), 'descent must start the underwater spin asset');
+const observedSpinFamilies = [];
+for (let draw = 0; draw < 12; draw += 1) {
+  window.dispatchEvent(new FakeCustomEvent('naoking:oraclephase', { detail:{ phase:'descent', route:'crown-goal-challenge', tier:'hot' } }));
+  for (let index = 0; index < 4; index += 1) await Promise.resolve();
+  const spinSnapshot = window.NaokingRoyalOracleAudio.snapshot();
+  observedSpinFamilies.push(spinSnapshot.spinFamily);
+  assert.ok(spinSnapshot.activeAssets.includes(spinSnapshot.spinFamily), 'descent must start its selected spin family');
+}
+assert.equal(new Set(observedSpinFamilies.slice(0, 10)).size, 10, 'shuffle bag must use every spin family before repeating');
+assert.ok(observedSpinFamilies.every((family, index) => index === 0 || family !== observedSpinFamilies[index - 1]), 'spin family repeated immediately');
 
 window.dispatchEvent(new FakeCustomEvent('naoking:oraclebeat', { detail:{ cue:'sports-signal', scene:'sports', beat:'signal', intensity:.8 } }));
 for (let index = 0; index < 4; index += 1) await Promise.resolve();

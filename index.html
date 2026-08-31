@@ -24,10 +24,10 @@
   <link rel="preload" href="assets/backgrounds/vrchat-01.webp" as="image" type="image/webp">
   <link rel="stylesheet" href="deep-sea.css?v=20260831f">
   <link rel="stylesheet" href="kingdom-experience.css?v=20260831f">
-  <link rel="stylesheet" href="roulette.css?v=20260831c">
+  <link rel="stylesheet" href="roulette.css?v=20260831e">
   <link rel="stylesheet" href="roulette-cinematics.css?v=20260831b">
   <link rel="stylesheet" href="deep-sea-game.css?v=20260830g">
-  <link rel="stylesheet" href="kingdom-world.css?v=20260831f">
+  <link rel="stylesheet" href="kingdom-world.css?v=20260831g">
 </head>
 <body data-page="home">
   <noscript><style>.opening{display:none!important}</style><p class="noscript-notice">JavaScriptが無効なため、王国門のみ表示しています。</p></noscript>
@@ -76,7 +76,7 @@
     <nav id="site-nav" aria-label="王国内の移動">
       <button class="nav-link is-active" type="button" data-tab="home"><span>00</span>王国門</button>
       <button class="nav-link" type="button" data-tab="videos"><span>01</span>映像記録</button>
-      <button class="nav-link" type="button" data-tab="fortune"><span>02</span>今日の占い</button>
+      <button class="nav-link" type="button" data-tab="fortune"><span>02</span>なおキング占い</button>
       <button class="nav-link" type="button" data-tab="game"><span>03</span>回遊海域</button>
       <button class="nav-link" type="button" data-tab="submit"><span>04</span>献上窓口</button>
       <button class="nav-link" type="button" data-tab="join"><span>05</span>入国儀式</button>
@@ -97,7 +97,7 @@
           <p class="hero-japanese">ここは、<em>なおキングダム。</em></p>
           <p class="lead">VRChatの海から現れたサメ、なおキングが統べる非公式の深海王国。映像と今日の占いと、意味のない威厳を静かに配信中。</p>
           <div class="hero-actions">
-            <button class="action action-primary" type="button" data-tab="fortune">今日の運勢を見る <span>↘</span></button>
+            <button class="action action-primary" type="button" data-tab="fortune">占いを回す <span>↘</span></button>
             <button class="action action-quiet" type="button" data-tab="videos">王国記録を見る <span>→</span></button>
           </div>
           <dl class="hero-coordinates">
@@ -175,7 +175,7 @@
           <p>静かな記録庫から、騒がしい占い機まで。好きな深度へどうぞ。</p>
         </header>
         <div class="portal-grid">
-          <button class="portal portal-featured" type="button" data-tab="fortune"><span>02 / なおキング占い</span><b>今日の運勢</b><p>王が、あなたの都合を無視して今日の運勢を決めます。</p><i>占いを始める →</i></button>
+          <button class="portal portal-featured" type="button" data-tab="fortune"><span>02 / なおキング占い</span><b>なおキング占い</b><p>王が勝手に、今日の運勢を決めます。</p><i>回してみる →</i></button>
           <button class="portal" type="button" data-tab="game"><span>03 / HUNTING GROUND</span><b>なおキングの回遊</b><p>魚を集め、網を避け、王冠を奪え。</p><i>出航する →</i></button>
           <button class="portal" type="button" data-tab="videos"><span>01 / ARCHIVE</span><b>映像記録庫</b><p>王国で起きた出来事を映像で保管。</p><i>記録を見る →</i></button>
           <button class="portal" type="button" data-tab="submit"><span>04 / OFFERING</span><b>写真素材を献上</b><p>動画に使える王国の記録を送る。</p><i>献上窓口へ →</i></button>
@@ -206,18 +206,18 @@
     </section>
 
     <section class="page" id="fortune" data-depth="4810" data-district="oracle" data-transition="pressure" aria-labelledby="fortune-title" hidden>
-      <div class="page-hero oracle-hero section-frame"><div><p class="kicker"><span>02</span> なおキングの今日の運勢</p><h1 id="fortune-title">今日の<br><em>サメ占い。</em></h1></div><p>ボタンを押すと、なおキングが今日の運勢をひとつ決めます。演出が騒がしくても、最後の結果は変わりません。連打すると王が怒ります。</p><div class="district-mark" aria-hidden="true"><span>4810</span><i></i><i></i><i></i></div></div>
+      <div class="page-hero oracle-hero section-frame"><div><p class="kicker"><span>02</span> ROYAL ORACLE</p><h1 id="fortune-title">なおキング<br><em>占い。</em></h1></div><p>なおキングが、今日の運勢を勝手に決めます。「回す」を一回押して、最後の結果を見るだけです。</p><div class="district-mark" aria-hidden="true"><span>4810</span><i></i><i></i><i></i></div></div>
       <div class="oracle-layout section-frame">
         <div class="fortune-card" id="card">
-          <div class="machine-plate"><span>なおキング占い機 // 3号</span><i>準備OK</i></div>
+          <div class="machine-plate"><span>なおキング占い</span><i>準備OK</i></div>
           <div class="roulette-marquee" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <div class="slot-window" id="slot" aria-label="なおキングの今日の運勢"><div class="pointer" aria-hidden="true">▼</div><div class="roulette-flare" aria-hidden="true"></div><div class="slot-reel" id="reel"><div class="shark-tile"><img class="shark-face" id="shark" src="assets/characters/naoking-1.webp" alt="なおキング"></div></div></div>
-          <p class="roulette-status" id="roulette-status">占う準備はできています</p>
-          <div class="result" aria-live="polite" aria-busy="false"><span>今日の結果</span><strong id="fortune-name">海の支配者</strong><p id="message">ボタンを押せ。王であるなおキングが、勝手に今日の運勢を決めてやる。</p></div>
-          <button type="button" id="spin"><span>今日の運勢を占う</span><small>一回だけ押してね</small></button>
-          <p class="footnote">※ 結果への苦情は受け付けません。なおキングは王なので。</p><div class="blast" id="blast" hidden><b>連打を発見</b><span>おい、何回も押すな。</span></div>
+          <div class="slot-window" id="slot" aria-label="今日の運勢を決めるルーレット"><div class="pointer" aria-hidden="true">▼</div><div class="roulette-flare" aria-hidden="true"></div><div class="slot-reel" id="reel"><div class="shark-tile"><img class="shark-face" id="shark" src="assets/characters/naoking-1.webp" alt="なおキング"></div></div></div>
+          <p class="roulette-status" id="roulette-status">いつでも回せます</p>
+          <div class="result" aria-label="今日の運勢の結果" aria-live="polite" aria-busy="false"><span>今日の運勢</span><strong id="fortune-name">まだ回していません</strong><p id="message">「回す」を押すと、今日の運勢が出ます。</p></div>
+          <button type="button" id="spin"><span>回す</span><small>一回だけ押してね</small></button>
+          <p class="footnote">※ 文句を言っても王は聞きません。</p><div class="blast" id="blast" hidden><b>押しすぎ</b><span>何回も押すな。王は一回で分かる。たぶん。</span></div>
         </div>
-        <aside class="oracle-notes"><header><span>かんたんな遊び方</span><b>占う前に読んでね</b></header><ol><li><span>01</span><p>深呼吸する。たぶん意味はない。</p></li><li><span>02</span><p>ボタンは一回だけ押す。王を急かすな。</p></li><li><span>03</span><p>出た結果を受け入れる。苦情は海へ流せ。</p></li></ol><div class="oracle-history"><span>最近の結果</span><ul id="fortune-history"><li>まだ占っていません</li></ul></div><p class="oracle-odds"><i></i>特別な演出が出ても、結果の当たりやすさは変わりません。</p></aside>
+        <aside class="oracle-notes"><header><span>遊び方</span><b>これだけです</b></header><ol><li><span>01</span><p>「回す」を一回押す。</p></li><li><span>02</span><p>なおキングが何かやらかす。</p></li><li><span>03</span><p>最後に出た運勢を見る。</p></li></ol><div class="oracle-history"><span>前の結果</span><ul id="fortune-history"><li>まだ結果はありません</li></ul></div><p class="oracle-odds"><i></i>演出が派手でも、最後に出る運勢が結果です。</p></aside>
       </div>
     </section>
 
@@ -293,6 +293,6 @@
     </div>
   </dialog>
 
-  <script src="signature-water.js?v=20260830f" defer></script><script src="site.js?v=20260831f" defer></script><script src="photo-catalog.js?v=20260831f" defer></script><script src="photo-background.js?v=20260831f" defer></script><script src="royal-abyss-lens.js?v=20260830h" defer></script><script src="kingdom-world-data.js?v=20260831g" defer></script><script src="kingdom-experience.js?v=20260831f" defer></script><script src="kingdom-audio.js?v=20260831f" defer></script><script src="roulette-audio.js?v=20260831b" defer></script><script src="kingdom-world.js?v=20260831f" defer></script><script src="submission.js?v=20260824d" defer></script><script src="roulette-entertainment.js?v=20260831c" defer></script><script src="roulette-cinematics.js?v=20260831b" defer></script><script src="roulette-controller.js?v=20260831e" defer></script><script src="deep-sea-game.js?v=20260831a" defer></script>
+  <script src="signature-water.js?v=20260830f" defer></script><script src="site.js?v=20260831f" defer></script><script src="photo-catalog.js?v=20260831f" defer></script><script src="photo-background.js?v=20260831f" defer></script><script src="royal-abyss-lens.js?v=20260830h" defer></script><script src="kingdom-world-data.js?v=20260831g" defer></script><script src="kingdom-experience.js?v=20260831f" defer></script><script src="kingdom-audio.js?v=20260831f" defer></script><script src="roulette-audio.js?v=20260831c" defer></script><script src="kingdom-world.js?v=20260831f" defer></script><script src="submission.js?v=20260824d" defer></script><script src="roulette-entertainment.js?v=20260831d" defer></script><script src="roulette-cinematics.js?v=20260831c" defer></script><script src="roulette-controller.js?v=20260831f" defer></script><script src="deep-sea-game.js?v=20260831a" defer></script>
 </body>
 </html>

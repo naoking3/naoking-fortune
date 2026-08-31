@@ -3,10 +3,19 @@
 
   if (window.NaokingRoyalOracleAudio) return;
 
-  const VERSION = '1.0.0';
+  const VERSION = '1.1.0';
   const BASE_PATH = new URL('assets/audio/royal-oracle/', document.currentScript?.src || location.href).href;
   const ASSETS = Object.freeze({
     spin:Object.freeze({ file:'normal-underwater-spin.wav', volume:.56, loop:true }),
+    spinBubble:Object.freeze({ file:'spin-bubble-parade.wav', volume:.54, loop:true }),
+    spinGlass:Object.freeze({ file:'spin-glass-water.wav', volume:.5, loop:true }),
+    spinSonar:Object.freeze({ file:'spin-soft-sonar.wav', volume:.52, loop:true }),
+    spinBell:Object.freeze({ file:'spin-royal-bell.wav', volume:.5, loop:true }),
+    spinMechanical:Object.freeze({ file:'spin-light-mechanical.wav', volume:.48, loop:true }),
+    spinFish:Object.freeze({ file:'spin-tiny-fish.wav', volume:.5, loop:true }),
+    spinQuiet:Object.freeze({ file:'spin-near-silence.wav', volume:.58, loop:true }),
+    spinCold:Object.freeze({ file:'spin-cold-water.wav', volume:.52, loop:true }),
+    spinPonkotsu:Object.freeze({ file:'spin-ponkotsu.wav', volume:.56, loop:true }),
     sports:Object.freeze({ file:'crown-goal.wav', volume:.78 }),
     race:Object.freeze({ file:'naoking-race.wav', volume:.72 }),
     powerCut:Object.freeze({ file:'power-cut.wav', volume:.82 }),
@@ -27,6 +36,10 @@
   });
   const BLACKOUT_CUES = new Set(['blackout', 'abyssal-blackout']);
   const PREMIUM_EFFECTS = new Set(['rainbow', 'crown', 'comet', 'abyss', 'revival']);
+  const SPIN_FAMILIES = Object.freeze([
+    'spin', 'spinBubble', 'spinGlass', 'spinSonar', 'spinBell',
+    'spinMechanical', 'spinFish', 'spinQuiet', 'spinCold', 'spinPonkotsu'
+  ]);
 
   const initialPrimary = readPrimarySnapshot();
   const state = {
@@ -38,6 +51,7 @@
     route:'',
     phase:'resting',
     scene:'',
+    spinFamily:'',
     stopCount:0,
     blackoutStage:'',
     stats:{ loads:0, loadFailures:0, plays:0, dropped:0, silences:0, cleanups:0 }
@@ -52,9 +66,35 @@
   const timers = new Set();
   const slotTokens = new Map();
   const playedKeys = [];
+  const playedSpinFamilies = [];
+  let spinFamilyBag = [];
+  let lastSpinFamily = '';
 
   function clamp(value, minimum = 0, maximum = 1) {
     return Math.max(minimum, Math.min(maximum, Number(value) || 0));
+  }
+
+  function shuffle(items) {
+    const copy = items.slice();
+    for (let index = copy.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+    }
+    return copy;
+  }
+
+  function nextSpinFamily() {
+    if (!spinFamilyBag.length) {
+      spinFamilyBag = shuffle(SPIN_FAMILIES);
+      if (spinFamilyBag.length > 1 && spinFamilyBag[0] === lastSpinFamily) {
+        [spinFamilyBag[0], spinFamilyBag[1]] = [spinFamilyBag[1], spinFamilyBag[0]];
+      }
+    }
+    const family = spinFamilyBag.shift() || 'spin';
+    lastSpinFamily = family;
+    playedSpinFamilies.push(family);
+    if (playedSpinFamilies.length > 30) playedSpinFamilies.shift();
+    return family;
   }
 
   function readPrimarySnapshot() {
@@ -295,7 +335,9 @@
     state.scene = '';
     primaryStopLayers('reel', 'tension', 'event', 'result');
     const intensity = detail.tier === 'extreme' ? 1 : detail.tier === 'hot' || detail.tier === 'superhot' ? .9 : .74;
-    playAsset('spin', { slot:'spin', loop:true, intensity, rate:.96 + Math.min(.08, intensity * .06), fadeIn:.12 });
+    const spinFamily = nextSpinFamily();
+    state.spinFamily = spinFamily;
+    playAsset(spinFamily, { slot:'spin', loop:true, intensity, rate:.96 + Math.min(.08, intensity * .06), fadeIn:.12 });
   }
 
   function playScene(scene, beat, detail = {}) {
@@ -544,6 +586,8 @@
       route:state.route,
       phase:state.phase,
       scene:state.scene,
+      spinFamily:state.spinFamily,
+      spinFamilyCount:SPIN_FAMILIES.length,
       stopCount:state.stopCount,
       contextState:context?.state || 'uncreated',
       blackoutStage:state.blackoutStage,
@@ -551,6 +595,7 @@
       loadedAssets:buffers.size,
       activeAssets:Object.freeze(Array.from(active.values(), entry => entry.key)),
       recentAssets:Object.freeze(playedKeys.slice()),
+      recentSpinFamilies:Object.freeze(playedSpinFamilies.slice()),
       pendingTimers:timers.size,
       stats:Object.freeze({ ...state.stats })
     });
@@ -560,6 +605,7 @@
     version:VERSION,
     assets:Object.freeze(Object.fromEntries(Object.entries(ASSETS).map(([key, value]) => [key, new URL(value.file, BASE_PATH).href]))),
     scenes:SCENE_ASSETS,
+    spinFamilies:SPIN_FAMILIES,
     preload,
     play:(key, options) => playAsset(key, options),
     stop:() => { clearTimers(); stopAll(); resetBlackout(); },

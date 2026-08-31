@@ -133,6 +133,64 @@ const scenes = [
     [0.76, 1.56, 2.36, 3.18].forEach((time, index) => click(time, 0.13, 310 + index * 30));
     tone(0.3, 3.3, 92, 118, 0.045, { wave: 'triangle', attack: 0.2, release: 0.28, vibratoDepth: 2, vibratoRate: 0.55 });
   }),
+  createScene('spin-bubble-parade.wav', 3.25, 0xbabb1e, ({ tone, noise, bubble }) => {
+    noise(0, 3.25, 0.038, { cutoffStart:760, cutoffEnd:1_600, mode:'bandpass', pulseRate:.7, attack:.16, release:.22 });
+    [0.08,0.25,0.48,0.72,1.04,1.26,1.61,1.95,2.18,2.58,2.88].forEach((time,index) => bubble(time,.16+(index%5)*.14,.085+(index%3)*.012));
+    tone(.12,2.85,124,168,.026,{ wave:'triangle', attack:.22, release:.3, vibratoDepth:3, vibratoRate:.8 });
+  }),
+  createScene('spin-glass-water.wav', 3.4, 0x61a55, ({ tone, noise, bell, bubble }) => {
+    noise(0,3.4,.03,{ cutoffStart:2_600, cutoffEnd:4_400, mode:'bandpass', pulseRate:.35, attack:.2, release:.24 });
+    [0.05,0.55,1.08,1.64,2.18,2.75].forEach((time,index) => bell(time,[523,659,784,698,880,988][index],.09,.75));
+    [0.38,1.37,2.42,3.03].forEach((time,index) => bubble(time,.24+index*.1,.055));
+    tone(.28,2.75,196,222,.022,{ wave:'triangle', attack:.28, release:.35 });
+  }),
+  createScene('spin-soft-sonar.wav', 3.6, 0x50aa7, ({ tone, noise, bell }) => {
+    noise(0,3.6,.025,{ cutoffStart:170, cutoffEnd:320, pulseRate:.44, attack:.22, release:.28 });
+    [0.12,1.22,2.34].forEach((time,index) => {
+      bell(time,610+index*76,.075,.98);
+      tone(time+.03,.88,118+index*9,178+index*12,.035,{ wave:'triangle', attack:.08, release:.75 });
+    });
+  }),
+  createScene('spin-royal-bell.wav', 3.45, 0xbe114810, ({ noise, bell, chord, bubble }) => {
+    noise(0,3.45,.025,{ cutoffStart:1_800, cutoffEnd:2_900, mode:'bandpass', pulseRate:.33, attack:.2, release:.28 });
+    chord(.08,[262,330,392],.15,1.35,.055);
+    bell(1.22,523,.105,1.1);
+    chord(2.12,[294,370,440,587],.14,1.12,.04);
+    [0.76,1.73,2.84].forEach((time,index) => bubble(time,.3+index*.16,.055));
+  }),
+  createScene('spin-light-mechanical.wav', 3.1, 0x1e4c4810, ({ tone, noise, click }) => {
+    noise(0,3.1,.04,{ cutoffStart:900, cutoffEnd:2_600, mode:'bandpass', pulseRate:2.4, attack:.12, release:.24 });
+    [0.08,0.42,0.74,1.04,1.35,1.63,1.92,2.18,2.45,2.68].forEach((time,index) => click(time,.105+(index%3)*.018,240+(index%4)*42));
+    tone(.18,2.62,146,218,.036,{ wave:'triangle', attack:.2, release:.26, vibratoDepth:4, vibratoRate:2.3 });
+  }),
+  createScene('spin-tiny-fish.wav', 3.3, 0xf15a4810, ({ tone, noise, bubble, click }) => {
+    noise(0,3.3,.035,{ cutoffStart:1_200, cutoffEnd:3_800, mode:'bandpass', pulseRate:1.6, attack:.12, release:.24 });
+    [0.06,0.31,0.58,0.84,1.18,1.43,1.82,2.04,2.39,2.7,2.98].forEach((time,index) => {
+      tone(time,.11,720+(index%4)*95,1_120+(index%3)*120,.065,{ attack:.03, release:.55, vibratoDepth:12, vibratoRate:13 });
+      if (index%3===0) bubble(time+.07,.18+(index%2)*.2,.05);
+      if (index%4===1) click(time+.04,.07,410);
+    });
+  }),
+  createScene('spin-near-silence.wav', 3.8, 0x511eace, ({ tone, noise, bubble }) => {
+    noise(0,3.8,.012,{ cutoffStart:120, cutoffEnd:260, pulseRate:.22, attack:.3, release:.34 });
+    tone(.35,3,74,82,.009,{ wave:'triangle', attack:.32, release:.4, vibratoDepth:1, vibratoRate:.31 });
+    bubble(1.18,.62,.026);
+    bubble(2.86,.28,.022);
+  }),
+  createScene('spin-cold-water.wav', 3.55, 0xc01d4810, ({ tone, noise, bell }) => {
+    noise(0,3.55,.055,{ cutoffStart:4_600, cutoffEnd:980, mode:'bandpass', pulseRate:.52, attack:.16, release:.24 });
+    tone(.05,3.25,138,96,.034,{ wave:'triangle', attack:.2, release:.28, vibratoDepth:5, vibratoRate:.42 });
+    [0.16,1.5,2.74].forEach((time,index) => bell(time,880-index*92,.052,.86));
+  }),
+  createScene('spin-ponkotsu.wav', 3.15, 0x4810bad, ({ tone, noise, click, bubble, bell }) => {
+    [0.06,0.34,0.61].forEach((time,index) => click(time,.15+index*.035,280-index*58));
+    tone(.78,.52,510,128,.11,{ wave:'triangle', attack:.04, release:.62, vibratoDepth:17, vibratoRate:7 });
+    noise(.76,.46,.055,{ cutoffStart:2_400, cutoffEnd:310, mode:'bandpass', attack:.02, release:.72 });
+    bubble(1.42,.68,.1);
+    bell(1.84,392,.08,.72);
+    bell(2.18,349,.065,.64);
+    click(2.71,.12,126);
+  }),
   createScene('crown-goal.wav', 3.45, 0x600a11, ({ tone, noise, click, bell, chord }) => {
     tone(0.06, 0.42, 1_480, 1_720, 0.18, { vibratoDepth: 44, vibratoRate: 10, attack: 0.05, release: 0.28 });
     tone(0.06, 0.42, 1_900, 1_760, 0.09, { vibratoDepth: 31, vibratoRate: 10, attack: 0.05, release: 0.28 });
