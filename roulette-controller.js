@@ -784,7 +784,9 @@
     const resultVisible = ['revealed', 'revival', 'resting'].includes(phase);
     emitOracle('naoking:oraclephase', {
       phase, tier, route:activePresentation?.id || '', family:activePresentation?.family || '',
-      sealed:true, resultKind:resultVisible ? activeVisualResult?.kind || '' : ''
+      scene:activePresentation?.scene || '', sealed:true,
+      resultKind:resultVisible ? activeVisualResult?.kind || '' : '',
+      effect:resultVisible ? activeVisualResult?.effect || '' : ''
     });
   }
 
@@ -798,7 +800,21 @@
   function dispatchOracleDraw(presentation) {
     emitOracle('naoking:oracledraw', {
       route:presentation.id, family:presentation.family, tier:presentation.tier,
-      draw:resolvedDraws, sealed:true
+      category:presentation.category || '', scene:presentation.scene || '', audioScene:presentation.audioScene || '',
+      draw:resolvedDraws, sealed:true, resultKind:activeVisualResult?.kind || '', effect:activeVisualResult?.effect || '',
+      endingVariant:presentation.ending?.variant || '', endingOutcome:presentation.ending?.outcome || '', reelCount:presentation.reelCount || DEFAULT_REEL_TILE_COUNT
+    });
+  }
+
+  function dispatchOracleCinematic(phase, durationMs = 0, extra = {}) {
+    if (!activePresentation) return;
+    emitOracle('naoking:oraclecinematic', {
+      phase, durationMs, route:activePresentation.id, family:activePresentation.family,
+      category:activePresentation.category || '', scene:activePresentation.scene || '',
+      audioScene:activePresentation.audioScene || '', tier:tierFor(activeVisualResult, activePresentation),
+      resultKind:activeVisualResult?.kind || '', effect:activeVisualResult?.effect || '',
+      endingVariant:activePresentation.ending?.variant || '', endingOutcome:activePresentation.ending?.outcome || '',
+      reducedMotion:reducedMotion.matches, ...extra
     });
   }
 
@@ -1072,6 +1088,7 @@
   }
 
   function resetVisualState() {
+    if (activePresentation) dispatchOracleCinematic('cleanup');
     clearScheduledTasks(); removeDynamicClasses();
     slot.classList.remove('is-jackpot', 'is-spinning', 'is-stopping'); setReelMotion('');
     effectLayer.className = 'roulette-fx'; effectLayer.style.removeProperty('--roulette-fx-duration');
@@ -1137,6 +1154,7 @@
     if (phase === 'signal') {
       setRouteReadout(presentation, phase);
       const cutinMs = cutinDuration(presentation, 'signal');
+      dispatchOracleCinematic('signal', cutinMs || 4200);
       setReelMotion(reelMotionFor(presentation, 'signal', cutinMs ? 'suspense' : (presentation.reversal ? 'reverse' : 'anticipation')));
       if (cutinMs && presentation.scene) showChaosScene(presentation, 'signal', cutinMs);
       else if (cutinMs) showTakeover(presentation, 'signal', cutinMs);
@@ -1159,6 +1177,7 @@
       later(() => card.classList.remove('is-chaos-twist'), 920);
       refreshSpinCandidates(activeVisualResult);
       const cutinMs = cutinDuration(presentation, 'twist');
+      dispatchOracleCinematic('twist', cutinMs || 4200);
       setReelMotion(reelMotionFor(presentation, 'anomaly', cutinMs ? 'suspense' : (presentation.twistMotion || 'anticipation')));
       if (cutinMs && presentation.scene) showChaosScene(presentation, 'twist', cutinMs);
       else if (cutinMs) showTakeover({ ...presentation, cue:'海流が変わった', detail:'演出が途中で変わった。まだ結果は分からない。', modifier:{ cue:null, detail:null } }, 'twist', cutinMs);
@@ -1177,6 +1196,7 @@
       }, Math.max(500, cutinMs - 500));
     }
     if (phase === 'judgment') {
+      dispatchOracleCinematic('judgment', 1350);
       refreshSpinCandidates(activeVisualResult);
       dispatchOracleBeat('reel-brake', { scene:presentation.audioScene || '', beat:phase, durationMs:1200, reducedMotion:reducedMotion.matches, intensity:presentation.tier === 'extreme' ? .94 : .64 });
       if (presentation.premium) flash('extreme', '王の印', 1500);
@@ -1220,7 +1240,7 @@
     setReelMotion('settled'); slot.classList.remove('is-spinning', 'is-stopping'); reel.innerHTML = tileSet(result.image, reelCount, true);
     title.textContent = plainCopy(result.title); message.textContent = plainCopy(result.message);
     resultRegion?.classList.remove('is-false-ending'); resultRegion?.classList.add('is-revealing'); resultRegion?.setAttribute('aria-busy', 'false');
-    setPhase('revealed'); applyFinalEffect(result, presentation); dispatchOracleResult(result, presentation);
+    setPhase('revealed'); dispatchOracleCinematic('result', result.kind === 'normal' ? 1250 : 2450); applyFinalEffect(result, presentation); dispatchOracleResult(result, presentation);
     status.textContent = result.kind === 'win' ? '王の結果 // 大当たり！' : result.kind === 'loss' ? '王の結果 // 残念、特別なハズレ' : '王の結果 // 今日の運勢が決まった';
     setButtonCopy('もう一度、占ってもらう', 'また王の気まぐれに任せる'); updateHistory(result, presentation); writeDailyState(result, presentation);
     busy = false;
@@ -1238,14 +1258,17 @@
       reel.innerHTML = tileSet('assets/characters/naoking-7.webp', presentation.reelCount, true); title.textContent = '通信断';
       message.textContent = '……信号も水流も、完全に停止しました。'; resultRegion?.classList.add('is-false-ending');
       status.textContent = '王国停電 // 占い機も停止'; flash('void', '王国ぜんぶ停電', 4200);
+      dispatchOracleCinematic('blackout', blackoutHold, { trueBlackout:true });
       showTakeover({ ...presentation, cue:'王国ぜんぶ停電', detail:'光も水流も音も、すべて止まった。', modifier:{ cue:null, detail:null } }, 'fake', 4200);
       dispatchOracleBeat('abyssal-blackout', { intensity:.18 });
       later(() => {
         flash('signal', '·', 900);
+        dispatchOracleCinematic('distant-signal', 900, { trueBlackout:true });
         dispatchOracleBeat('abyssal-distant-signal', { intensity:.22 });
       }, 3900);
       later(() => {
         card.classList.remove('is-failed', 'is-fake', 'is-abyssal-blackout'); setPhase('revival', 'jackpot');
+        dispatchOracleCinematic('revival', rebootHold, { trueBlackout:true });
         showTakeover({ ...presentation, cue:'遠くに光が見えた', detail:'深海の向こうから、王国を起こす光が近づく。', modifier:{ cue:null, detail:null } }, 'revival', 1700);
         flash('revival', '逆転大当たり', 2500); setReelMotion('revival'); slot.classList.add('is-spinning');
         dispatchOracleBeat('abyssal-reboot', { intensity:1 });
@@ -1256,6 +1279,7 @@
     const fakeHold = presentation.scene ? 1500 : 1800;
     const revivalHold = presentation.scene ? 2000 : 1600;
     setPhase('fake', 'fake-loss'); setReelMotion('settled'); card.classList.add('is-failed', 'is-fake');
+    dispatchOracleCinematic('fake', fakeHold);
     reel.innerHTML = tileSet('assets/characters/naoking-7.webp', presentation.reelCount, true); title.textContent = '結果は終了……？';
     message.textContent = '……王冠の気配なし。占い機を止める。'; resultRegion?.classList.add('is-false-ending');
     status.textContent = '気配なし // 占い終了'; flash('void', '終了', 900);
@@ -1263,6 +1287,7 @@
     dispatchOracleBeat('silence', { silenceMs:Math.min(1200, fakeHold), intensity:.2 });
     later(() => {
       card.classList.remove('is-failed'); setPhase('revival', 'revival');
+      dispatchOracleCinematic('revival', revivalHold);
       if (presentation.scene) showTakeover({ ...presentation, cue:'最後の海流', detail:'最後の海流が、閉じた結果を押し戻す。', modifier:{ cue:null, detail:null } }, 'revival', revivalHold);
       else showTakeover({ ...presentation, cue:'待て、結果が変わった', detail:'なおキングが終了を勝手に取り消した。王なので説明はしない。', modifier:{ cue:null, detail:null } }, 'revival', revivalHold);
       flash('revival', '再始動', Math.min(1800, revivalHold)); setReelMotion(presentation.reversal ? 'reverse' : 'revival'); slot.classList.add('is-spinning');
@@ -1513,6 +1538,7 @@
 
     activeVisualResult = result;
     activePresentation = presentation;
+    dispatchOracleDraw(presentation);
     card.classList.add(`is-route-${presentation.id}`);
     if (presentation.premium) card.classList.add('is-premium');
     renderSpinCandidates(presentation);
@@ -1525,6 +1551,9 @@
       message.textContent = plainCopy(result.message);
     } else if (['signal', 'anomaly', 'judgment'].includes(previewPhase)) {
       applyRouteMoment(presentation, previewPhase === 'anomaly' ? 'twist' : previewPhase);
+      if (presentation.id === 'abyssal-blackout-revival' && previewPhase === 'anomaly') {
+        later(() => dispatchOracleCinematic('blackout', 5200, { trueBlackout:true, preview:true }), 350);
+      }
     }
     return Object.freeze({ route:presentation.id, phase:previewPhase, result:result.key, reelCount });
   }

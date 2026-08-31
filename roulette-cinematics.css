@@ -1,0 +1,209 @@
+/* ROYAL ORACLE cinematic scenes — isolated, result-safe presentation layer. */
+#royal-oracle-cinematic-root {
+  --ro-cyan:#8cf5f2; --ro-blue:#167ca9; --ro-ink:#031426; --ro-gold:#f5d367;
+  position:fixed; inset:0; z-index:2147482000; overflow:hidden; opacity:0;
+  pointer-events:none; isolation:isolate; contain:layout style paint;
+  font-family:"Noto Sans JP","Yu Gothic",system-ui,sans-serif;
+  color:#edffff; transition:opacity .32s ease;
+}
+#royal-oracle-cinematic-root.is-visible { opacity:1; }
+#royal-oracle-cinematic-root * { box-sizing:border-box; }
+.ro-cinematic-water { position:absolute; inset:-15%; z-index:-3; opacity:.46; background:
+  radial-gradient(ellipse at 48% -10%,rgba(171,255,248,.42),transparent 44%),
+  repeating-radial-gradient(ellipse at 50% -25%,transparent 0 7%,rgba(116,234,238,.08) 7.4% 7.8%,transparent 8.2% 13%);
+  filter:blur(5px); animation:ro-water-drift 8s ease-in-out infinite alternate; }
+.ro-cinematic-vignette { position:absolute; inset:0; z-index:90; box-shadow:inset 0 0 18vw rgba(0,9,28,.75); background:linear-gradient(180deg,rgba(0,13,28,.28),transparent 28%,transparent 66%,rgba(0,10,25,.42)); }
+.ro-cinematic-caption { position:absolute; z-index:100; left:50%; bottom:clamp(18px,4.8vh,58px); width:min(82vw,850px); transform:translateX(-50%); text-align:center; text-shadow:0 3px 18px #00111f,0 0 22px rgba(63,222,231,.46); }
+.ro-cinematic-caption small { display:block; margin-bottom:.34rem; color:#b8f5f2; font-size:clamp(.66rem,1vw,.88rem); font-weight:900; letter-spacing:.24em; }
+.ro-cinematic-caption strong { display:block; font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size:clamp(1.25rem,3.5vw,3.35rem); font-weight:950; letter-spacing:.04em; line-height:1.1; }
+.ro-sheet-frame { position:absolute; inset:0; display:block; background-repeat:no-repeat; background-size:400% 200%; opacity:0; }
+.ro-soccer-sheet { background-image:url("assets/oracle-cinematics/naoking-soccer-sprites.webp"); filter:drop-shadow(0 12px 10px rgba(0,9,25,.52)); mix-blend-mode:screen; }
+.ro-race-sheet { background-image:url("assets/oracle-cinematics/naoking-race-sprites.webp"); filter:drop-shadow(0 7px 7px rgba(0,9,25,.46)); mix-blend-mode:screen; }
+.ro-soccer-frame-ready { background-position:0 0; }
+.ro-soccer-frame-kick { background-position:33.333% 100%; }
+.ro-soccer-frame-shock { background-position:66.666% 100%; }
+
+/* Flagship 1: Crown Goal Challenge */
+.ro-scene-soccer { background:linear-gradient(180deg,#062b50 0%,#075c7b 42%,#06334c 43%,#02172c 100%); }
+.ro-soccer-field { position:absolute; inset:0; overflow:hidden; perspective:900px; }
+.ro-soccer-field::before { content:""; position:absolute; left:-12%; right:-12%; bottom:-19%; height:66%; transform:rotateX(61deg); transform-origin:bottom; background:
+  linear-gradient(90deg,transparent 49.6%,rgba(194,255,244,.54) 49.8% 50.2%,transparent 50.4%),
+  repeating-linear-gradient(90deg,rgba(21,144,130,.22) 0 11vw,rgba(7,97,104,.2) 11vw 22vw),
+  linear-gradient(#157e78,#053f53); border-top:2px solid rgba(190,255,247,.36); box-shadow:0 -22px 80px rgba(43,231,214,.13); }
+.ro-field-lines { position:absolute; left:10%; right:8%; bottom:4%; height:46%; transform:perspective(620px) rotateX(65deg); border:3px solid rgba(225,255,249,.36); border-radius:52% 52% 0 0; }
+.ro-field-lines::before { content:""; position:absolute; width:25%; aspect-ratio:1; left:37.5%; top:4%; border:3px solid rgba(225,255,249,.28); border-radius:50%; }
+.ro-field-light { position:absolute; inset:-10%; background:radial-gradient(ellipse at 75% 65%,rgba(142,255,233,.22),transparent 32%),linear-gradient(118deg,transparent 15%,rgba(177,250,255,.13) 38%,transparent 56%); animation:ro-stadium-light 4.5s ease-in-out infinite alternate; }
+.ro-soccer-goal { position:absolute; z-index:8; width:clamp(320px,39vw,720px); right:-1vw; bottom:9vh; filter:drop-shadow(0 22px 18px rgba(0,8,22,.55)); }
+.ro-soccer-keeper { position:absolute; z-index:16; right:9vw; bottom:14vh; width:clamp(150px,18vw,360px); transform-origin:center; transition:transform .75s cubic-bezier(.24,.72,.2,1),filter .4s; }
+.ro-keeper-image { display:block; width:100%; }
+.ro-soccer-player { position:absolute; z-index:22; left:2vw; bottom:9vh; width:clamp(210px,26vw,480px); aspect-ratio:1.25; transform-origin:center bottom; transition:transform .75s cubic-bezier(.17,.75,.16,1),filter .3s; }
+.ro-player-pose,.ro-run-cycle { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; opacity:0; filter:drop-shadow(0 15px 13px rgba(0,8,22,.48)); }
+.ro-run-cycle .ro-run-frame { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; opacity:0; }
+.ro-crown-ball { position:absolute; z-index:28; left:31vw; bottom:16vh; width:clamp(58px,7vw,125px); transition:transform 1s cubic-bezier(.2,.8,.2,1),filter .25s; filter:drop-shadow(0 0 12px rgba(255,228,104,.55)); }
+.ro-ball-trail { position:absolute; z-index:24; left:34vw; bottom:21vh; width:38vw; height:4px; opacity:0; transform-origin:left; transform:rotate(-9deg) scaleX(0); background:linear-gradient(90deg,rgba(255,231,120,.9),rgba(123,245,243,.32),transparent); filter:blur(1px) drop-shadow(0 0 8px #fff2a3); }
+.ro-goal-flash { position:absolute; z-index:12; right:9vw; bottom:22vh; width:20vw; aspect-ratio:1; opacity:0; border-radius:50%; background:radial-gradient(circle,#fff 0,#ffe982 12%,rgba(91,241,232,.42) 36%,transparent 70%); transform:scale(.2); }
+.ro-scoreboard { position:absolute; z-index:70; top:clamp(80px,12vh,130px); left:50%; transform:translateX(-50%); padding:.55rem 1.15rem; border:1px solid rgba(176,245,239,.35); border-radius:5px; background:rgba(1,22,39,.7); box-shadow:0 12px 36px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.13); text-align:center; }
+.ro-scoreboard small { display:block; color:#94e9e7; font-size:.63rem; font-weight:900; letter-spacing:.24em; }
+.ro-scoreboard span { display:block; margin-top:.2rem; color:#ffe57d; font:900 clamp(1.1rem,2.4vw,2rem)/1 monospace; letter-spacing:.12em; }
+.ro-bubble-crowd { position:absolute; z-index:5; inset:38% 0 15%; opacity:.26; overflow:hidden; }
+.ro-stage-soccer-prepare .ro-pose-ready { opacity:1; animation:ro-ready-breathe 1.5s ease-in-out infinite; }
+.ro-stage-soccer-run .ro-soccer-player { transform:translate3d(24vw,0,0); }
+.ro-stage-soccer-run .ro-soccer-frame-run { opacity:1; animation:ro-soccer-sheet-run .48s steps(1) infinite; }
+.ro-stage-soccer-kick .ro-soccer-player,.ro-stage-soccer-flight .ro-soccer-player,.ro-stage-soccer-keeper .ro-soccer-player,.ro-stage-soccer-suspense .ro-soccer-player { transform:translate3d(28vw,-1vh,0) rotate(-4deg); }
+.ro-stage-soccer-kick .ro-soccer-frame-kick,.ro-stage-soccer-flight .ro-soccer-frame-kick,.ro-stage-soccer-keeper .ro-soccer-frame-kick,.ro-stage-soccer-suspense .ro-soccer-frame-kick { opacity:1; }
+.ro-stage-soccer-kick .ro-soccer-player { animation:ro-kick-impact .5s cubic-bezier(.16,.75,.17,1) both; }
+.ro-stage-soccer-flight .ro-crown-ball,.ro-stage-soccer-keeper .ro-crown-ball,.ro-stage-soccer-suspense .ro-crown-ball { transform:translate3d(42vw,-17vh,0) rotate(640deg) scale(.82); transition-duration:1.7s; }
+.ro-stage-soccer-flight .ro-ball-trail,.ro-stage-soccer-keeper .ro-ball-trail,.ro-stage-soccer-suspense .ro-ball-trail { opacity:1; transform:rotate(-9deg) scaleX(1); transition:transform 1.35s ease-out,opacity .2s; }
+.ro-stage-soccer-keeper .ro-soccer-keeper,.ro-stage-soccer-suspense .ro-soccer-keeper { transform:translate3d(-7vw,-6vh,0) rotate(-12deg); }
+.ro-stage-soccer-suspense .ro-soccer-field { animation:ro-camera-hold 1.25s ease-in-out infinite alternate; }
+.ro-stage-soccer-goal .ro-pose-win { opacity:1; }
+.ro-stage-soccer-goal .ro-soccer-player { transform:translate3d(25vw,-4vh,0) scale(1.08); }
+.ro-stage-soccer-goal .ro-crown-ball { transform:translate3d(54vw,-13vh,0) rotate(1000deg) scale(.7); }
+.ro-stage-soccer-goal .ro-soccer-keeper { transform:translate3d(5vw,-10vh,0) rotate(22deg); }
+.ro-stage-soccer-goal .ro-soccer-goal { animation:ro-net-hit .55s ease-out 2; }
+.ro-stage-soccer-goal .ro-goal-flash { animation:ro-goal-burst 1.25s ease-out both; }
+.ro-stage-soccer-goal .ro-scoreboard span::after { content:" 01"; color:#fff3a4; }
+.ro-stage-soccer-save .ro-pose-lose,.ro-stage-soccer-post .ro-pose-lose { opacity:1; }
+.ro-stage-soccer-save .ro-soccer-player,.ro-stage-soccer-post .ro-soccer-player { transform:translate3d(25vw,2vh,0) rotate(5deg); }
+.ro-stage-soccer-save .ro-soccer-keeper { transform:translate3d(-11vw,-8vh,0) rotate(-18deg) scale(1.08); }
+.ro-stage-soccer-save .ro-crown-ball { transform:translate3d(46vw,-12vh,0) rotate(680deg) scale(.75); animation:ro-ball-save .8s .25s ease-out both; }
+.ro-stage-soccer-post .ro-crown-ball { transform:translate3d(50vw,-20vh,0) rotate(720deg) scale(.7); animation:ro-ball-post 1s .22s ease-out both; }
+
+/* Flagship 2: Naoking Race */
+.ro-scene-race { background:linear-gradient(180deg,#041b39 0%,#075374 43%,#062f49 44%,#020e21 100%); }
+.ro-race-sky { position:absolute; inset:0 0 50%; overflow:hidden; background:radial-gradient(ellipse at 50% 0,rgba(136,248,244,.28),transparent 55%); }
+.ro-race-sky i { position:absolute; width:45vw; height:5px; border-radius:50%; background:linear-gradient(90deg,transparent,rgba(131,238,240,.35),transparent); filter:blur(2px); animation:ro-current-line 2.7s linear infinite; }
+.ro-race-sky i:nth-child(2){top:34%;animation-delay:-.9s}.ro-race-sky i:nth-child(3){top:67%;animation-delay:-1.8s}
+.ro-race-track { position:absolute; inset:22% -6% 7%; overflow:hidden; transform:perspective(900px) rotateX(55deg); transform-origin:bottom; background:
+  repeating-linear-gradient(0deg,transparent 0 calc(20% - 2px),rgba(169,244,242,.28) calc(20% - 1px) 20%),
+  repeating-linear-gradient(90deg,rgba(9,91,105,.72) 0 10vw,rgba(6,62,85,.76) 10vw 20vw); border-block:3px solid rgba(184,249,243,.38); box-shadow:0 -30px 80px rgba(41,223,218,.12); }
+.ro-track-lines { position:absolute; inset:0; background:linear-gradient(90deg,transparent 49.8%,rgba(255,255,255,.2) 50%,transparent 50.2%); }
+.ro-race-gate { position:absolute; z-index:35; left:-1vw; top:0; width:30vw; height:100%; object-fit:fill; transform:rotateX(-55deg); transform-origin:bottom; transition:transform .7s ease,opacity .6s; }
+.ro-finish-line { position:absolute; z-index:5; right:10vw; inset-block:0; width:4.2vw; background:repeating-conic-gradient(#eaffff 0 25%,#06243b 0 50%) 0/22px 22px; box-shadow:0 0 18px rgba(218,255,253,.36); }
+.ro-racer { position:absolute; z-index:20; left:-17vw; top:calc(4% + var(--lane)*19%); width:clamp(105px,12vw,210px); aspect-ratio:1.35; transform:rotateX(-55deg) translate3d(0,0,0); transform-origin:center bottom; transition:transform 1.5s cubic-bezier(.25,.74,.2,1),filter .4s,opacity .4s; }
+.ro-racer i { position:absolute; z-index:6; top:-.25rem; left:.2rem; display:grid; place-items:center; width:2rem; aspect-ratio:1; border-radius:50%; color:#04182b; background:#f4d461; border:2px solid #fff0a3; font:950 .84rem/1 monospace; box-shadow:0 3px 11px rgba(0,0,0,.35); }
+.ro-racer-sprite { position:absolute; inset:-32% -45%; }
+.ro-racer .ro-run-frame { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; opacity:0; }
+.ro-racer .ro-race-sheet { opacity:1; }
+.ro-race-frame-1{background-position:0 0}.ro-race-frame-2{background-position:33.333% 0}.ro-race-frame-3{background-position:66.666% 0}.ro-race-frame-4{background-position:100% 0}.ro-race-frame-5{background-position:33.333% 100%}
+.ro-racer.is-hero { z-index:23; filter:drop-shadow(0 0 11px rgba(255,225,104,.7)); }
+.ro-race-board { position:absolute; z-index:70; top:clamp(78px,11vh,128px); left:50%; transform:translateX(-50%); min-width:220px; padding:.55rem 1rem; border:1px solid rgba(173,245,240,.35); background:rgba(1,19,35,.74); text-align:center; box-shadow:0 10px 30px rgba(0,0,0,.3); }
+.ro-race-board small { display:block;color:#a8f0ed;font-size:.62rem;font-weight:900;letter-spacing:.2em}.ro-race-board span{display:block;margin-top:.25rem;color:#ffe47f;font-weight:950}
+.ro-stage-race-start .ro-race-gate,.ro-stage-race-leg-one .ro-race-gate,.ro-stage-race-leg-two .ro-race-gate,.ro-stage-race-chaos .ro-race-gate,.ro-stage-race-final .ro-race-gate,.ro-stage-race-photo .ro-race-gate { transform:rotateX(-55deg) translateY(-110%); opacity:0; }
+.ro-stage-race-start .ro-racer { transform:rotateX(-55deg) translate3d(23vw,0,0); }
+.ro-stage-race-leg-one .ro-racer-1{transform:rotateX(-55deg) translate3d(47vw,0,0)}.ro-stage-race-leg-one .ro-racer-2{transform:rotateX(-55deg) translate3d(39vw,0,0)}.ro-stage-race-leg-one .ro-racer-3{transform:rotateX(-55deg) translate3d(55vw,0,0)}.ro-stage-race-leg-one .ro-racer-4{transform:rotateX(-55deg) translate3d(35vw,0,0)}.ro-stage-race-leg-one .ro-racer-5{transform:rotateX(-55deg) translate3d(43vw,0,0)}
+.ro-stage-race-leg-two .ro-racer-1{transform:rotateX(-55deg) translate3d(58vw,0,0)}.ro-stage-race-leg-two .ro-racer-2{transform:rotateX(-55deg) translate3d(66vw,0,0)}.ro-stage-race-leg-two .ro-racer-3{transform:rotateX(-55deg) translate3d(61vw,0,0)}.ro-stage-race-leg-two .ro-racer-4{transform:rotateX(-55deg) translate3d(71vw,0,0)}.ro-stage-race-leg-two .ro-racer-5{transform:rotateX(-55deg) translate3d(54vw,0,0)}
+.ro-stage-race-chaos .ro-racer-1{transform:rotateX(-55deg) translate3d(71vw,0,0) rotate(84deg)}.ro-stage-race-chaos .ro-racer-2{transform:rotateX(-55deg) translate3d(55vw,0,0) scaleX(-1)}.ro-stage-race-chaos .ro-racer-3{transform:rotateX(-55deg) translate3d(78vw,0,0)}.ro-stage-race-chaos .ro-racer-4{transform:rotateX(-55deg) translate3d(69vw,0,0)}.ro-stage-race-chaos .ro-racer-5{transform:rotateX(-55deg) translate3d(75vw,0,0)}
+.ro-stage-race-final .ro-racer-1,.ro-stage-race-photo .ro-racer-1{transform:rotateX(-55deg) translate3d(85vw,0,0)}.ro-stage-race-final .ro-racer-2,.ro-stage-race-photo .ro-racer-2{transform:rotateX(-55deg) translate3d(84vw,0,0)}.ro-stage-race-final .ro-racer-3,.ro-stage-race-photo .ro-racer-3{transform:rotateX(-55deg) translate3d(87vw,0,0)}.ro-stage-race-final .ro-racer-4,.ro-stage-race-photo .ro-racer-4{transform:rotateX(-55deg) translate3d(86vw,0,0)}.ro-stage-race-final .ro-racer-5,.ro-stage-race-photo .ro-racer-5{transform:rotateX(-55deg) translate3d(83vw,0,0)}
+.ro-stage-race-photo .ro-race-track { animation:ro-photo-finish .6s steps(2) infinite; }
+.ro-stage-race-win .ro-racer:not(.is-hero){opacity:.34;filter:blur(2px)}.ro-stage-race-win .ro-racer.is-hero{transform:rotateX(-55deg) translate3d(108vw,-4vh,0) scale(1.25);transition-duration:.72s}
+.ro-stage-race-lose .ro-racer-3{transform:rotateX(-55deg) translate3d(59vw,0,0) rotate(92deg);filter:grayscale(.4)}.ro-stage-race-lose .ro-racer-4{transform:rotateX(-55deg) translate3d(78vw,0,0) scale(1.18)}
+.ro-stage-race-draw .ro-racer-2,.ro-stage-race-draw .ro-racer-3,.ro-stage-race-draw .ro-racer-4{transform:rotateX(-55deg) translate3d(99vw,0,0);transition-duration:.8s}
+
+/* Flagship 3: true site-wide power failure / revival */
+.ro-scene-blackout { background:transparent; }
+.ro-blackout-darkness { position:absolute; z-index:-1; inset:0; opacity:0; background:#000; transition:opacity .25s steps(2,end); }
+.ro-blackout-glitch { position:absolute; z-index:2; inset:0; opacity:0; background:repeating-linear-gradient(0deg,transparent 0 8px,rgba(255,255,255,.1) 9px 10px),linear-gradient(90deg,transparent 0 28%,rgba(128,238,244,.22) 29% 32%,transparent 33%); mix-blend-mode:screen; }
+.ro-emergency { position:absolute; z-index:10; top:12%; left:50%; width:clamp(80px,10vw,160px); opacity:0; transform:translateX(-50%) scale(.8); text-align:center; }
+.ro-emergency-lamp{display:block;width:100%}.ro-emergency small{display:block;margin-top:-.7rem;color:#ff8b7e;font-size:.65rem;font-weight:950;letter-spacing:.28em}
+.ro-distant-signal { position:absolute; z-index:12; inset:0; display:grid; place-items:center; opacity:0; }
+.ro-distant-signal i { position:absolute; width:10px; aspect-ratio:1; border-radius:50%; background:#bffcff; box-shadow:0 0 7px #fff,0 0 24px #64edf4,0 0 80px #29bcd5; }
+.ro-distant-signal i:nth-child(2){animation:ro-signal-ring 2.1s ease-out infinite}.ro-distant-signal i:nth-child(3){animation:ro-signal-ring 2.1s .75s ease-out infinite}.ro-distant-signal span{margin-top:12vh;color:rgba(193,250,252,.68);letter-spacing:.55em}
+.ro-restart-core { position:absolute; z-index:18; inset:0; display:grid; place-items:center; opacity:0; background:radial-gradient(circle,rgba(255,244,172,.9) 0,rgba(71,228,234,.64) 12%,rgba(7,94,132,.35) 29%,transparent 58%); }
+.ro-restart-core i { position:absolute; width:min(72vw,820px); aspect-ratio:1; border:2px solid rgba(220,255,251,.8); border-radius:50%; box-shadow:0 0 60px rgba(88,239,238,.55),inset 0 0 70px rgba(255,229,119,.32); }
+.ro-restart-core b { color:#ffe472; font-size:clamp(5rem,18vw,15rem); text-shadow:0 0 18px #fff,0 0 70px #ffdc68; }
+.ro-restart-core strong { position:absolute; top:72%; font-size:clamp(1.4rem,4vw,3.8rem); font-weight:950; letter-spacing:.24em; }
+.ro-blackout-eyes { position:absolute; z-index:8; left:68%; top:48%; display:flex; gap:26px; opacity:0; }
+.ro-blackout-eyes i { width:7px;height:3px;border-radius:50%;background:#b9f4f0;box-shadow:0 0 8px #88ffff; }
+.ro-scene-blackout .ro-cinematic-caption { opacity:0; transition:opacity .3s; }
+.ro-stage-blackout-warning .ro-blackout-glitch { opacity:.8; animation:ro-glitch .16s steps(2) 7; }
+.ro-stage-blackout-warning .ro-cinematic-caption { opacity:1; }
+.ro-stage-blackout-off .ro-blackout-darkness,.ro-stage-blackout-emergency .ro-blackout-darkness,.ro-stage-blackout-signal .ro-blackout-darkness,.ro-stage-blackout-restart .ro-blackout-darkness,.ro-stage-blackout-end .ro-blackout-darkness { opacity:1; }
+.ro-stage-blackout-off .ro-cinematic-water,.ro-stage-blackout-off .ro-cinematic-vignette { display:none; }
+.ro-stage-blackout-emergency .ro-emergency { opacity:1; animation:ro-emergency-pulse 1.4s steps(1) infinite; }
+.ro-stage-blackout-emergency .ro-blackout-eyes { opacity:.45; animation:ro-eyes-blink 3.2s steps(1) infinite; }
+.ro-stage-blackout-signal .ro-distant-signal { opacity:1; }
+.ro-stage-blackout-restart .ro-restart-core { opacity:1; animation:ro-restart-explosion 1.5s cubic-bezier(.12,.8,.18,1) both; }
+.ro-stage-blackout-restart .ro-blackout-darkness { animation:ro-power-return 1.8s steps(5) .25s both; }
+.ro-stage-blackout-restart .ro-cinematic-caption,.ro-stage-blackout-end .ro-cinematic-caption { opacity:1; }
+.ro-stage-blackout-end .ro-emergency { opacity:.52; }
+html.royal-oracle-power-off body > :not(#royal-oracle-cinematic-root):not(script):not(style),
+html.royal-oracle-power-off body > :not(#royal-oracle-cinematic-root):not(script):not(style) * {
+  animation-play-state:paused!important;
+  pointer-events:none!important;
+}
+
+/* Premium / jackpot support */
+.ro-scene-jackpot { background:radial-gradient(circle at 50% 45%,rgba(255,238,140,.34),transparent 30%),linear-gradient(150deg,rgba(3,36,65,.94),rgba(5,116,119,.86),rgba(83,62,22,.86)); }
+.ro-jackpot-rays { position:absolute; inset:-50%; background:repeating-conic-gradient(from 0deg,rgba(255,235,147,.34) 0 2deg,transparent 2deg 12deg); opacity:.35; animation:ro-rays-spin 18s linear infinite; }
+.ro-jackpot-tide { position:absolute; inset:0; background:linear-gradient(120deg,transparent 30%,rgba(255,244,187,.26) 46%,transparent 60%); transform:translateX(-100%); animation:ro-gold-tide 2.7s ease-in-out infinite; }
+.ro-jackpot-crown { position:absolute; z-index:12; inset:0; display:grid; place-items:center; }
+.ro-jackpot-crown i { color:#ffdc5b;font:900 clamp(8rem,26vw,24rem)/1 serif;text-shadow:0 0 18px white,0 0 90px #ffd44c;transform:scale(.3);opacity:.2;transition:transform 1.3s cubic-bezier(.1,.8,.2,1),opacity .7s; }
+.ro-jackpot-crown span { position:absolute;width:min(60vw,740px);aspect-ratio:1;border:2px solid rgba(255,239,154,.5);border-radius:50%;box-shadow:0 0 70px rgba(255,215,73,.35); }
+.ro-jackpot-naoking { position:absolute; z-index:18; right:4vw; bottom:7vh; width:clamp(240px,32vw,560px); opacity:0; transform:translateX(45vw) rotate(8deg); transition:transform 1s cubic-bezier(.14,.76,.17,1),opacity .5s; }
+.ro-jackpot-school { position:absolute;z-index:7;inset:0;overflow:hidden}.ro-jackpot-school .ro-school-fish{opacity:0}
+.ro-stage-jackpot-school .ro-jackpot-school .ro-school-fish,.ro-stage-jackpot-ready .ro-jackpot-school .ro-school-fish,.ro-stage-jackpot-burst .ro-jackpot-school .ro-school-fish{opacity:.76;animation:ro-fish-orbit calc(3.2s + var(--fish-depth)*.7s) var(--fish-delay) linear infinite}
+.ro-stage-jackpot-ready .ro-jackpot-crown i,.ro-stage-jackpot-burst .ro-jackpot-crown i{opacity:.95;transform:scale(1)}
+.ro-stage-jackpot-ready .ro-jackpot-naoking,.ro-stage-jackpot-burst .ro-jackpot-naoking{opacity:1;transform:none}
+.ro-stage-jackpot-burst { animation:ro-jackpot-screen .8s ease-out 2; }
+.ro-stage-jackpot-burst .ro-jackpot-crown span { animation:ro-jackpot-rings 1.2s ease-out infinite; }
+.ro-stage-jackpot-fade { opacity:.42!important;filter:grayscale(.5);transition:opacity 1s,filter 1s; }
+
+/* Fish-school support */
+.ro-scene-fish-school { background:linear-gradient(180deg,rgba(3,41,72,.85),rgba(4,95,110,.58),rgba(1,24,47,.76)); }
+.ro-school-depth { position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(120,245,237,.2),transparent 45%); }
+.ro-fish-school { position:absolute;z-index:10;inset:0;overflow:hidden;perspective:800px; }
+.ro-school-fish { position:absolute; display:block; left:-18vw; top:calc(10% + var(--fish-row)*11%); width:calc(58px + var(--fish-depth)*24px); opacity:calc(.34 + var(--fish-depth)*.17); filter:blur(calc((3 - var(--fish-depth))*1px)); }
+.ro-school-fish-image { display:block;width:100%; }
+.ro-stage-school-cross .ro-school-fish,.ro-stage-school-camera .ro-school-fish,.ro-stage-school-orbit .ro-school-fish,.ro-stage-school-gold .ro-school-fish { animation:ro-fish-cross calc(2.4s + var(--fish-depth)*.42s) var(--fish-delay) linear infinite; }
+.ro-stage-school-camera .ro-fish-school { transform:scale(1.35);transition:transform 1.7s ease; }
+.ro-stage-school-orbit .ro-school-fish { animation-name:ro-fish-orbit; }
+.ro-stage-school-gold .ro-fish-school { filter:sepia(.65) saturate(1.8) brightness(1.32); }
+.ro-stage-school-exit .ro-fish-school { transform:translateX(120vw);opacity:0;transition:transform 1.2s ease-in,opacity 1s; }
+.ro-school-shadow { position:absolute;z-index:5;left:50%;top:45%;width:45vw;height:20vh;border-radius:50%;background:rgba(0,10,27,.45);filter:blur(35px);opacity:0; }
+.ro-stage-school-camera .ro-school-shadow { opacity:.75;transform:scale(1.7);transition:opacity .8s,transform 1.5s; }
+
+@keyframes ro-water-drift{to{transform:translate3d(3%,2%,0) rotate(.8deg)}}
+@keyframes ro-stadium-light{to{transform:translateX(5%) skewX(-3deg);opacity:.72}}
+@keyframes ro-ready-breathe{50%{transform:translateY(-8px) rotate(-1deg)}}
+@keyframes ro-soccer-sheet-run{0%{background-position:33.333% 0}25%{background-position:66.666% 0}50%{background-position:100% 0}75%{background-position:0 100%}}
+@keyframes ro-kick-impact{0%{transform:translate3d(27vw,0,0) rotate(-8deg)}65%{transform:translate3d(30vw,-2vh,0) rotate(8deg)}100%{transform:translate3d(28vw,-1vh,0) rotate(-4deg)}}
+@keyframes ro-camera-hold{to{transform:scale(1.035)}}
+@keyframes ro-net-hit{45%{transform:translateX(1.2vw) scaleX(1.035)}}
+@keyframes ro-goal-burst{50%{opacity:1;transform:scale(1.25)}100%{opacity:0;transform:scale(2.2)}}
+@keyframes ro-ball-save{to{transform:translate3d(34vw,8vh,0) rotate(980deg) scale(.58)}}
+@keyframes ro-ball-post{45%{filter:brightness(2.3) drop-shadow(0 0 30px #fff);transform:translate3d(50vw,-20vh,0) rotate(720deg) scale(.7)}100%{transform:translate3d(36vw,6vh,0) rotate(1030deg) scale(.56)}}
+@keyframes ro-current-line{from{left:-50vw}to{left:105vw}}
+@keyframes ro-photo-finish{50%{filter:brightness(1.55) contrast(1.14)}}
+@keyframes ro-glitch{0%,100%{transform:none;clip-path:inset(0)}33%{transform:translateX(3vw);clip-path:inset(21% 0 48%)}66%{transform:translateX(-2vw);clip-path:inset(62% 0 11%)}}
+@keyframes ro-emergency-pulse{0%,48%{filter:brightness(1)}49%,100%{filter:brightness(.18)}}
+@keyframes ro-eyes-blink{0%,42%,46%,100%{transform:scaleY(1)}44%{transform:scaleY(.05)}}
+@keyframes ro-signal-ring{from{width:8px;opacity:.8}to{width:38vw;opacity:0;border:1px solid #9bffff;background:transparent}}
+@keyframes ro-restart-explosion{0%{opacity:0;transform:scale(.05)}36%{opacity:1;transform:scale(1.16)}100%{opacity:1;transform:scale(1)}}
+@keyframes ro-power-return{0%,18%{opacity:1}20%,33%{opacity:.28}35%,48%{opacity:.92}50%,65%{opacity:.12}68%,100%{opacity:0}}
+@keyframes ro-rays-spin{to{transform:rotate(360deg)}}
+@keyframes ro-gold-tide{60%,100%{transform:translateX(110%)}}
+@keyframes ro-fish-cross{from{transform:translate3d(-15vw,0,calc(var(--fish-depth)*40px))}to{transform:translate3d(135vw,calc(sin(var(--fish-i))*4vh),calc(var(--fish-depth)*40px))}}
+@keyframes ro-fish-orbit{0%{transform:rotate(0deg) translateX(calc(13vw + var(--fish-depth)*3vw)) rotate(0deg)}100%{transform:rotate(360deg) translateX(calc(13vw + var(--fish-depth)*3vw)) rotate(-360deg)}}
+@keyframes ro-jackpot-screen{50%{filter:brightness(1.45) saturate(1.35)}}
+@keyframes ro-jackpot-rings{to{transform:scale(1.55);opacity:0}}
+
+@media (max-width:700px) {
+  .ro-cinematic-caption{bottom:max(16px,env(safe-area-inset-bottom));width:92vw}.ro-cinematic-caption small{font-size:.58rem}.ro-cinematic-caption strong{font-size:clamp(1.1rem,6vw,2rem)}
+  .ro-scoreboard,.ro-race-board{top:max(68px,calc(env(safe-area-inset-top) + 60px));transform:translateX(-50%) scale(.82)}
+  .ro-soccer-goal{width:58vw;right:-12vw;bottom:18vh}.ro-soccer-keeper{width:30vw;right:5vw;bottom:23vh}.ro-soccer-player{width:42vw;left:-7vw;bottom:17vh}.ro-crown-ball{left:33vw;bottom:25vh;width:12vw}.ro-ball-trail{left:38vw;bottom:30vh;width:48vw}
+  .ro-stage-soccer-run .ro-soccer-player{transform:translate3d(26vw,0,0)}
+  .ro-stage-soccer-kick .ro-soccer-player,.ro-stage-soccer-flight .ro-soccer-player,.ro-stage-soccer-keeper .ro-soccer-player,.ro-stage-soccer-suspense .ro-soccer-player{transform:translate3d(31vw,-1vh,0) rotate(-4deg)}
+  .ro-stage-soccer-flight .ro-crown-ball,.ro-stage-soccer-keeper .ro-crown-ball,.ro-stage-soccer-suspense .ro-crown-ball{transform:translate3d(45vw,-12vh,0) rotate(640deg) scale(.75)}
+  .ro-stage-soccer-goal .ro-soccer-player,.ro-stage-soccer-save .ro-soccer-player,.ro-stage-soccer-post .ro-soccer-player{transform:translate3d(27vw,1vh,0)}.ro-stage-soccer-goal .ro-crown-ball{transform:translate3d(51vw,-10vh,0) rotate(1000deg) scale(.62)}
+  .ro-race-track{inset:27% -30% 13%;}.ro-race-gate{width:47vw}.ro-racer{left:-24vw;width:22vw}.ro-racer-sprite{inset:-34% -48%}.ro-finish-line{right:19vw}
+  .ro-stage-race-final .ro-racer-1,.ro-stage-race-photo .ro-racer-1{transform:rotateX(-55deg) translate3d(102vw,0,0)}.ro-stage-race-final .ro-racer-2,.ro-stage-race-photo .ro-racer-2{transform:rotateX(-55deg) translate3d(101vw,0,0)}.ro-stage-race-final .ro-racer-3,.ro-stage-race-photo .ro-racer-3{transform:rotateX(-55deg) translate3d(104vw,0,0)}.ro-stage-race-final .ro-racer-4,.ro-stage-race-photo .ro-racer-4{transform:rotateX(-55deg) translate3d(103vw,0,0)}.ro-stage-race-final .ro-racer-5,.ro-stage-race-photo .ro-racer-5{transform:rotateX(-55deg) translate3d(100vw,0,0)}
+  .ro-stage-race-lose .ro-racer-3{transform:rotateX(-55deg) translate3d(52vw,0,0) rotate(92deg)}.ro-stage-race-lose .ro-racer-4{transform:rotateX(-55deg) translate3d(70vw,0,0) scale(1.18)}
+  .ro-jackpot-naoking{width:53vw;right:-8vw;bottom:11vh}.ro-school-fish{width:calc(42px + var(--fish-depth)*15px)}
+}
+
+@media (prefers-reduced-motion:reduce) {
+  #royal-oracle-cinematic-root *,#royal-oracle-cinematic-root *::before,#royal-oracle-cinematic-root *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.18s!important}
+  .ro-cinematic-water{transform:none}.ro-stage-soccer-run .ro-soccer-player{transform:translate3d(18vw,0,0)}.ro-stage-soccer-flight .ro-crown-ball,.ro-stage-soccer-keeper .ro-crown-ball,.ro-stage-soccer-suspense .ro-crown-ball{transform:translate3d(37vw,-9vh,0) rotate(40deg)}
+  .ro-school-fish:nth-child(n+15),.ro-jackpot-school .ro-school-fish:nth-child(n+13){display:none}
+}

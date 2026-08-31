@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 240" role="img" aria-labelledby="title">
+  <title id="title">王冠ボールを蹴るなおキング</title>
+  <defs><linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#9ce4f3"/><stop offset="1" stop-color="#3b82ae"/></linearGradient><filter id="s"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#00162b" flood-opacity=".42"/></filter></defs>
+  <g filter="url(#s)" transform="rotate(7 152 126)">
+    <path d="m61 126-47-42 11 69 41-3Z" fill="#4b98bf" stroke="#0b4267" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M57 126C64 55 126 39 200 66c49 18 72 62 54 99-17 35-76 42-133 26-49-14-69-36-64-65Z" fill="url(#body)" stroke="#0b4267" stroke-width="7"/>
+    <path d="m124 59 24-44 23 49Z" fill="#67bbd8" stroke="#0b4267" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M190 188c31-6 53-20 65-39-7 45-65 61-118 44Z" fill="#effdff"/>
+    <path d="m115 59 9-28 14 19 15-24 12 33" fill="#f6ce54" stroke="#7a5711" stroke-width="6" stroke-linejoin="round"/>
+    <path d="m214 105 26 7" stroke="#082f4a" stroke-width="9" stroke-linecap="round"/>
+    <path d="M235 137q13 11 22-4" fill="none" stroke="#082f4a" stroke-width="6" stroke-linecap="round"/>
+    <path d="M197 127q-9 4-15 15m27-12q-7 8-9 17" fill="none" stroke="#0b4267" stroke-width="6" stroke-linecap="round"/>
+    <path d="m94 142 34-20-13 41" fill="#76c7df" stroke="#0b4267" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M136 188 111 222M175 193l85 14" fill="none" stroke="#0b4267" stroke-width="14" stroke-linecap="round"/>
+    <path d="m254 193 45 20-45 18-14-19Z" fill="#f5ce58" stroke="#77520d" stroke-width="6" stroke-linejoin="round"/>
+  </g>
+</svg>

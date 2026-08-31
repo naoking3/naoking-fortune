@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 250" role="img" aria-labelledby="title">
+  <title id="title">勝って喜ぶなおキング</title>
+  <defs><linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a6ebf6"/><stop offset="1" stop-color="#4288b2"/></linearGradient><filter id="s"><feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#00162b" flood-opacity=".4"/></filter></defs>
+  <g filter="url(#s)">
+    <path d="m65 137-48-36 12 65 40-7Z" fill="#4d9ac0" stroke="#0b4267" stroke-width="7"/>
+    <path d="M61 132C67 64 129 45 202 70c49 17 71 58 54 97-16 36-75 48-132 32-51-14-68-39-63-67Z" fill="url(#body)" stroke="#0b4267" stroke-width="7"/>
+    <path d="m127 64 22-43 24 48Z" fill="#69bedb" stroke="#0b4267" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M190 195c31-7 53-21 66-41-8 47-66 64-119 47Z" fill="#effdff"/>
+    <path d="m118 64 8-29 14 19 15-24 13 33" fill="#f7d05a" stroke="#79550e" stroke-width="6" stroke-linejoin="round"/>
+    <path d="m211 112 9 8 10-9m12 2 8 7 9-11" fill="none" stroke="#082f4a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M223 141q13 24 31-1" fill="#f28f9f" stroke="#082f4a" stroke-width="6"/>
+    <path d="m101 137-40-47M187 131l52-44" fill="none" stroke="#61b8d7" stroke-width="18" stroke-linecap="round"/>
+    <path d="M127 197 106 230M174 202l23 30" fill="none" stroke="#0b4267" stroke-width="14" stroke-linecap="round"/>
+  </g>
+</svg>

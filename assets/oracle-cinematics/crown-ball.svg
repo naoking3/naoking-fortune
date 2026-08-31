@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title">
+  <title id="title">王冠ボール</title>
+  <defs><radialGradient id="ball" cx="35%" cy="28%"><stop stop-color="#fff8b6"/><stop offset=".55" stop-color="#f5cf55"/><stop offset="1" stop-color="#b77a12"/></radialGradient><filter id="g"><feGaussianBlur in="SourceGraphic" stdDeviation="0" result="b"/><feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#ffe786" flood-opacity=".85"/></filter></defs>
+  <g filter="url(#g)"><circle cx="80" cy="91" r="50" fill="url(#ball)" stroke="#6d4b11" stroke-width="7"/><path d="M40 64 48 17l30 25 26-31 16 47Z" fill="#ffe16b" stroke="#6d4b11" stroke-width="7" stroke-linejoin="round"/><path d="m50 83 23-14 25 11 8 27-22 17-27-10Z" fill="#8a611c" opacity=".72"/><path d="m73 69 6-24m19 35 21-13m-13 40 16 15m-38 2 1 22m-28-32-20 13m13-44-18-10" stroke="#fff5bd" stroke-width="5" opacity=".62"/></g>
+</svg>

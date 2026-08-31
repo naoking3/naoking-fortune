@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" role="img" aria-labelledby="title">
+  <title id="title">非常灯</title>
+  <defs><radialGradient id="red"><stop stop-color="#fff2cc"/><stop offset=".24" stop-color="#ff6858"/><stop offset="1" stop-color="#7b0714"/><animate attributeName="r" values=".48;.72;.48" dur="1.2s" repeatCount="indefinite"/></radialGradient><filter id="g"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <g filter="url(#g)"><path d="M53 146c0-46 14-92 57-92s57 46 57 92Z" fill="url(#red)" stroke="#34040a" stroke-width="9"/><path d="M37 146h146v35H37Z" rx="8" fill="#233443" stroke="#8bb4c1" stroke-width="8"/><path d="M110 19v21M45 42l17 18m113-18-17 18M20 101h24m132 0h24" stroke="#ff665e" stroke-width="12" stroke-linecap="round" opacity=".8"/></g>
+</svg>

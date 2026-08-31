@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 190" role="img" aria-labelledby="title">
+  <title id="title">走るなおキング 2</title>
+  <defs><linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#9ce5f3"/><stop offset="1" stop-color="#4089b2"/></linearGradient><filter id="soft"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#001b32" flood-opacity=".35"/></filter></defs>
+  <g filter="url(#soft)" transform="translate(0 5)">
+    <path d="M44 104 10 69l6 59 32-4Z" fill="#4b96bd" stroke="#0c4165" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M42 101C49 48 103 26 165 45c46 13 74 45 66 79-8 32-54 44-107 35-50-8-87-28-82-58Z" fill="url(#body)" stroke="#0c4165" stroke-width="6"/>
+    <path d="m103 45 18-33 18 34Z" fill="#62b5d5" stroke="#0c4165" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M166 156c30-2 50-14 62-33-11 43-52 53-99 36Z" fill="#eafcff" opacity=".95"/>
+    <path d="m198 144 26 18-34 2Z" fill="#4f9fc4" stroke="#0c4165" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M118 155 139 181M151 155l-21 28" fill="none" stroke="#0c4165" stroke-width="12" stroke-linecap="round"/>
+    <path d="m84 50 9-23 11 17 13-21 10 23" fill="#f4cd57" stroke="#7c5a12" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M181 87h24" stroke="#08324e" stroke-width="8" stroke-linecap="round"/>
+    <path d="M202 112q11 10 20-2" fill="none" stroke="#08324e" stroke-width="5" stroke-linecap="round"/>
+    <path d="M166 103q-8 5-12 13m24-11q-8 8-8 16" fill="none" stroke="#0c4165" stroke-width="5" stroke-linecap="round"/>
+    <path d="m79 111 23-11-8 29" fill="#74c5df" stroke="#0c4165" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+</svg>

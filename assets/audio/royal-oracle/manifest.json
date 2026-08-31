@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "generatedBy": "tools/generate-royal-oracle-audio.mjs",
+  "source": "Original deterministic synthesis; no external recordings or third-party samples.",
+  "format": {
+    "codec": "PCM",
+    "channels": 1,
+    "sampleRate": 24000,
+    "bitDepth": 16
+  },
+  "assets": [
+    {
+      "file": "normal-underwater-spin.wav",
+      "durationSeconds": 4
+    },
+    {
+      "file": "crown-goal.wav",
+      "durationSeconds": 3.45
+    },
+    {
+      "file": "naoking-race.wav",
+      "durationSeconds": 3.7
+    },
+    {
+      "file": "power-cut.wav",
+      "durationSeconds": 0.92
+    },
+    {
+      "file": "distant-signal.wav",
+      "durationSeconds": 1.45
+    },
+    {
+      "file": "restart-surge.wav",
+      "durationSeconds": 2.35
+    },
+    {
+      "file": "revival-rise.wav",
+      "durationSeconds": 2.85
+    },
+    {
+      "file": "jackpot-burst.wav",
+      "durationSeconds": 3.65
+    },
+    {
+      "file": "premium-crown.wav",
+      "durationSeconds": 3.25
+    }
+  ]
+}
