@@ -79,9 +79,9 @@
       id: 'oracle',
       routeId: 'fortune',
       code: 'COURT-02',
-      title: 'Royal Pressure Court',
-      titleJa: '王立水圧法廷',
-      identity: '一度の宣告を重く見せる危険な占術機関',
+      title: 'なおキング占いの間',
+      titleJa: 'なおキング占いの間',
+      identity: '王が勝手に今日の運勢を決める、少し騒がしい占い部屋',
       material: 'black-pearl-machinery',
       motion: 'charge-hold-verdict',
       sound: 'pressure-pulse-and-verdict-bell',
@@ -340,7 +340,7 @@
     { id: 'visit-one-memory', group: 'explore', label: '王国風景を一枚だけ眺める', target: 'gallery', duration: '約20秒', completionEvent: 'gallery:view', optional: true },
     { id: 'follow-record-current', group: 'explore', label: '記録庫で今日の一枚を見つける', target: 'record', duration: '約30秒', completionEvent: 'record:daily-still', optional: true },
     { id: 'find-quiet-creature', group: 'explore', label: 'どこかにいる静かな来訪者を見つける', target: 'any', duration: '好きなだけ', completionEvent: 'discovery:daily-visitor', optional: true },
-    { id: 'ask-oracle-once', group: 'play', label: '王立占術機を一度だけ回す', target: 'oracle', duration: '約1分', completionEvent: 'oracle:result', optional: true },
+    { id: 'ask-oracle-once', group: 'play', label: 'なおキング占いを一度だけ回す', target: 'oracle', duration: '約1分', completionEvent: 'oracle:result', optional: true },
     { id: 'collect-three-bubbles', group: 'play', label: '生存海域で王国餌を三つ集める', target: 'game', duration: '約1分', completionEvent: 'game:bubbles-3', optional: true },
     { id: 'calm-dive', group: 'play', label: '急がず短い航行を一度楽しむ', target: 'game', duration: '約1分', completionEvent: 'game:run', optional: true },
     { id: 'preview-one-frame', group: 'make', label: '写真工房で額縁を一つ試す', target: 'workshop', duration: '約30秒', completionEvent: 'workshop:frame-preview', optional: true },
@@ -357,11 +357,11 @@
   })));
 
   const ORACLE_PRESENTATION_MODIFIERS = immutable([
-    { id: 'first-tide', label: 'FIRST TIDE', presentationOnly: true, cue: 'soft-pressure-rise' },
-    { id: 'today-echo', label: "TODAY'S ECHO", presentationOnly: true, cue: 'distant-double-tone' },
-    { id: 'court-silence', label: 'COURT SILENCE', presentationOnly: true, cue: 'brief-room-tone-dip' },
-    { id: 'crown-refraction', label: 'CROWN REFRACTION', presentationOnly: true, cue: 'pearl-shimmer' },
-    { id: 'blue-hour', label: 'BLUE HOUR', presentationOnly: true, cue: 'low-blue-pulse' }
+    { id: 'first-tide', label: '今日最初の潮', presentationOnly: true, cue: 'soft-pressure-rise' },
+    { id: 'today-echo', label: '今日のひびき', presentationOnly: true, cue: 'distant-double-tone' },
+    { id: 'court-silence', label: '王様が急に静か', presentationOnly: true, cue: 'brief-room-tone-dip' },
+    { id: 'crown-refraction', label: '王冠がキラッ', presentationOnly: true, cue: 'pearl-shimmer' },
+    { id: 'blue-hour', label: '海が青く光る時間', presentationOnly: true, cue: 'low-blue-pulse' }
   ]);
 
   const GAME_CHALLENGES = immutable([
