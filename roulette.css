@@ -934,6 +934,32 @@ html.oracle-tier-extreme .header-depth b,html.oracle-tier-extreme .depth-rail b,
  */
 .oracle-event-props{position:absolute;z-index:1;inset:0;overflow:hidden;pointer-events:none;perspective:1100px;transform-style:preserve-3d;contain:layout style paint}
 .oracle-event-props>i,.oracle-event-props>b,.oracle-event-props>span{position:absolute;display:block;opacity:0;will-change:transform,opacity}
+.scene-duel .oracle-event-props{z-index:4;overflow:visible}
+.scene-duel .oracle-duel-fighter{position:absolute;z-index:2;bottom:2%;width:clamp(150px,25vw,340px);margin:0;opacity:0;filter:drop-shadow(0 15px 18px rgba(0,6,22,.55));animation:oracle-duel-fighter-in .72s cubic-bezier(.18,.84,.18,1) both}
+.scene-duel .oracle-duel-fighter img{display:block;width:100%;height:auto;object-fit:contain}
+.scene-duel .oracle-duel-fighter.is-left{left:5%;transform-origin:bottom right}
+.scene-duel .oracle-duel-fighter.is-right{right:5%;transform:scaleX(-1);transform-origin:bottom left;animation-delay:.1s}
+.scene-duel .oracle-duel-vs{position:absolute;z-index:4;left:50%;top:52%;display:block;opacity:0;color:#fff4bf;font:900 clamp(34px,7vw,92px)/1 var(--display);letter-spacing:-.08em;text-shadow:0 3px 0 #7c2635,0 0 28px rgba(244,210,109,.7);translate:-50% -50%;animation:oracle-duel-vs .7s .34s cubic-bezier(.16,.78,.18,1) both}
+.scene-news-live .oracle-event-props,.scene-cctv-chase .oracle-event-props{z-index:5;display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:clamp(8px,1.5vw,22px);align-items:end;padding:clamp(18px,4vh,58px) clamp(18px,5vw,84px) clamp(24px,7vh,96px)}
+.oracle-cctv-feed{position:relative;display:block;min-height:clamp(118px,18vh,230px);margin:0;overflow:hidden;border:1px solid rgba(168,239,243,.4);background:linear-gradient(145deg,rgba(5,53,70,.94),rgba(1,14,29,.96));box-shadow:0 10px 24px rgba(0,4,18,.42),inset 0 0 30px rgba(102,226,236,.1);opacity:0;animation:oracle-cctv-feed-on .48s cubic-bezier(.18,.82,.2,1) both}
+.oracle-cctv-feed:nth-child(2){animation-delay:.11s}.oracle-cctv-feed:nth-child(3){animation-delay:.22s}.oracle-cctv-feed:nth-child(4){animation-delay:.33s}
+.oracle-cctv-feed small{position:absolute;z-index:4;left:8px;top:7px;color:#cdfaf5;font:900 clamp(7px,.7vw,11px)/1 var(--mono);letter-spacing:.12em;text-shadow:0 1px 4px #001523}
+.oracle-cctv-feed>span{position:absolute;z-index:4;left:8px;right:8px;bottom:7px;display:block!important;opacity:1!important;color:#d8ffff;font:800 clamp(7px,.72vw,11px)/1.2 var(--mono);text-shadow:0 1px 4px #001523}
+.oracle-cctv-feed.feed-king img{position:absolute;right:-6%;bottom:-7%;width:82%;height:auto;filter:drop-shadow(0 6px 8px rgba(0,8,24,.62))}
+.oracle-cctv-feed.feed-king>b{position:absolute;right:8%;top:20%;display:block!important;opacity:1!important;color:#ffe68c;font:900 clamp(26px,4vw,60px)/1 var(--display);text-shadow:0 0 14px rgba(255,223,113,.5);animation:oracle-cctv-crown 1.6s ease-in-out infinite alternate}
+.oracle-cctv-feed.feed-crown{background:radial-gradient(circle at 50% 44%,rgba(255,220,106,.28),transparent 33%),linear-gradient(145deg,#173b49,#061425)}
+.oracle-cctv-feed.feed-crown>b{position:absolute;left:50%;top:39%;display:block!important;opacity:1!important;color:#ffeb9d;font:900 clamp(42px,6vw,90px)/1 var(--display);translate:-50% -50%;animation:oracle-cctv-crown 1.2s ease-in-out infinite alternate}
+.oracle-cctv-feed.feed-school i{position:absolute;display:block!important;width:30%;height:17%;border-radius:50%;opacity:.9!important;background:radial-gradient(circle at 74% 35%,#e8ffff 0 9%,#15425a 10% 18%,transparent 19%),linear-gradient(145deg,#e9ffff,#63d5df 46%,#0c536d);box-shadow:-18px 6px 0 -5px #2995a5;animation:oracle-cctv-fish-swim 2.2s ease-in-out infinite}
+.oracle-cctv-feed.feed-school i:nth-of-type(1){left:6%;top:30%}.oracle-cctv-feed.feed-school i:nth-of-type(2){left:38%;top:51%;scale:.72;animation-delay:-.5s}.oracle-cctv-feed.feed-school i:nth-of-type(3){left:58%;top:19%;scale:.55;animation-delay:-1.1s}
+.oracle-cctv-feed.feed-shadow{background:radial-gradient(ellipse at 56% 48%,rgba(111,231,232,.18),transparent 8%),linear-gradient(135deg,#020d1d,#0b3241)}
+.oracle-cctv-feed.feed-shadow>b{position:absolute;left:18%;top:20%;width:68%;height:52%;display:block!important;opacity:.8!important;background:linear-gradient(100deg,transparent 0 15%,rgba(5,13,25,.96) 16% 77%,transparent 78%);clip-path:polygon(0 51%,31% 14%,83% 20%,100% 49%,75% 80%,25% 83%);filter:drop-shadow(0 0 8px rgba(123,238,238,.35));animation:oracle-cctv-shadow 1.8s ease-in-out infinite alternate}
+@keyframes oracle-duel-fighter-in{from{opacity:0;translate:var(--duel-in,-18vw) 7vh;scale:.72}to{opacity:1;translate:0 0;scale:1}}
+.scene-duel .oracle-duel-fighter.is-right{--duel-in:18vw}
+@keyframes oracle-duel-vs{from{opacity:0;scale:2.2;filter:blur(9px)}to{opacity:1;scale:1;filter:none}}
+@keyframes oracle-cctv-feed-on{from{opacity:0;translate:0 20px;filter:brightness(2.3)}to{opacity:1;translate:0 0;filter:none}}
+@keyframes oracle-cctv-crown{to{scale:1.16;filter:brightness(1.25)}}
+@keyframes oracle-cctv-fish-swim{50%{translate:14px -6px}to{translate:2px 2px}}
+@keyframes oracle-cctv-shadow{to{translate:14px -4px;opacity:.46}}
 
 /* Sports: a real ballistic crown path, post geometry, then a freeze-frame. */
 .oracle-chaos-stage.scene-crown-goal::before{background:linear-gradient(180deg,rgba(18,101,130,.58),rgba(2,19,39,.92) 66%),repeating-linear-gradient(90deg,transparent 0 8vw,rgba(197,250,255,.035) 8.1vw 8.25vw)}
@@ -1297,6 +1323,8 @@ html.is-oracle-suspended .site-header,html.is-oracle-suspended body[data-page="f
   .scene-news-live .oracle-event-props>i{width:46vw;height:15vh}.scene-news-live .oracle-event-props>i:nth-child(1){left:2%}.scene-news-live .oracle-event-props>i:nth-child(2){left:auto;right:2%}
   .scene-repair-disaster .oracle-event-props>i{width:72px;height:36px}
   .scene-cctv-chase .oracle-event-props>i{width:32%}
+  .scene-duel .oracle-duel-fighter{width:34vw;bottom:6%}.scene-duel .oracle-duel-fighter.is-left{left:0}.scene-duel .oracle-duel-fighter.is-right{right:0}.scene-duel .oracle-duel-vs{top:48%;font-size:42px}
+  .scene-news-live .oracle-event-props,.scene-cctv-chase .oracle-event-props{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;align-content:end;padding:60px 10px 18px}.oracle-cctv-feed{min-height:86px}.oracle-cctv-feed small{font-size:7px}.oracle-cctv-feed>span{font-size:7px}.oracle-cctv-feed.feed-king img{width:72%}.oracle-cctv-feed.feed-crown>b{font-size:38px}
   .oracle-chaos-stage.scene-giant-naoking .oracle-chaos-panel{height:auto;background:rgba(2,27,44,.74)}
   .oracle-chaos-stage.scene-pixel-palace .oracle-chaos-panel{min-height:260px;border-width:6px;box-shadow:7px 7px 0 #020925,-7px -7px 0 rgba(102,226,229,.2)}
   .oracle-current-c,.oracle-bubble-d,.oracle-bubble-e,.oracle-pressure-ring-b { display:none; }
@@ -1424,15 +1452,15 @@ html.is-oracle-suspended .oracle-fish-school .oracle-fish { animation-play-state
 .oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish { animation:oracle-school-cross var(--fish-duration) linear infinite;animation-delay:calc(0s - var(--fish-delay)); }
 .oracle-fish-school:is(.school-small,[data-school="small"]) .oracle-fish:nth-child(3n) { animation-name:oracle-school-cross-low; }
 .oracle-fish-school:is(.school-royal,[data-school="royal"]) { transform-style:preserve-3d; }
-.oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish { left:50%;top:50%;width:calc(var(--fish-size) + 7px);animation:oracle-school-orbit var(--fish-duration) cubic-bezier(.45,.04,.55,.96) infinite;animation-delay:calc(0s - var(--fish-delay)); }
+.oracle-fish-school:is(.school-royal,[data-school="royal"]) .oracle-fish { left:var(--fish-anchor-x,50%);top:var(--fish-anchor-y,50%);width:calc(var(--fish-size) + 7px);animation:oracle-school-orbit var(--fish-duration) cubic-bezier(.45,.04,.55,.96) infinite;animation-delay:calc(0s - var(--fish-delay)); }
 .oracle-fish-school:is(.school-golden,[data-school="golden"]) .oracle-fish { animation:oracle-school-absorb var(--fish-duration) cubic-bezier(.58,.02,.8,.54) infinite;animation-delay:calc(0s - var(--fish-delay)); }
-.oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish { left:50%;top:50%;width:calc(var(--fish-size) + 24px);animation:oracle-school-depth var(--fish-duration) cubic-bezier(.26,.03,.72,.96) infinite;animation-delay:calc(0s - var(--fish-delay));filter:blur(var(--fish-blur,1px)) drop-shadow(0 14px 24px rgba(0,3,14,.62)); }
-.oracle-fish-school:is(.school-naoking,[data-school="naoking"]) .oracle-fish { left:50%;top:50%;animation:oracle-school-spiral var(--fish-duration) cubic-bezier(.47,.02,.53,.98) infinite;animation-delay:calc(0s - var(--fish-delay)); }
+.oracle-fish-school:is(.school-abyss,[data-school="abyss"]) .oracle-fish { left:var(--fish-anchor-x,50%);top:var(--fish-anchor-y,50%);width:calc(var(--fish-size) + 24px);animation:oracle-school-depth var(--fish-duration) cubic-bezier(.26,.03,.72,.96) infinite;animation-delay:calc(0s - var(--fish-delay));filter:blur(var(--fish-blur,1px)) drop-shadow(0 14px 24px rgba(0,3,14,.62)); }
+.oracle-fish-school:is(.school-naoking,[data-school="naoking"]) .oracle-fish { left:var(--fish-anchor-x,50%);top:var(--fish-anchor-y,50%);animation:oracle-school-spiral var(--fish-duration) cubic-bezier(.47,.02,.53,.98) infinite;animation-delay:calc(0s - var(--fish-delay)); }
 .oracle-fish-school:is(.motion-cross,[data-motion="cross"]) .oracle-fish { animation-name:oracle-school-cross; }
-.oracle-fish-school:is(.motion-orbit,[data-motion="orbit"]) .oracle-fish { left:50%;top:50%;animation-name:oracle-school-orbit; }
+.oracle-fish-school:is(.motion-orbit,[data-motion="orbit"]) .oracle-fish { left:var(--fish-anchor-x,50%);top:var(--fish-anchor-y,50%);animation-name:oracle-school-orbit; }
 .oracle-fish-school:is(.motion-absorb,[data-motion="absorb"]) .oracle-fish { animation-name:oracle-school-absorb; }
-.oracle-fish-school:is(.motion-depth,[data-motion="depth"]) .oracle-fish { left:50%;top:50%;animation-name:oracle-school-depth; }
-.oracle-fish-school:is(.motion-spiral,[data-motion="spiral"]) .oracle-fish { left:50%;top:50%;animation-name:oracle-school-spiral; }
+.oracle-fish-school:is(.motion-depth,[data-motion="depth"]) .oracle-fish { left:var(--fish-anchor-x,50%);top:var(--fish-anchor-y,50%);animation-name:oracle-school-depth; }
+.oracle-fish-school:is(.motion-spiral,[data-motion="spiral"]) .oracle-fish { left:var(--fish-anchor-x,50%);top:var(--fish-anchor-y,50%);animation-name:oracle-school-spiral; }
 
 html.oracle-world-fish-school-small .oracle-environment::before { background:repeating-linear-gradient(12deg,transparent 0 42px,rgba(132,239,245,.09) 43px 45px,transparent 46px 86px);animation:oracle-expansion-current-cross 1.2s linear infinite; }
 html.oracle-world-fish-school-royal .oracle-environment::before { background:repeating-radial-gradient(ellipse at 50% 48%,transparent 0 8vw,rgba(255,226,133,.08) 8.1vw 8.35vw);animation:oracle-expansion-world-orbit 3.4s linear infinite; }
@@ -1461,10 +1489,10 @@ html.oracle-world-fish-school-naoking .fortune-card { animation:oracle-expansion
 @keyframes oracle-reel-rewind { 0%{translate:0 32%;scale:1 .88}44%{translate:0 -8%;scale:1 1.15}100%{translate:0 -34%;scale:1 .9} }
 @keyframes oracle-school-cross { 0%{translate:-18vw 0;rotate:var(--fish-turn);opacity:0}10%{opacity:.88}55%{translate:46vw -4vh;opacity:.9}100%{translate:110vw 3vh;opacity:0} }
 @keyframes oracle-school-cross-low { 0%{translate:-22vw 0;opacity:0}12%{opacity:.72}52%{translate:48vw 7vh}100%{translate:112vw -3vh;opacity:0} }
-@keyframes oracle-school-orbit { 0%{translate:-50% -50%;transform:rotate(0) translateX(clamp(110px,31vw,440px)) rotate(0);scale:.62;opacity:0}12%{opacity:.9}50%{transform:rotate(180deg) translateX(clamp(110px,31vw,440px)) rotate(-180deg);scale:1.08}100%{translate:-50% -50%;transform:rotate(360deg) translateX(clamp(110px,31vw,440px)) rotate(-360deg);scale:.62;opacity:0} }
-@keyframes oracle-school-absorb { 0%{translate:calc(-26vw - var(--fish-x)) calc(-20vh - var(--fish-y));scale:1.25;opacity:0}15%{opacity:.92}74%{translate:calc(50vw - var(--fish-x)) calc(52vh - var(--fish-y));scale:.48;opacity:.92}100%{translate:calc(50vw - var(--fish-x)) calc(52vh - var(--fish-y));scale:.04;opacity:0} }
+@keyframes oracle-school-orbit { 0%{translate:-50% -50%;transform:rotate(0) translateX(var(--fish-orbit-radius,clamp(110px,31vw,440px))) rotate(90deg);scale:.62;opacity:0}12%{opacity:.9}50%{transform:rotate(180deg) translateX(var(--fish-orbit-radius,clamp(110px,31vw,440px))) rotate(90deg);scale:1.08}100%{translate:-50% -50%;transform:rotate(360deg) translateX(var(--fish-orbit-radius,clamp(110px,31vw,440px))) rotate(90deg);scale:.62;opacity:0} }
+@keyframes oracle-school-absorb { 0%{translate:calc(-26vw - var(--fish-x)) calc(-20vh - var(--fish-y));scale:1.25;opacity:0}15%{opacity:.92}74%{translate:calc(var(--fish-anchor-x,50vw) - var(--fish-x)) calc(var(--fish-anchor-y,52vh) - var(--fish-y));scale:.48;opacity:.92}100%{translate:calc(var(--fish-anchor-x,50vw) - var(--fish-x)) calc(var(--fish-anchor-y,52vh) - var(--fish-y));scale:.04;opacity:0} }
 @keyframes oracle-school-depth { 0%{translate:-50% -50%;scale:.03;opacity:0}20%{opacity:.16}67%{scale:1.08;opacity:.72}100%{translate:calc(-50% + var(--fish-x)) calc(-50% + var(--fish-y));scale:5.2;opacity:0} }
-@keyframes oracle-school-spiral { 0%{translate:-50% -50%;transform:rotate(0) translateX(46vw) rotate(0);scale:.25;opacity:0}12%{opacity:.92}72%{transform:rotate(660deg) translateX(10vw) rotate(-660deg);scale:1.08}100%{translate:-50% -50%;transform:rotate(900deg) translateX(2vw) rotate(-900deg);scale:.05;opacity:0} }
+@keyframes oracle-school-spiral { 0%{translate:-50% -50%;transform:rotate(0) translateX(min(46vw,var(--fish-orbit-radius,260px))) rotate(90deg);scale:.25;opacity:0}12%{opacity:.92}72%{transform:rotate(660deg) translateX(max(2vw,calc(var(--fish-orbit-radius,260px) - 150px))) rotate(90deg);scale:1.08}100%{translate:-50% -50%;transform:rotate(900deg) translateX(2vw) rotate(90deg);scale:.05;opacity:0} }
 @keyframes oracle-expansion-current-cross { to{background-position:86px 0} }
 @keyframes oracle-expansion-world-orbit { to{transform:rotate(360deg) scale(1.12)} }
 @keyframes oracle-expansion-world-absorb { 0%{transform:scale(1.5) rotate(-16deg);opacity:0}70%{opacity:1}100%{transform:scale(.18) rotate(18deg);opacity:0} }
@@ -1969,10 +1997,10 @@ html.oracle-world-naoking-overload body[data-page="fortune"] .photo-background {
 }
 
 @keyframes oracle-school-cross-mobile { 0%{translate:-22vw 0;opacity:0}12%{opacity:.82}100%{translate:112vw 7vh;opacity:0} }
-@keyframes oracle-school-orbit-mobile { 0%{translate:-50% -50%;transform:rotate(0) translateX(36vw) rotate(0);scale:.55;opacity:0}15%{opacity:.86}100%{translate:-50% -50%;transform:rotate(360deg) translateX(36vw) rotate(-360deg);scale:.9;opacity:0} }
-@keyframes oracle-school-absorb-mobile { 0%{translate:calc(-22vw - var(--fish-x)) calc(-12vh - var(--fish-y));scale:1.05;opacity:0}18%{opacity:.85}100%{translate:calc(50vw - var(--fish-x)) calc(48vh - var(--fish-y));scale:.05;opacity:0} }
+@keyframes oracle-school-orbit-mobile { 0%{translate:-50% -50%;transform:rotate(0) translateX(min(36vw,var(--fish-orbit-radius,160px))) rotate(90deg);scale:.55;opacity:0}15%{opacity:.86}100%{translate:-50% -50%;transform:rotate(360deg) translateX(min(36vw,var(--fish-orbit-radius,160px))) rotate(90deg);scale:.9;opacity:0} }
+@keyframes oracle-school-absorb-mobile { 0%{translate:calc(-22vw - var(--fish-x)) calc(-12vh - var(--fish-y));scale:1.05;opacity:0}18%{opacity:.85}100%{translate:calc(var(--fish-anchor-x,50vw) - var(--fish-x)) calc(var(--fish-anchor-y,48vh) - var(--fish-y));scale:.05;opacity:0} }
 @keyframes oracle-school-depth-mobile { 0%{translate:-50% -50%;scale:.04;opacity:0}22%{opacity:.2}100%{translate:calc(-50% + var(--fish-x)) calc(-50% + var(--fish-y));scale:3.2;opacity:0} }
-@keyframes oracle-school-spiral-mobile { 0%{translate:-50% -50%;transform:rotate(0) translateX(43vw) rotate(0);scale:.2;opacity:0}14%{opacity:.86}100%{translate:-50% -50%;transform:rotate(720deg) translateX(4vw) rotate(-720deg);scale:.08;opacity:0} }
+@keyframes oracle-school-spiral-mobile { 0%{translate:-50% -50%;transform:rotate(0) translateX(min(43vw,var(--fish-orbit-radius,160px))) rotate(90deg);scale:.2;opacity:0}14%{opacity:.86}100%{translate:-50% -50%;transform:rotate(720deg) translateX(4vw) rotate(90deg);scale:.08;opacity:0} }
 @keyframes oracle-world-accordion-card-mobile { from{transform:perspective(900px) rotateY(-5deg) scaleX(.82) scale(.82)}to{transform:perspective(900px) rotateY(5deg) scaleX(1.04) scale(.82)} }
 @keyframes oracle-world-ui-card-fall-mobile { 0%,22%{transform:scale(.86)}100%{transform:translate(25vw,62vh) rotate(18deg) scale(.58);opacity:.04} }
 @keyframes oracle-world-parade-card-mobile { from{translate:-3vw 2vh;rotate:-1deg;scale:.76}to{translate:3vw -2vh;rotate:1deg;scale:.76} }

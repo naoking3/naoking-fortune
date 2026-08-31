@@ -89,10 +89,10 @@
     'portal-panic':{ image:'assets/characters/naoking-panic.webp', glyph:'どこ？', signal:['変な穴が開いた！','王が吸い込まれた','鏡の王が、本物の王を追いかけます。'], twist:['出口が入れ替わる！','別の入口に逆戻り','王は無事に帰れるのでしょうか。'] },
     'machine-power-cycle':{ image:'assets/characters/naoking-panic.webp', glyph:'0%', signal:['突然の停電！','占い機が全部止まった','光も泡も音も、すべて止まりました。'], twist:['王が修理中！','手回しで直している','直るのか爆発するのか。あと少しです。'] },
     'oracle-ui-collapse':{ image:'assets/characters/naoking-panic.webp', glyph:'迷子', signal:['画面が壊れた！','文字もサメも落下','全部が画面の下へ落ちていきます。'], twist:['王が雑に修理！','手で表示を並べ直す','最後の一文字だけ、まだ戻りません。'] },
-    'golden-ocean-jackpot':{ image:'assets/characters/naoking-jackpot.webp', glyph:'♛', signal:['超大当たり！','海が金色に変わる','すべてのサメが大当たりの光に包まれます。'], twist:['王宮が出現！','巨大な王宮が海底から上がる','窓が全部光り、王冠の雨が始まります。'] },
-    'fish-celebration-jackpot':{ image:'assets/characters/naoking-jackpot.webp', glyph:'∞', signal:['超大当たり！','全部の魚が大集合','小魚も巨大魚も、王冠の形に並びます。'], twist:['魚が光に変身！','群れが光る泡になる','泡が集まり、大当たりの文字を作ります。'] },
-    'abyss-dawn-jackpot':{ image:'assets/characters/naoking-jackpot.webp', glyph:'☼', signal:['超大当たり！','真っ暗、そして無音','遠くに一本だけ、朝の光が見えます。'], twist:['深海に朝が来た！','光が一気に広がる','王宮も魚も王冠も、全部が輝きます。'] },
-    'naoking-overload-jackpot':{ image:'assets/characters/naoking-jackpot.webp', glyph:'×1000', signal:['超大当たり！','小さな王が大量発生','増やした本人は、満足そうです。'], twist:['巨大な王が来た！','画面に入りきらない','全部を押しのけ、中央に居座りました。'] }
+    'golden-ocean-jackpot':{ image:'assets/characters/naoking-3.webp', glyph:'♛', signal:['超大当たり！','海が金色に変わる','すべてのサメが大当たりの光に包まれます。'], twist:['王宮が出現！','巨大な王宮が海底から上がる','窓が全部光り、王冠の雨が始まります。'] },
+    'fish-celebration-jackpot':{ image:'assets/characters/naoking-3.webp', glyph:'∞', signal:['超大当たり！','全部の魚が大集合','小魚も巨大魚も、王冠の形に並びます。'], twist:['魚が光に変身！','群れが光る泡になる','泡が集まり、大当たりの文字を作ります。'] },
+    'abyss-dawn-jackpot':{ image:'assets/characters/naoking-3.webp', glyph:'☼', signal:['超大当たり！','真っ暗、そして無音','遠くに一本だけ、朝の光が見えます。'], twist:['深海に朝が来た！','光が一気に広がる','王宮も魚も王冠も、全部が輝きます。'] },
+    'naoking-overload-jackpot':{ image:'assets/characters/naoking-3.webp', glyph:'×1000', signal:['超大当たり！','小さな王が大量発生','増やした本人は、満足そうです。'], twist:['巨大な王が来た！','画面に入りきらない','全部を押しのけ、中央に居座りました。'] }
   });
 
   const sequences = Object.freeze({

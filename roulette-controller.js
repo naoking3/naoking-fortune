@@ -218,19 +218,19 @@
   const normalResults = normalDefs.map(makeNormal);
 
   const winResults = [
-    { key:'rainbow', kind:'win', title:'大当たり！ 虹色', image:'assets/characters/naoking-jackpot.webp', effect:'rainbow', duration:2350, messages:[
+    { key:'rainbow', kind:'win', title:'大当たり！ 虹色', image:'assets/characters/naoking-3.webp', effect:'rainbow', duration:2350, messages:[
       '大当たり！ 今日はかなり運がいい。','虹が出た。お前、本当に当てたんだな。','大当たりだ。運を使い切る前に深呼吸しろ。','なおキングが立った。かなり珍しい大当たりだ。','虹色の大当たり！ 今日だけ少し偉そうにしていい。'
     ]},
-    { key:'crown', kind:'win', title:'大当たり！ 王冠', image:'assets/characters/naoking-jackpot.webp', effect:'crown', duration:2400, messages:[
+    { key:'crown', kind:'win', title:'大当たり！ 王冠', image:'assets/characters/naoking-3.webp', effect:'crown', duration:2400, messages:[
       '大当たり！ 王冠が落ちてきた。避けなかったお前の勝ち。','王冠が直撃。文句なしの大当たりだ。','王冠が増えた。1個はお前の運らしい。','上を見ろ。王冠と幸運が一緒に来た。','大当たり！ 今日だけ選ばれた側だ。調子に乗るなよ。'
     ]},
-    { key:'revival', kind:'win', title:'やっぱ大当たり！', image:'assets/characters/naoking-jackpot.webp', effect:'revival', duration:2850, messages:[
+    { key:'revival', kind:'win', title:'やっぱ大当たり！', image:'assets/characters/naoking-3.webp', effect:'revival', duration:2850, messages:[
       'ハズレと思った？ やっぱ大当たり！','終わったふりでした。なおキングが勝手に復活。','終了からの大当たり。心臓に悪いだろ。','残念……からの大当たり！ お前、持ってるな。','なおキングが結果をひっくり返した。理由はない。'
     ]},
-    { key:'comet', kind:'win', title:'大当たり！ 流れ星', image:'assets/characters/naoking-jackpot.webp', effect:'comet', duration:2150, messages:[
+    { key:'comet', kind:'win', title:'大当たり！ 流れ星', image:'assets/characters/naoking-3.webp', effect:'comet', duration:2150, messages:[
       '大当たり！ 流れ星がお前に当たった。','金色の流れ星が来た。今日は運がいい。','願う前に当たった。仕事が早い流れ星だ。','幸運が落ちてきた。早く拾え。','海底なのに流れ星。意味はないが大当たり。'
     ]},
-    { key:'abyss', kind:'win', title:'大当たり！ 深海の光', image:'assets/characters/naoking-jackpot.webp', effect:'abyss', duration:2200, messages:[
+    { key:'abyss', kind:'win', title:'大当たり！ 深海の光', image:'assets/characters/naoking-3.webp', effect:'abyss', duration:2200, messages:[
       '大当たり！ 深海の光がお前を選んだ。','海底の光が、お前だけを照らしている。','深海で大当たり。今日は少し自慢していい。','見つかったな。今日はかなり運がいい。','暗い海で大当たり。めちゃくちゃ目立つな。'
     ]}
   ];
@@ -783,7 +783,8 @@
   const chaosGlyph = document.createElement('b'); chaosGlyph.setAttribute('aria-hidden', 'true');
   const chaosProps = document.createElement('div');
   chaosProps.className = 'oracle-event-props'; chaosProps.setAttribute('aria-hidden', 'true');
-  chaosProps.innerHTML = '<i></i><i></i><i></i><i></i><b></b><span></span>';
+  const defaultChaosPropsMarkup = '<i></i><i></i><i></i><i></i><b></b><span></span>';
+  chaosProps.innerHTML = defaultChaosPropsMarkup;
   const chaosAction = document.createElement('button');
   chaosAction.className = 'oracle-chaos-action'; chaosAction.type = 'button'; chaosAction.hidden = true;
   chaosCopy.append(chaosEyebrow, chaosTitle, chaosDetail, chaosAction);
@@ -1026,7 +1027,7 @@
   }
 
   function setIntruder(presentation, running) {
-    const source = { dry:'assets/characters/naoking-7.webp', sleepy:'assets/characters/naoking-sleepy.webp', fish:'assets/characters/naoking-3.webp', king:'assets/characters/naoking-jackpot.webp' }[presentation.intrusion] || 'assets/characters/naoking-hero.webp';
+    const source = { dry:'assets/characters/naoking-7.webp', sleepy:'assets/characters/naoking-sleepy.webp', fish:'assets/characters/naoking-3.webp', king:'assets/characters/naoking-3.webp' }[presentation.intrusion] || 'assets/characters/naoking-hero.webp';
     intruder.src = source;
     intruder.className = `oracle-intruder${running ? ` is-running is-${presentation.intrusion || 'king'}` : ''}`;
   }
@@ -1046,7 +1047,7 @@
     cardboard:{ image:'assets/characters/naoking-7.webp', glyph:'箱', signal:['王冠が落下','王冠が来た','見た目だけは大当たりです。期待するな。'], twist:['ただの紙','段ボールでした','王国のお金が足りません。'] },
     'cracked-tank':{ image:'assets/characters/naoking-panic.webp', glyph:'⚠', signal:['水が漏れている','王国水槽にひび','なおキングがテープを探しています。遅い。'], twist:['その場しのぎ','雑に貼りました','水はまだ漏れています。ダメじゃん。'] },
     'verdict-book':{ image:'assets/characters/naoking-7.webp', glyph:'本', signal:['最後の記録','ハズレの本を閉じます','今日の占いは終了しました。……たぶん。'], twist:['しおりが動いた','王冠のしおりが逆走','最後のページが勝手に開き直ります。'] },
-    'golden-bubble':{ image:'assets/characters/naoking-jackpot.webp', glyph:'○', signal:['光なし、水流なし','海は完全に止まった','遠くに、泡が一つだけ残っています。'], twist:['金色の泡','金の泡が破裂','王国ぜんぶを、もう一度動かします。'] },
+    'golden-bubble':{ image:'assets/characters/naoking-3.webp', glyph:'○', signal:['光なし、水流なし','海は完全に止まった','遠くに、泡が一つだけ残っています。'], twist:['金色の泡','金の泡が破裂','王国ぜんぶを、もう一度動かします。'] },
     duel:{ image:'assets/characters/naoking-hero.webp', glyph:'対決', signal:['なおキング同士がケンカ！','どっちが勝つ？','そっくりすぎて、本人たちも混乱しています。'], twist:['最後の一発','同時にぶつかった','どちらが勝ったか、泡が晴れるまで分からない。'] },
     'crown-chase':{ image:'assets/characters/naoking-panic.webp', glyph:'♛↗', signal:['王冠を追え','王冠が逃走','なおキングと5匹のサメが、画面の外まで追いかける。'], twist:['最後の曲がり角','王冠が急に曲がった','捕まえたか、見失ったか。もうすぐ分かる。'] },
     'royal-trial':{ image:'assets/characters/naoking-hero.webp', glyph:'決', signal:['王国の結果会議','深海王国の会議、開始','当たりにもハズレにも見えるサメを順に見る。'], twist:['最後の答え','王の木槌が上がる','木槌が落ちたあと、結果を見せる。偉そうだな。'] },
@@ -1060,9 +1061,9 @@
     'council-deadlock':{ image:'assets/characters/naoking-hero.webp', glyph:'議', signal:['王国会議','全員、意見が違う','王は話を聞かず、木槌だけ構えています。'], twist:['最後の一票','最後の札を開く','賛成、反対、寝言。どれにするか王が悩んでいる。'] },
     'upside-down':{ image:'assets/characters/naoking-panic.webp', glyph:'↻', signal:['重力の点検','王国、上下反転','画面の部品が天井へ落ち始めました。'], twist:['ぶつかった','王冠と画面の部品が衝突','壊れたか直ったか、上下を戻して確かめる。'] },
     'giant-naoking':{ image:'assets/characters/naoking-hero.webp', glyph:'王', signal:['王が巨大化','巨大なおキング接近','背景から目の前へ。なぜ大きいのか本人も知らない。'], twist:['近すぎる','顔で画面が埋まりました','合格、不合格、くしゃみ。離れるまで何も見えない。'] },
-    coronation:{ image:'assets/characters/naoking-jackpot.webp', glyph:'♛', signal:['王の特別お披露目','サメ5匹がおじぎ','占い機が豪華になった。急すぎる。'], twist:['王が来た','王冠をかぶる時間','なおキングは少し遅刻しました。王なのに。'] },
+    coronation:{ image:'assets/characters/naoking-3.webp', glyph:'♛', signal:['王の特別お披露目','サメ5匹がおじぎ','占い機が豪華になった。急すぎる。'], twist:['王が来た','王冠をかぶる時間','なおキングは少し遅刻しました。王なのに。'] },
     'vault-4810':{ image:'assets/characters/naoking-sleepy.webp', glyph:'4810', signal:['4つのカギ','王国の金庫を開ける','一つ、二つ、三つ……最後の4つ目。'], twist:['金庫が開いた','中で王が寝ていた','起こしたので、結果を押し出してもらいます。'] },
-    'pixel-palace':{ image:'assets/characters/naoking-jackpot.webp', glyph:'ドット絵', signal:['王宮ゲーム開始','王宮がドット絵になった','王冠の門まで、あと一画面。結果はまだ秘密だ。'], twist:['最後の部屋','大きな扉を開く','戦うか、寝るか、隠し道か。次の瞬間に決まる。'] },
+    'pixel-palace':{ image:'assets/characters/naoking-3.webp', glyph:'ドット絵', signal:['王宮ゲーム開始','王宮がドット絵になった','王冠の門まで、あと一画面。結果はまだ秘密だ。'], twist:['最後の部屋','大きな扉を開く','戦うか、寝るか、隠し道か。次の瞬間に決まる。'] },
     ...(expansion.scenes || {})
   });
 
@@ -1071,7 +1072,25 @@
     fishSchool.className = 'oracle-fish-school';
     fishSchool.removeAttribute('data-school');
     fishSchool.removeAttribute('data-motion');
+    fishSchool.style.removeProperty('--fish-anchor-x');
+    fishSchool.style.removeProperty('--fish-anchor-y');
+    fishSchool.style.removeProperty('--fish-orbit-radius');
     fishSchool.replaceChildren();
+  }
+
+  function positionFishSchoolAnchor() {
+    const viewportWidth = Math.max(document.documentElement?.clientWidth || 0, window.innerWidth || 0, 1);
+    const viewportHeight = Math.max(document.documentElement?.clientHeight || 0, window.innerHeight || 0, 1);
+    const rect = slot?.getBoundingClientRect?.();
+    const isUsable = rect && rect.width > 10 && rect.height > 10;
+    const x = isUsable ? Math.min(viewportWidth - 24, Math.max(24, rect.left + rect.width / 2)) : viewportWidth / 2;
+    const y = isUsable ? Math.min(viewportHeight - 24, Math.max(24, rect.top + rect.height / 2)) : viewportHeight / 2;
+    const radius = isUsable
+      ? Math.min(Math.max(104, rect.width * .62), Math.min(viewportWidth * .34, viewportHeight * .46))
+      : Math.min(viewportWidth * .28, viewportHeight * .34);
+    fishSchool.style.setProperty('--fish-anchor-x', `${Math.round(x)}px`);
+    fishSchool.style.setProperty('--fish-anchor-y', `${Math.round(y)}px`);
+    fishSchool.style.setProperty('--fish-orbit-radius', `${Math.round(radius)}px`);
   }
 
   function showFishSchool(presentation, phase = 'signal', ms = 3600) {
@@ -1099,6 +1118,7 @@
       fish.append(body, tail); fragment.append(fish);
     }
     const motion = presentation.fishMotion || 'cross';
+    positionFishSchoolAnchor();
     fishSchool.className = `oracle-fish-school is-visible school-${family} motion-${motion} phase-${phase}`;
     fishSchool.dataset.school = family; fishSchool.dataset.motion = motion;
     fishSchool.replaceChildren(fragment);
@@ -1112,6 +1132,19 @@
     chaosSceneRevision += 1;
     chaosStage.className = 'oracle-chaos-stage'; chaosStage.setAttribute('aria-hidden', 'true');
     chaosAction.hidden = true; chaosAction.textContent = ''; chaosInteracted = false;
+    chaosProps.innerHTML = defaultChaosPropsMarkup;
+  }
+
+  function setChaosProps(sceneName) {
+    if (sceneName === 'duel') {
+      chaosProps.innerHTML = '<figure class="oracle-duel-fighter is-left"><img src="assets/characters/naoking-1.webp" alt=""></figure><b class="oracle-duel-vs">VS</b><figure class="oracle-duel-fighter is-right"><img src="assets/characters/naoking-2.webp" alt=""></figure>';
+      return;
+    }
+    if (sceneName === 'news-live' || sceneName === 'cctv-chase') {
+      chaosProps.innerHTML = '<figure class="oracle-cctv-feed feed-king"><small>CAM 01</small><img src="assets/characters/naoking-3.webp" alt=""><b>♛</b></figure><figure class="oracle-cctv-feed feed-crown"><small>CAM 02</small><b>♛</b><span>王冠を追跡中</span></figure><figure class="oracle-cctv-feed feed-school"><small>CAM 03</small><i></i><i></i><i></i><span>魚群を確認</span></figure><figure class="oracle-cctv-feed feed-shadow"><small>CAM 04</small><b></b><span>封筒らしき影</span></figure>';
+      return;
+    }
+    chaosProps.innerHTML = defaultChaosPropsMarkup;
   }
 
   function showChaosScene(presentation, phase = 'signal', ms = 1500) {
@@ -1120,6 +1153,7 @@
     const copy = phase === 'twist' && presentation.ending
       ? [presentation.ending.eyebrow, presentation.ending.title, presentation.ending.detail]
       : (scene[phase] || scene.signal);
+    setChaosProps(presentation.scene);
     chaosImage.src = scene.image; chaosGlyph.textContent = plainCopy(scene.glyph || '');
     chaosEyebrow.textContent = phase === 'twist'
       ? (presentation.ending ? endingLabel(presentation.ending.outcome) : '演出が変わった')
@@ -1437,6 +1471,9 @@
   }
 
   button.addEventListener('click', spin);
+  window.addEventListener('resize', () => {
+    if (fishSchool.classList.contains('is-visible')) positionFishSchoolAnchor();
+  }, { passive:true });
   window.addEventListener('naoking:pagechange', event => {
     if (event.detail?.page === 'fortune') return;
     drawToken += 1; busy = false; locked = false; taps = []; resetVisualState(); setButtonCopy('回す');

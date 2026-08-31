@@ -16,7 +16,7 @@ const requiredAssets = [
   'naoking-run-1.svg', 'naoking-run-2.svg', 'naoking-run-3.svg', 'naoking-kick-ready.svg',
   'naoking-kick.svg', 'naoking-celebrate.svg', 'naoking-defeat.svg', 'naoking-keeper.svg',
   'crown-ball.svg', 'goal.svg', 'race-gate.svg', 'fish.svg', 'emergency-lamp.svg',
-  'naoking-soccer-sprites.webp', 'naoking-race-sprites.webp'
+  'naoking-race-sprites.webp'
 ];
 requiredAssets.forEach(file => assert.equal(existsSync(join(repo, 'assets', 'oracle-cinematics', file)), true, `${file} is required`));
 
@@ -50,10 +50,17 @@ async function exercise(width, height) {
     ball:document.querySelectorAll('.ro-crown-ball').length,
     goal:document.querySelectorAll('.ro-soccer-goal').length,
     generatedFrames:document.querySelectorAll('.ro-soccer-sheet').length,
+    characterSources:[...document.querySelectorAll('.ro-soccer-player img,.ro-soccer-keeper img')].map(image => image.getAttribute('src')),
     overflow:document.documentElement.scrollWidth - innerWidth
   }));
   assert.deepEqual({ racers:state.racers, ball:state.ball, goal:state.goal }, { racers:1, ball:1, goal:1 });
-  assert.ok(state.generatedFrames >= 4);
+  assert.equal(state.generatedFrames, 0, 'soccer must not use the old sprite sheet');
+  assert.deepEqual(state.characterSources, [
+    'assets/characters/naoking-5.webp', 'assets/characters/naoking-1.webp',
+    'assets/characters/naoking-1.webp', 'assets/characters/naoking-2.webp',
+    'assets/characters/naoking-3.webp', 'assets/characters/naoking-2.webp',
+    'assets/characters/naoking-3.webp', 'assets/characters/naoking-7.webp'
+  ]);
   assert.ok(state.overflow <= 1, `${width}px soccer overflow must stay clipped`);
   await page.evaluate(() => window.RoyalOracleCinematics.resolve('win', 'crown'));
   assert.equal(await page.locator('.ro-cinematic').getAttribute('data-stage'), 'soccer-goal');
@@ -86,6 +93,15 @@ async function exercise(width, height) {
   await page.evaluate(() => window.RoyalOracleCinematics.resolve('win', 'revival'));
   assert.equal(await page.locator('.ro-cinematic').getAttribute('data-stage'), 'blackout-restart');
   if (screenshotDir) await page.screenshot({ path:join(screenshotDir, `blackout-${width}.png`) });
+  await page.evaluate(() => window.RoyalOracleCinematics.stop());
+
+  await page.evaluate(() => window.RoyalOracleCinematics.play('golden-ocean-jackpot'));
+  await page.waitForSelector('.ro-scene-jackpot.is-visible');
+  const jackpotCharacter = await page.locator('.ro-jackpot-naoking').getAttribute('src');
+  assert.match(jackpotCharacter || '', /assets\/characters\/naoking-3\.webp$/, 'jackpot must use the approved Naoking character asset');
+  await page.evaluate(() => window.RoyalOracleCinematics.resolve('win', 'crown'));
+  assert.equal(await page.locator('.ro-cinematic').getAttribute('data-stage'), 'jackpot-burst');
+  if (screenshotDir) await page.screenshot({ path:join(screenshotDir, `jackpot-${width}.png`) });
   await page.evaluate(() => window.RoyalOracleCinematics.stop());
 
   state = await page.evaluate(() => ({ api:window.RoyalOracleCinematics.getState(), root:Boolean(document.querySelector('#royal-oracle-cinematic-root')), classes:[...document.documentElement.classList].filter(value => value.startsWith('royal-oracle-cinematic')) }));

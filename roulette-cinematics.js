@@ -11,6 +11,18 @@
   const VERSION = '1.0.0';
   const ROOT_ID = 'royal-oracle-cinematic-root';
   const ASSET_ROOT = 'assets/oracle-cinematics/';
+  // The cinematic SVG drafts used a different smooth illustration style. Keep
+  // every on-screen Naoking on the established pixel-character model instead.
+  const OFFICIAL_NAOKING_POSES = Object.freeze({
+    'naoking-keeper.svg':'assets/characters/naoking-5.webp',
+    'naoking-kick-ready.svg':'assets/characters/naoking-1.webp',
+    'naoking-kick.svg':'assets/characters/naoking-2.webp',
+    'naoking-celebrate.svg':'assets/characters/naoking-3.webp',
+    'naoking-defeat.svg':'assets/characters/naoking-7.webp',
+    'naoking-run-1.svg':'assets/characters/naoking-1.webp',
+    'naoking-run-2.svg':'assets/characters/naoking-2.webp',
+    'naoking-run-3.svg':'assets/characters/naoking-3.webp'
+  });
   const html = document.documentElement;
   const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)') || { matches:false };
   const supportedRoutes = Object.freeze([
@@ -35,7 +47,7 @@
   const frames = new Set();
   const controller = new AbortController();
 
-  const asset = file => `${ASSET_ROOT}${file}`;
+  const asset = file => OFFICIAL_NAOKING_POSES[file] || `${ASSET_ROOT}${file}`;
   const image = (file, className, alt = '') => `<img class="${className}" src="${asset(file)}" alt="${alt}" draggable="false">`;
   const fishMarkup = count => Array.from({ length:count }, (_, index) => {
     const row = index % 7;
@@ -115,10 +127,6 @@
         ${image('goal.svg', 'ro-soccer-goal')}
         <div class="ro-soccer-keeper">${image('naoking-keeper.svg', 'ro-keeper-image')}</div>
         <div class="ro-soccer-player">
-          <span class="ro-sheet-frame ro-soccer-sheet ro-soccer-frame-ready"></span>
-          <span class="ro-sheet-frame ro-soccer-sheet ro-soccer-frame-run"></span>
-          <span class="ro-sheet-frame ro-soccer-sheet ro-soccer-frame-kick"></span>
-          <span class="ro-sheet-frame ro-soccer-sheet ro-soccer-frame-shock"></span>
           ${image('naoking-kick-ready.svg', 'ro-player-pose ro-pose-ready')}
           <span class="ro-run-cycle">${image('naoking-run-1.svg', 'ro-run-frame ro-run-one')}${image('naoking-run-2.svg', 'ro-run-frame ro-run-two')}${image('naoking-run-3.svg', 'ro-run-frame ro-run-three')}</span>
           ${image('naoking-kick.svg', 'ro-player-pose ro-pose-kick')}
@@ -364,8 +372,7 @@
       'naoking-run-1.svg', 'naoking-run-2.svg', 'naoking-run-3.svg',
       'naoking-kick-ready.svg', 'naoking-kick.svg', 'naoking-celebrate.svg',
       'naoking-defeat.svg', 'naoking-keeper.svg', 'crown-ball.svg', 'goal.svg',
-      'race-gate.svg', 'fish.svg', 'emergency-lamp.svg'
-      , 'naoking-soccer-sprites.webp', 'naoking-race-sprites.webp'
+      'race-gate.svg', 'fish.svg', 'emergency-lamp.svg', 'naoking-race-sprites.webp'
     ].map(asset)),
     play:(route, options = {}) => start({ route, family:options.family || '', tier:options.tier || '' }, { ...options, route, preview:true }),
     resolve,
